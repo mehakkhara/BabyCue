@@ -2,6 +2,22 @@ import { useState } from 'react'
 import TipCard from '../components/TipCard'
 import { getTipsForProfile, getBabyAgeInMonths } from '../data/tips'
 
+const AGE_STATS = {
+  0:  { milk: '16–24 oz', wake: '45–60 min', naps: '4–5', diapers: '8–12' },
+  1:  { milk: '16–24 oz', wake: '45–60 min', naps: '4–5', diapers: '8–12' },
+  2:  { milk: '24–32 oz', wake: '1–1.5 hr',  naps: '4–5', diapers: '6–8'  },
+  3:  { milk: '24–32 oz', wake: '1–1.5 hr',  naps: '3–5', diapers: '6–8'  },
+  4:  { milk: '24–36 oz', wake: '1.5–2 hr',  naps: '3–4', diapers: '4–6'  },
+  5:  { milk: '24–36 oz', wake: '1.5–2.5 hr',naps: '3',   diapers: '4–6'  },
+  6:  { milk: '24–36 oz', wake: '2–3 hr',    naps: '2–3', diapers: '4–6'  },
+  7:  { milk: '24–32 oz', wake: '2.5–3 hr',  naps: '2–3', diapers: '4–5'  },
+  8:  { milk: '24–32 oz', wake: '2.5–3 hr',  naps: '2',   diapers: '4–5'  },
+  9:  { milk: '24–32 oz', wake: '3–3.5 hr',  naps: '2',   diapers: '4–5'  },
+  10: { milk: '16–24 oz', wake: '3–4 hr',    naps: '1–2', diapers: '4–5'  },
+  11: { milk: '16–24 oz', wake: '3–4 hr',    naps: '1–2', diapers: '4–5'  },
+  12: { milk: '16–24 oz', wake: '3.5–4.5 hr',naps: '1',   diapers: '4–5'  },
+}
+
 const styleLabels = {
   gentle: 'Gentle Parenting',
   schedule: 'Schedule-Based',
@@ -24,6 +40,13 @@ export default function HomeScreen({ onResetProfile }) {
   const ageInMonths = getBabyAgeInMonths(dateOfBirth)
   const contentMonth = Math.max(1, Math.min(ageInMonths, 12))
   const tipsList = getTipsForProfile(contentMonth, parentingStyle, selectedTopic)
+  const stats = AGE_STATS[contentMonth] || AGE_STATS[12]
+  const STAT_ITEMS = [
+    { icon: '🍼', label: 'Milk/day',     value: stats.milk    },
+    { icon: '⏱️', label: 'Wake window',  value: stats.wake    },
+    { icon: '💤', label: 'Naps',         value: stats.naps    },
+    { icon: '🩹', label: 'Diapers',      value: stats.diapers },
+  ]
 
   return (
     <div style={{
@@ -57,6 +80,27 @@ export default function HomeScreen({ onResetProfile }) {
         }}>
           {styleLabels[parentingStyle]}
         </span>
+      </div>
+
+      {/* Stats banner */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '2px' }}>
+        {STAT_ITEMS.map(stat => (
+          <div key={stat.label} style={{
+            flex: '1 0 80px',
+            backgroundColor: '#fff',
+            borderRadius: '14px',
+            padding: '14px 8px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+          }}>
+            <span style={{ fontSize: '20px' }}>{stat.icon}</span>
+            <span style={{ fontSize: '13px', fontWeight: '700', color: '#1a1a2e', textAlign: 'center' }}>{stat.value}</span>
+            <span style={{ fontSize: '10px', color: '#999', textAlign: 'center', lineHeight: '1.3' }}>{stat.label}</span>
+          </div>
+        ))}
       </div>
 
       {/* Daily Tip box — always shows unfiltered first tip */}
