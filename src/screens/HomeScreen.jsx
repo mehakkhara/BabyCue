@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import TipCard from '../components/TipCard'
-import { getTipsForProfile, getBabyAgeInMonths } from '../data/tips'
+import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 
 const AGE_STATS = {
   0:  { milk: '16–24 oz', wake: '45–60 min', naps: '4–5', diapers: '8–12' },
@@ -23,30 +23,40 @@ const styleLabels = {
   schedule: 'Schedule-Based',
 }
 
+const styleEmoji = {
+  gentle: '🌿',
+  schedule: '📅',
+}
+
+const otherStyle = {
+  gentle: 'schedule',
+  schedule: 'gentle',
+}
+
 const TOPICS = [
-  { value: null,          label: 'All',         emoji: '✨' },
-  { value: 'sleep',       label: 'Sleep',       emoji: '🌙' },
-  { value: 'teething',    label: 'Teething',    emoji: '🦷' },
-  { value: 'feeding',     label: 'Feeding',     emoji: '🍼' },
-  { value: 'development', label: 'Development', emoji: '🧠' },
-  { value: 'motor',       label: 'Motor',       emoji: '💪' },
+  { value: 'sleep',       label: 'Sleep',       emoji: '🌙', desc: 'Schedules, naps & night waking'  },
+  { value: 'feeding',     label: 'Feeding',     emoji: '🍼', desc: 'Milk, solids & feeding cues'     },
+  { value: 'development', label: 'Development', emoji: '🧠', desc: 'Milestones & play'               },
+  { value: 'activity',    label: 'Activities',  emoji: '🎨', desc: 'What to do with baby right now'  },
+  { value: 'teething',    label: 'Teething',    emoji: '🦷', desc: 'Comfort & timing'                },
+  { value: 'motor',       label: 'Motor',       emoji: '💪', desc: 'Movement & strength'             },
 ]
 
 const STAT_COLORS = [
-  { bg: '#E8F0FE', accent: '#4F7CF7' },
-  { bg: '#EDE8FD', accent: '#8B5CF6' },
-  { bg: '#D4EDE6', accent: '#059669' },
-  { bg: '#FCE4EC', accent: '#E91E8C' },
+  { accent: '#4F7CF7' },
+  { accent: '#8B5CF6' },
+  { accent: '#059669' },
+  { accent: '#E91E8C' },
 ]
 
 export default function HomeScreen({ onResetProfile }) {
   const [selectedTopic, setSelectedTopic] = useState(null)
+  const [viewStyle, setViewStyle] = useState(null)
 
   const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
   const { babyName, dateOfBirth, parentingStyle, momName } = profile
   const ageInMonths = getBabyAgeInMonths(dateOfBirth)
   const contentMonth = Math.max(1, Math.min(ageInMonths, 12))
-  const tipsList = getTipsForProfile(contentMonth, parentingStyle, selectedTopic)
   const stats = AGE_STATS[contentMonth] || AGE_STATS[12]
   const STAT_ITEMS = [
     { icon: '🍼', label: 'Milk/day',    value: stats.milk    },
@@ -55,7 +65,24 @@ export default function HomeScreen({ onResetProfile }) {
     { icon: '🩹', label: 'Diapers',     value: stats.diapers },
   ]
 
+  const activeStyle = viewStyle || parentingStyle
+
   const dailyTip = getTipsForProfile(contentMonth, parentingStyle)[0]
+  const topicTips = selectedTopic
+    ? getTipsForProfile(contentMonth, activeStyle, selectedTopic)
+    : []
+
+  const activeTopic = TOPICS.find(t => t.value === selectedTopic)
+
+  function openTopic(topic) {
+    setSelectedTopic(topic)
+    setViewStyle(null)
+  }
+
+  function closeTopic() {
+    setSelectedTopic(null)
+    setViewStyle(null)
+  }
 
   return (
     <div style={{
@@ -77,7 +104,7 @@ export default function HomeScreen({ onResetProfile }) {
           Hi {momName}!
         </p>
         <h1 style={{ margin: '0 0 12px', fontSize: '24px', fontWeight: '700', color: '#1e1b4b', lineHeight: 1.2 }}>
-          {babyName} is {ageInMonths === 0 ? 'a newborn' : `${ageInMonths} ${ageInMonths === 1 ? 'month' : 'months'} old`}
+          {babyName} is {formatBabyAge(dateOfBirth)}
         </h1>
         <span style={{
           display: 'inline-block',
@@ -95,41 +122,37 @@ export default function HomeScreen({ onResetProfile }) {
 
       {/* Stats banner */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', overflowX: 'auto', paddingBottom: '2px' }}>
-        {STAT_ITEMS.map((stat, i) => {
-          const { bg, accent } = STAT_COLORS[i]
-          return (
-            <div key={stat.label} style={{
-              flex: '1 0 76px',
-              background: '#fff',
-              borderRadius: '18px',
-              padding: '14px 8px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
-              position: 'relative',
-              overflow: 'hidden',
-            }}>
-              {/* Pastel color tab at top */}
-              <div style={{
-                position: 'absolute',
-                top: 0, left: 0, right: 0,
-                height: '4px',
-                borderRadius: '18px 18px 0 0',
-                backgroundColor: accent,
-                opacity: 0.6,
-              }} />
-              <span style={{ fontSize: '18px', marginTop: '4px' }}>{stat.icon}</span>
-              <span style={{ fontSize: '12px', fontWeight: '700', color: '#1e1b4b', textAlign: 'center', lineHeight: 1.2 }}>
-                {stat.value}
-              </span>
-              <span style={{ fontSize: '10px', color: '#9ca3af', textAlign: 'center', lineHeight: 1.3 }}>
-                {stat.label}
-              </span>
-            </div>
-          )
-        })}
+        {STAT_ITEMS.map((stat, i) => (
+          <div key={stat.label} style={{
+            flex: '1 0 76px',
+            background: '#fff',
+            borderRadius: '18px',
+            padding: '14px 8px 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0,
+              height: '4px',
+              borderRadius: '18px 18px 0 0',
+              backgroundColor: STAT_COLORS[i].accent,
+              opacity: 0.6,
+            }} />
+            <span style={{ fontSize: '18px', marginTop: '4px' }}>{stat.icon}</span>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: '#1e1b4b', textAlign: 'center', lineHeight: 1.2 }}>
+              {stat.value}
+            </span>
+            <span style={{ fontSize: '10px', color: '#9ca3af', textAlign: 'center', lineHeight: 1.3 }}>
+              {stat.label}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Tip of the Day */}
@@ -138,7 +161,7 @@ export default function HomeScreen({ onResetProfile }) {
           background: '#fff',
           borderRadius: '20px',
           padding: '20px',
-          marginBottom: '14px',
+          marginBottom: '20px',
           boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
           borderLeft: '4px solid #a78bfa',
         }}>
@@ -157,78 +180,132 @@ export default function HomeScreen({ onResetProfile }) {
         </div>
       )}
 
-      {/* This Month's Focus */}
-      <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '4px' }}>
-        <span style={{ fontSize: '16px' }}>🌙</span>
-        <h2 style={{ margin: 0, fontSize: '15px', fontWeight: '600', color: '#6b7280' }}>
-          This Month's Focus
-          {selectedTopic && (
-            <span style={{ fontSize: '13px', fontWeight: '500', color: '#7C6FF7', marginLeft: '8px' }}>
-              — {TOPICS.find(t => t.value === selectedTopic)?.label}
-            </span>
-          )}
-        </h2>
-      </div>
-
-      {/* Tip cards */}
-      {tipsList.length > 0 ? (
-        tipsList.map(tip => (
-          <TipCard
-            key={tip.id}
-            title={tip.title}
-            body={tip.body}
-            style={tip.style}
-            source={tip.source}
-          />
-        ))
+      {/* Topic browser */}
+      {!selectedTopic ? (
+        <div style={{ animation: 'fadeIn 0.2s ease' }}>
+          <p style={{ margin: '0 0 14px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
+            What do you want to explore?
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {TOPICS.map((topic, i) => (
+              <button
+                key={topic.value}
+                onClick={() => openTopic(topic.value)}
+                style={{
+                  background: '#fff',
+                  border: 'none',
+                  borderRadius: '18px',
+                  padding: '18px 16px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+                  transition: 'transform 0.12s, box-shadow 0.12s',
+                  gridColumn: TOPICS.length % 2 !== 0 && i === TOPICS.length - 1 ? 'span 2' : undefined,
+                }}
+                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
+                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.97)'}
+                onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <span style={{ fontSize: '28px', display: 'block', marginBottom: '8px' }}>{topic.emoji}</span>
+                <span style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: '#1e1b4b', marginBottom: '4px' }}>
+                  {topic.label}
+                </span>
+                <span style={{ display: 'block', fontSize: '12px', color: '#9ca3af', lineHeight: 1.4 }}>
+                  {topic.desc}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
       ) : (
-        <p style={{ color: '#9ca3af', fontSize: '14px', padding: '0 4px' }}>
-          No {selectedTopic} tips for month {ageInMonths} yet — try another topic!
-        </p>
+        <div style={{ animation: 'fadeIn 0.2s ease' }}>
+          {/* Back button */}
+          <button
+            onClick={closeTopic}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0 0 16px',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#7C6FF7',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            {activeTopic.emoji} {activeTopic.label}
+          </button>
+
+          {/* Style toggle */}
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            marginBottom: '16px',
+            background: '#f3f4f6',
+            borderRadius: '14px',
+            padding: '4px',
+          }}>
+            {[parentingStyle, otherStyle[parentingStyle]].map(s => {
+              const isActive = activeStyle === s
+              const isOwn = s === parentingStyle
+              return (
+                <button
+                  key={s}
+                  onClick={() => setViewStyle(s)}
+                  style={{
+                    flex: 1,
+                    padding: '9px 12px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: isActive ? '#fff' : 'transparent',
+                    boxShadow: isActive ? '0 2px 8px rgba(100,100,180,0.12)' : 'none',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: isActive ? '#1e1b4b' : '#9ca3af',
+                    transition: 'all 0.15s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '5px',
+                  }}
+                >
+                  <span>{styleEmoji[s]}</span>
+                  <span>{isOwn ? 'Your style' : styleLabels[s]}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Tips */}
+          <div key={activeStyle} style={{ animation: 'fadeIn 0.18s ease' }}>
+            {topicTips.length > 0 ? (
+              topicTips.map(tip => (
+                <TipCard
+                  key={tip.id}
+                  title={tip.title}
+                  body={tip.body}
+                  style={tip.style}
+                  source={tip.source}
+                />
+              ))
+            ) : (
+              <p style={{ color: '#9ca3af', fontSize: '14px', padding: '0 4px' }}>
+                No {activeTopic.label.toLowerCase()} tips for this month yet — check back soon!
+              </p>
+            )}
+          </div>
+        </div>
       )}
 
-      {/* Topic chips */}
-      <div style={{ marginTop: '28px' }}>
-        <p style={{ margin: '0 0 12px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '4px' }}>
-          Explore by Topic
-        </p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-          {TOPICS.map(topic => {
-            const isSelected = selectedTopic === topic.value
-            return (
-              <button
-                key={String(topic.value)}
-                onClick={() => setSelectedTopic(topic.value)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  padding: '8px 14px',
-                  borderRadius: '20px',
-                  border: 'none',
-                  background: isSelected
-                    ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)'
-                    : '#fff',
-                  color: isSelected ? '#fff' : '#6b7280',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  boxShadow: isSelected
-                    ? '0 4px 12px rgba(124,111,247,0.35)'
-                    : '0 2px 8px rgba(100,100,180,0.08)',
-                  transition: 'all 0.15s',
-                }}
-              >
-                <span>{topic.emoji}</span>
-                <span>{topic.label}</span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
       {/* Edit profile */}
-      <div style={{ textAlign: 'center', marginTop: '32px', paddingBottom: '16px' }}>
+      <div style={{ textAlign: 'center', marginTop: '36px', paddingBottom: '16px' }}>
         <button
           onClick={onResetProfile}
           style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}

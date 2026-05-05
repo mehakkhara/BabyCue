@@ -26,6 +26,7 @@ function loadExisting() {
 
 export default function OnboardingScreen({ onComplete }) {
   const existing = loadExisting()
+  const [momName, setMomName] = useState(existing?.momName || '')
   const [babyName, setBabyName] = useState(existing?.babyName || '')
   const [dateOfBirth, setDateOfBirth] = useState(existing?.dateOfBirth || '')
   const [parentingStyle, setParentingStyle] = useState(existing?.parentingStyle || '')
@@ -34,7 +35,7 @@ export default function OnboardingScreen({ onComplete }) {
 
   function handleSave() {
     if (!canSave) return
-    const profile = { babyName: babyName.trim(), dateOfBirth, parentingStyle, momName: 'Mama' }
+    const profile = { momName: momName.trim() || 'Mama', babyName: babyName.trim(), dateOfBirth, parentingStyle }
     localStorage.setItem('babyProfile', JSON.stringify(profile))
     onComplete(profile)
   }
@@ -59,6 +60,31 @@ export default function OnboardingScreen({ onComplete }) {
         {isEditing ? 'Update your baby\'s info below.' : 'Tell us about your baby to get started.'}
       </p>
 
+      {/* Mom's name */}
+      <label style={{ display: 'block', marginBottom: '24px' }}>
+        <span style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#555', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Your Name
+        </span>
+        <input
+          type="text"
+          placeholder="e.g. Sarah"
+          value={momName}
+          onChange={e => setMomName(e.target.value)}
+          autoFocus={!existing}
+          style={{
+            width: '100%',
+            fontSize: '17px',
+            padding: '14px 16px',
+            borderRadius: '12px',
+            border: '2px solid #E5E7EB',
+            outline: 'none',
+            boxSizing: 'border-box',
+          }}
+          onFocus={e => e.target.style.borderColor = '#7C3AED'}
+          onBlur={e => e.target.style.borderColor = '#E5E7EB'}
+        />
+      </label>
+
       {/* Baby name */}
       <label style={{ display: 'block', marginBottom: '24px' }}>
         <span style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#555', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -69,7 +95,6 @@ export default function OnboardingScreen({ onComplete }) {
           placeholder="e.g. Lila"
           value={babyName}
           onChange={e => setBabyName(e.target.value)}
-          autoFocus={!isEditing}
           style={{
             width: '100%',
             fontSize: '17px',

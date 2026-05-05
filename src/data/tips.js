@@ -98,6 +98,54 @@ export const tips = [
   { id: 74, month: 12, style: 'schedule', topic: 'development', title: '12-Month Developmental Checklist', body: 'At the 12-month well visit, your pediatrician will check for: waving, pointing, saying 1–2 words, imitating sounds, and responding to their name. Come with questions — it\'s a big appointment.', source: 'AAP' },
   { id: 75, month: 12, style: 'gentle', topic: 'motor', title: 'First Steps on Their Terms', body: 'Some babies walk at 10 months, others at 15 — both are within normal range. Resist comparing. As long as baby is pulling up and cruising, walking will come.', source: 'AAP' },
   { id: 76, month: 12, style: 'schedule', topic: 'motor', title: 'Stair Awareness Begins', body: 'Now that baby is mobile, gate all stairs and begin teaching safe stair navigation — going down feet-first on their belly. This is a skill worth practicing early.', source: 'AAP' },
+
+  // Activities — Month 1
+  { id: 101, month: 1, style: 'gentle', topic: 'activity', title: 'Skin-to-Skin Story Time', body: 'Read any book aloud while baby rests on your chest. They can\'t understand the words yet, but your voice, heartbeat, and warmth together are deeply calming and stimulating.', source: 'Zero to Three' },
+  { id: 102, month: 1, style: 'schedule', topic: 'activity', title: 'Tummy Time Windows', body: 'Work 2–3 short tummy time sessions (2–3 minutes each) into wake windows. Place a rolled towel under their chest and get down at eye level to hold their attention.', source: 'AAP' },
+
+  // Activities — Month 2
+  { id: 103, month: 2, style: 'gentle', topic: 'activity', title: 'High-Contrast Card Gazing', body: 'Hold a black-and-white pattern card 8–12 inches from baby\'s face and slowly move it side to side. Newborn vision is tuned to high contrast — watch their eyes lock on and follow.', source: 'Zero to Three' },
+  { id: 104, month: 2, style: 'schedule', topic: 'activity', title: 'Song-and-Wind-Down Ritual', body: 'Pick two songs and sing them in the same order before every nap and bedtime. The repetition starts building a sleep association that pays off in the weeks ahead.', source: 'Pediatric Sleep Council' },
+
+  // Activities — Month 3
+  { id: 105, month: 3, style: 'gentle', topic: 'activity', title: 'Baby Gym Batting', body: 'Lay baby under a play gym and guide their hand to swipe at a hanging toy. Once they feel it move and make noise, the lightbulb moment — "I did that!" — is visible on their face.', source: 'Zero to Three' },
+  { id: 106, month: 3, style: 'schedule', topic: 'activity', title: 'Kick-and-Splash Bath Play', body: 'During bath time, let baby kick freely in warm shallow water. The splashing delights them and the leg movement builds the strength they\'ll need for rolling and crawling.', source: 'AAP' },
+
+  // Activities — Month 4
+  { id: 107, month: 4, style: 'gentle', topic: 'activity', title: 'Peek-a-Boo with a Scarf', body: 'Cover your face with a soft scarf, then whisk it away. At 4 months this is pure comedy to them. The suspense and reveal lights up the exact circuits that object permanence will grow from.', source: 'Zero to Three' },
+  { id: 108, month: 4, style: 'schedule', topic: 'activity', title: 'Rattle Sound Tracking', body: 'Shake a rattle to baby\'s left, then right, then above — making them turn their head to find the source. It\'s a workout for neck muscles and an early listening skill all in one.', source: 'AAP' },
+
+  // Activities — Month 5
+  { id: 109, month: 5, style: 'gentle', topic: 'activity', title: 'Lap Bounce Rhymes', body: 'Sit baby on your lap facing you and bounce gently to a nursery rhyme. After a few rounds they\'ll start leaning forward in anticipation of the bounce. That anticipation is early humor.', source: 'Zero to Three' },
+  { id: 110, month: 5, style: 'schedule', topic: 'activity', title: 'Reach-and-Grab Line-Up', body: 'Lay 3–4 different toys in a row just within reach during floor time. Let baby work their way down the line. The effort of reaching and grabbing each one builds fine motor skills fast.', source: 'AAP' },
+
+  // Activities — Month 6
+  { id: 111, month: 6, style: 'gentle', topic: 'activity', title: 'Water Sensory Play', body: 'Fill a shallow container with a little warm water and let baby splash their hands (you right there, always). The sensation is endlessly fascinating and the mess is 100% worth it.', source: 'Zero to Three' },
+  { id: 112, month: 6, style: 'schedule', topic: 'activity', title: 'First Food Exploration', body: 'Before the spoon comes out, let baby touch, squeeze, and smell a small piece of soft food. Positive early sensory exposure to food is one of the strongest predictors of a good eater later.', source: 'WHO / AAP' },
+
+  // Activities — Month 7
+  { id: 113, month: 7, style: 'gentle', topic: 'activity', title: 'Hide the Toy', body: 'Slowly hide a favorite toy under a blanket while baby watches. Pause. Let them find it. Object permanence is clicking right now and their delight at finding it every time never gets old.', source: 'Zero to Three' },
+  { id: 114, month: 7, style: 'schedule', topic: 'activity', title: 'Fill and Dump Containers', body: 'Give baby a cup and a small pile of large soft balls or blocks. Show them how to drop one in, then dump it out. This loop will occupy them far longer than any electronic toy.', source: 'Zero to Three' },
+
+  // Activities — Month 8
+  { id: 115, month: 8, style: 'gentle', topic: 'activity', title: 'Dance to Different Tempos', body: 'Play a slow song, then a fast one, moving baby\'s arms and swaying with them to each. Babies this age respond visibly to rhythm changes — it\'s musical training disguised as fun.', source: 'Zero to Three' },
+  { id: 116, month: 8, style: 'schedule', topic: 'activity', title: 'Ball Roll Back and Forth', body: 'Sit facing baby on the floor, legs apart, and roll a soft ball toward them. Guide their hands to push it back. This is their very first turn-taking game — a huge social milestone.', source: 'Zero to Three' },
+
+  // Activities — Month 9
+  { id: 117, month: 9, style: 'gentle', topic: 'activity', title: 'Cardboard Box World', body: 'Give baby a large empty box to crawl into and explore. Add a soft toy inside. The novelty of an enclosed space is genuinely thrilling to a 9-month-old and costs exactly nothing.', source: 'Zero to Three' },
+  { id: 118, month: 9, style: 'schedule', topic: 'activity', title: 'Simple Obstacle Course', body: 'Arrange a row of cushions, a tunnel made of blankets, and a toy at the end. Guide baby through it. The structured challenge builds crawling confidence and problem-solving.', source: 'AAP' },
+
+  // Activities — Month 10
+  { id: 119, month: 10, style: 'gentle', topic: 'activity', title: 'Edible Finger Painting', body: 'Mix plain yogurt with a little mashed berry on a tray and let baby paint freely. It\'s edible, washable, and produces some of the best baby photos you\'ll ever take.', source: 'Zero to Three' },
+  { id: 120, month: 10, style: 'schedule', topic: 'activity', title: 'Push-and-Chase Game', body: 'Push a soft ball across the floor and let baby crawl after it. Once they reach it, guide them to push it back toward you. Short, structured rounds of this build motor skills and anticipation.', source: 'AAP' },
+
+  // Activities — Month 11
+  { id: 121, month: 11, style: 'gentle', topic: 'activity', title: 'Outdoor Texture Walk', body: 'Take a slow walk and stop to let baby touch leaves, grass, bark, and smooth stones. Let them lead. Nature provides more sensory variety than any toy store, and fresh air helps everyone.', source: 'Zero to Three' },
+  { id: 122, month: 11, style: 'schedule', topic: 'activity', title: 'One-Piece Knob Puzzle', body: 'Introduce a simple single-piece knob puzzle. Show baby how to lift and replace the piece. It takes patience but the concentration on their face — and eventual triumph — is worth every attempt.', source: 'AAP' },
+
+  // Activities — Month 12
+  { id: 123, month: 12, style: 'gentle', topic: 'activity', title: 'Discovery Basket', body: 'Fill a basket with 6–8 safe objects of different textures — a wooden ring, a soft ball, a silicone spoon, a fabric square. Let baby empty and investigate it all. Simple, endlessly replayable.', source: 'Zero to Three' },
+  { id: 124, month: 12, style: 'schedule', topic: 'activity', title: 'Stacking Tower Challenge', body: 'Stack 3 soft foam blocks in front of baby and let them knock it down. Then stack them again. Show them how to add a block. The back-and-forth of build-and-destroy is perfect 12-month play.', source: 'Zero to Three' },
 ]
 
 export const funActivities = [
@@ -128,4 +176,20 @@ export function getBabyAgeInMonths(dateOfBirth) {
   let months = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth())
   if (today.getDate() < dob.getDate()) months--
   return Math.max(0, months)
+}
+
+export function getBabyAgeInWeeks(dateOfBirth) {
+  const dob = new Date(dateOfBirth)
+  const today = new Date()
+  const diffMs = today - dob
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7))
+}
+
+export function formatBabyAge(dateOfBirth) {
+  const weeks = getBabyAgeInWeeks(dateOfBirth)
+  if (weeks < 13) {
+    return weeks === 1 ? '1 week old' : `${weeks} weeks old`
+  }
+  const months = getBabyAgeInMonths(dateOfBirth)
+  return months === 1 ? '1 month old' : `${months} months old`
 }
