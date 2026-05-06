@@ -15,7 +15,19 @@ const AGE_STATS = {
   9:  { milk: '24–32 oz', wake: '3–3.5 hr',  naps: '2',   diapers: '4–5'  },
   10: { milk: '16–24 oz', wake: '3–4 hr',    naps: '1–2', diapers: '4–5'  },
   11: { milk: '16–24 oz', wake: '3–4 hr',    naps: '1–2', diapers: '4–5'  },
-  12: { milk: '16–24 oz', wake: '3.5–4.5 hr',naps: '1',   diapers: '4–5'  },
+  12: { milk: '16–24 oz', wake: '3.5–4.5 hr',naps: '1–2', diapers: '4–5'  },
+  13: { milk: '16–24 oz', wake: '4–5 hr',    naps: '1–2', diapers: '3–5'  },
+  14: { milk: '16–24 oz', wake: '4–5 hr',    naps: '1–2', diapers: '3–5'  },
+  15: { milk: '16–24 oz', wake: '4.5–5.5 hr',naps: '1–2', diapers: '3–5'  },
+  16: { milk: '16–24 oz', wake: '5–6 hr',    naps: '1',   diapers: '3–4'  },
+  17: { milk: '16–24 oz', wake: '5–6 hr',    naps: '1',   diapers: '3–4'  },
+  18: { milk: '16–24 oz', wake: '5–6 hr',    naps: '1',   diapers: '3–4'  },
+  19: { milk: '14–20 oz', wake: '5–6 hr',    naps: '1',   diapers: '3–4'  },
+  20: { milk: '14–20 oz', wake: '5.5–6 hr',  naps: '1',   diapers: '3–4'  },
+  21: { milk: '14–20 oz', wake: '5.5–6 hr',  naps: '1',   diapers: '3–4'  },
+  22: { milk: '14–20 oz', wake: '5.5–6.5 hr',naps: '1',   diapers: '2–4'  },
+  23: { milk: '14–20 oz', wake: '6+ hr',     naps: '1',   diapers: '2–4'  },
+  24: { milk: '14–20 oz', wake: '6+ hr',     naps: '1',   diapers: '2–4'  },
 }
 
 const styleLabels = {
@@ -28,14 +40,20 @@ const styleEmoji = {
   schedule: '📅',
 }
 
-const TOPICS = [
+const PRIMARY_TOPICS = [
   { value: null,          label: 'All',         emoji: '✨' },
   { value: 'sleep',       label: 'Sleep',       emoji: '🌙' },
   { value: 'feeding',     label: 'Feeding',     emoji: '🍼' },
   { value: 'development', label: 'Development', emoji: '🧠' },
-  { value: 'activity',    label: 'Activities',  emoji: '🎨' },
-  { value: 'teething',    label: 'Teething',    emoji: '🦷' },
   { value: 'motor',       label: 'Motor',       emoji: '💪' },
+]
+
+const OTHER_TOPICS = [
+  { value: 'activity',   label: 'Activities',  emoji: '🎨' },
+  { value: 'teething',   label: 'Teething',    emoji: '🦷' },
+  { value: 'fussy',      label: 'Fussy Phase', emoji: '😮‍💨' },
+  { value: 'leap',       label: 'Dev Leap',    emoji: '🧩' },
+  { value: 'regression', label: 'Regression',  emoji: '🔄' },
 ]
 
 const STAT_COLORS = [
@@ -48,11 +66,12 @@ const STAT_COLORS = [
 export default function HomeScreen({ onResetProfile }) {
   const [selectedTopic, setSelectedTopic] = useState(null)
   const [viewStyle, setViewStyle] = useState(null)
+  const [showOtherTopics, setShowOtherTopics] = useState(false)
 
   const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
   const { babyName, dateOfBirth, parentingStyle, momName } = profile
   const ageInMonths = getBabyAgeInMonths(dateOfBirth)
-  const currentMonth = Math.max(1, Math.min(ageInMonths, 12))
+  const currentMonth = Math.max(1, Math.min(ageInMonths, 24))
   const [browseMonth, setBrowseMonth] = useState(currentMonth)
 
   const stats = AGE_STATS[browseMonth] || AGE_STATS[12]
@@ -165,16 +184,16 @@ export default function HomeScreen({ onResetProfile }) {
         </div>
 
         <button
-          onClick={() => setBrowseMonth(m => Math.min(12, m + 1))}
-          disabled={browseMonth === 12}
+          onClick={() => setBrowseMonth(m => Math.min(24, m + 1))}
+          disabled={browseMonth === 24}
           style={{
             width: '32px', height: '32px',
             borderRadius: '50%',
             border: 'none',
-            background: browseMonth === 12 ? '#f3f4f6' : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
-            color: browseMonth === 12 ? '#c4c4d4' : '#fff',
+            background: browseMonth === 24 ? '#f3f4f6' : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+            color: browseMonth === 24 ? '#c4c4d4' : '#fff',
             fontSize: '16px',
-            cursor: browseMonth === 12 ? 'not-allowed' : 'pointer',
+            cursor: browseMonth === 24 ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0,
           }}
@@ -323,12 +342,15 @@ export default function HomeScreen({ onResetProfile }) {
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}>
-          {TOPICS.map(topic => {
+          {PRIMARY_TOPICS.map(topic => {
             const isSelected = selectedTopic === topic.value
             return (
               <button
                 key={String(topic.value)}
-                onClick={() => setSelectedTopic(topic.value)}
+                onClick={() => {
+                  setSelectedTopic(topic.value)
+                  setShowOtherTopics(false)
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -355,7 +377,88 @@ export default function HomeScreen({ onResetProfile }) {
               </button>
             )
           })}
+          {/* Other chip */}
+          {(() => {
+            const otherSelected = OTHER_TOPICS.some(t => t.value === selectedTopic)
+            const isActive = showOtherTopics || otherSelected
+            return (
+              <button
+                onClick={() => setShowOtherTopics(v => !v)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '8px 14px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  background: isActive
+                    ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)'
+                    : '#fff',
+                  color: isActive ? '#fff' : '#6b7280',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  boxShadow: isActive
+                    ? '0 4px 12px rgba(124,111,247,0.35)'
+                    : '0 2px 8px rgba(100,100,180,0.08)',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <span>＋</span>
+                <span>Other</span>
+              </button>
+            )
+          })()}
         </div>
+
+        {/* Other topics expanded row */}
+        {showOtherTopics && (
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            overflowX: 'auto',
+            paddingBottom: '4px',
+            marginTop: '8px',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            animation: 'fadeIn 0.15s ease',
+          }}>
+            {OTHER_TOPICS.map(topic => {
+              const isSelected = selectedTopic === topic.value
+              return (
+                <button
+                  key={topic.value}
+                  onClick={() => setSelectedTopic(isSelected ? null : topic.value)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '8px 14px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    background: isSelected
+                      ? 'linear-gradient(135deg, #e879f9, #a78bfa)'
+                      : '#faf5ff',
+                    color: isSelected ? '#fff' : '#7c3aed',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    boxShadow: isSelected
+                      ? '0 4px 12px rgba(168,85,247,0.35)'
+                      : '0 2px 8px rgba(168,85,247,0.08)',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <span>{topic.emoji}</span>
+                  <span>{topic.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* Edit profile */}
