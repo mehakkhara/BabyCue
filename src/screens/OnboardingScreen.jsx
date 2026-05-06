@@ -56,9 +56,24 @@ export default function OnboardingScreen({ onComplete }) {
       <h1 style={{ margin: '0 0 8px', fontSize: '26px', fontWeight: '700', color: '#1a1a2e', lineHeight: 1.3 }}>
         {isEditing ? 'Edit Profile' : 'Welcome'}
       </h1>
-      <p style={{ margin: '0 0 40px', fontSize: '15px', color: '#888' }}>
+      <p style={{ margin: '0 0 16px', fontSize: '15px', color: '#888' }}>
         {isEditing ? 'Update your baby\'s info below.' : 'Tell us about your baby to get started.'}
       </p>
+      {!isEditing && (
+        <div style={{
+          background: 'linear-gradient(135deg, #ede9fe, #dce8f8)',
+          borderRadius: '12px',
+          padding: '14px 16px',
+          marginBottom: '32px',
+          fontSize: '14px',
+          color: '#6d5fe6',
+          fontWeight: '500',
+          lineHeight: 1.6,
+          textAlign: 'center',
+        }}>
+          🌿 Daily tips personalized to your baby's exact age and your parenting style.
+        </div>
+      )}
 
       {/* Mom's name */}
       <label style={{ display: 'block', marginBottom: '24px' }}>

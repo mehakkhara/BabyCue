@@ -67,6 +67,18 @@ export default function HomeScreen({ onResetProfile }) {
   const [selectedTopic, setSelectedTopic] = useState(null)
   const [viewStyle, setViewStyle] = useState(null)
   const [showOtherTopics, setShowOtherTopics] = useState(false)
+  const [savedTips, setSavedTips] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('savedTips') || '[]') } catch { return [] }
+  })
+  const [gotItId, setGotItId] = useState(null)
+
+  function saveTip(id) {
+    setSavedTips(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+      localStorage.setItem('savedTips', JSON.stringify(next))
+      return next
+    })
+  }
 
   const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
   const { babyName, dateOfBirth, parentingStyle, momName } = profile
@@ -269,6 +281,42 @@ export default function HomeScreen({ onResetProfile }) {
                   Source: {tipOfDay.source}
                 </p>
               )}
+              <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+                <button
+                  onClick={() => saveTip(tipOfDay.id)}
+                  style={{
+                    flex: 1,
+                    padding: '9px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: savedTips.includes(tipOfDay.id) ? '#ede9fe' : '#f5f3ff',
+                    color: savedTips.includes(tipOfDay.id) ? '#7C6FF7' : '#9ca3af',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {savedTips.includes(tipOfDay.id) ? '🔖 Saved' : '🔖 Save tip'}
+                </button>
+                <button
+                  onClick={() => setGotItId(tipOfDay.id)}
+                  style={{
+                    flex: 1,
+                    padding: '9px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: gotItId === tipOfDay.id ? '#ecfdf5' : '#f0fdf4',
+                    color: gotItId === tipOfDay.id ? '#15803d' : '#9ca3af',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {gotItId === tipOfDay.id ? '✓ Done!' : '✓ Got it'}
+                </button>
+              </div>
             </div>
 
             {/* Two more tips */}
@@ -290,10 +338,13 @@ export default function HomeScreen({ onResetProfile }) {
       </div>
 
       {/* Style toggle */}
+      <p style={{ margin: '20px 0 8px', fontSize: '12px', color: '#9ca3af', fontStyle: 'italic' }}>
+        Curious what the other approach says?
+      </p>
       <div style={{
         display: 'flex',
         gap: '8px',
-        margin: '20px 0 16px',
+        marginBottom: '16px',
         background: '#f3f4f6',
         borderRadius: '14px',
         padding: '4px',
