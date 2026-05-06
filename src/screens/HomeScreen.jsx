@@ -84,8 +84,10 @@ export default function HomeScreen({ onResetProfile }) {
 
   const activeStyle = viewStyle || parentingStyle
   const allTips = getTipsForProfile(browseMonth, activeStyle, selectedTopic)
-  const [tipOfDay, ...remainingTips] = allTips
-  const extraTips = remainingTips.slice(0, 2)
+  const dayIndex = Math.floor(Date.now() / 86400000)
+  const todayTipIndex = allTips.length > 0 ? dayIndex % allTips.length : 0
+  const tipOfDay = allTips[todayTipIndex]
+  const extraTips = allTips.filter((_, i) => i !== todayTipIndex).slice(0, 2)
 
   const isCurrentMonth = browseMonth === currentMonth
 
