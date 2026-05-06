@@ -10,8 +10,11 @@ function GrowthChart({ entries, sex, metric }) {
   const PH = H - PT - PB
 
   const isWeight = metric === 'weight'
-  const yMin = isWeight ? 1.5 : 43
-  const yMax = isWeight ? 17 : 97
+  // WHO data is in kg; display weight in lbs
+  const KG_TO_LBS = 2.205
+  const cv = v => isWeight ? v * KG_TO_LBS : v
+  const yMin = isWeight ? 1.5 * KG_TO_LBS : 43
+  const yMax = isWeight ? 17  * KG_TO_LBS : 97
 
   const data = WHO[metric][sex === 'M' ? 'boys' : 'girls']
 
@@ -19,11 +22,11 @@ function GrowthChart({ entries, sex, metric }) {
   function toY(v) { return PT + (1 - (v - yMin) / (yMax - yMin)) * PH }
 
   function polyPts(arr) {
-    return MONTHS25.map(m => `${toX(m).toFixed(1)},${toY(arr[m]).toFixed(1)}`).join(' ')
+    return MONTHS25.map(m => `${toX(m).toFixed(1)},${toY(cv(arr[m])).toFixed(1)}`).join(' ')
   }
   function bandPts(upper, lower) {
-    const up = MONTHS25.map(m => `${toX(m).toFixed(1)},${toY(upper[m]).toFixed(1)}`)
-    const dn = [...MONTHS25].reverse().map(m => `${toX(m).toFixed(1)},${toY(lower[m]).toFixed(1)}`)
+    const up = MONTHS25.map(m => `${toX(m).toFixed(1)},${toY(cv(upper[m])).toFixed(1)}`)
+    const dn = [...MONTHS25].reverse().map(m => `${toX(m).toFixed(1)},${toY(cv(lower[m])).toFixed(1)}`)
     return [...up, ...dn].join(' ')
   }
 
@@ -32,7 +35,7 @@ function GrowthChart({ entries, sex, metric }) {
     .sort((a, b) => a.ageMonths - b.ageMonths)
     .map(e => ({ x: toX(e.ageMonths), y: toY(e[metric]) }))
 
-  const yLabels = isWeight ? [2,4,6,8,10,12,14,16] : [45,55,65,75,85,95]
+  const yLabels = isWeight ? [5, 10, 15, 20, 25, 30, 35] : [45, 55, 65, 75, 85, 95]
   const xLabels = [0, 6, 12, 18, 24]
 
   return (
@@ -52,9 +55,9 @@ function GrowthChart({ entries, sex, metric }) {
         stroke="#c4b5fd" strokeWidth="1.5" strokeDasharray="4,3" />
 
       {/* Percentile labels on right */}
-      <text x={W - PR + 3} y={toY(data.p97[24]) + 3} fontSize="7.5" fill="#c4b5fd">97</text>
-      <text x={W - PR + 3} y={toY(data.p50[24]) + 3} fontSize="7.5" fill="#c4b5fd">50</text>
-      <text x={W - PR + 3} y={toY(data.p3[24])  + 3} fontSize="7.5" fill="#c4b5fd">3</text>
+      <text x={W - PR + 3} y={toY(cv(data.p97[24])) + 3} fontSize="7.5" fill="#c4b5fd">97</text>
+      <text x={W - PR + 3} y={toY(cv(data.p50[24])) + 3} fontSize="7.5" fill="#c4b5fd">50</text>
+      <text x={W - PR + 3} y={toY(cv(data.p3[24]))  + 3} fontSize="7.5" fill="#c4b5fd">3</text>
 
       {/* Axes */}
       <line x1={PL} y1={PT} x2={PL} y2={H - PB} stroke="#e5e7eb" strokeWidth="1" />
@@ -201,10 +204,10 @@ export default function StatsScreen() {
                   borderTop: '3px solid #10b981',
                 }}>
                   <div style={{ fontSize: '18px', fontWeight: '800', color: '#1e1b4b' }}>
-                    {latest.weight} kg
+                    {latest.weight} lbs
                   </div>
                   <div style={{ fontSize: '11px', color: '#10b981', fontWeight: '700', marginTop: '2px' }}>
-                    {ordinal(getPercentile(latest.ageMonths, latest.weight, sex, 'weight'))} %ile
+                    {ordinal(getPercentile(latest.ageMonths, latest.weight / 2.205, sex, 'weight'))} %ile
                   </div>
                   <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>Weight</div>
                 </div>
@@ -254,7 +257,7 @@ export default function StatsScreen() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', paddingLeft: '4px' }}>
               <span style={{ fontSize: '12px', fontWeight: '700', color: '#1e1b4b' }}>
-                {metric === 'weight' ? 'Weight (kg)' : 'Length/Height (cm)'}
+                {metric === 'weight' ? 'Weight (lbs)' : 'Length/Height (cm)'}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#9ca3af' }}>
@@ -314,9 +317,9 @@ export default function StatsScreen() {
               <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
                 <label style={{ flex: 1 }}>
                   <span style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
-                    Weight (kg)
+                    Weight (lbs)
                   </span>
-                  <input type="number" step="0.1" min="0" max="30" placeholder="e.g. 7.2"
+                  <input type="number" step="0.1" min="0" max="70" placeholder="e.g. 15.9"
                     value={formWeight} onChange={e => setFormWeight(e.target.value)}
                     style={{
                       width: '100%', fontSize: '15px', padding: '11px 14px',
@@ -377,9 +380,9 @@ export default function StatsScreen() {
                     <div style={{ display: 'flex', gap: '12px' }}>
                       {e.weight != null && (
                         <span style={{ fontSize: '13px', fontWeight: '700', color: '#1e1b4b' }}>
-                          ⚖️ {e.weight} kg
+                          ⚖️ {e.weight} lbs
                           <span style={{ fontSize: '11px', color: '#10b981', fontWeight: '600', marginLeft: '4px' }}>
-                            {ordinal(getPercentile(e.ageMonths, e.weight, sex, 'weight'))}
+                            {ordinal(getPercentile(e.ageMonths, e.weight / 2.205, sex, 'weight'))}
                           </span>
                         </span>
                       )}
