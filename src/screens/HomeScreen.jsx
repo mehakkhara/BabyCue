@@ -28,18 +28,14 @@ const styleEmoji = {
   schedule: '📅',
 }
 
-const otherStyle = {
-  gentle: 'schedule',
-  schedule: 'gentle',
-}
-
 const TOPICS = [
-  { value: 'sleep',       label: 'Sleep',       emoji: '🌙', desc: 'Schedules, naps & night waking'  },
-  { value: 'feeding',     label: 'Feeding',     emoji: '🍼', desc: 'Milk, solids & feeding cues'     },
-  { value: 'development', label: 'Development', emoji: '🧠', desc: 'Milestones & play'               },
-  { value: 'activity',    label: 'Activities',  emoji: '🎨', desc: 'What to do with baby right now'  },
-  { value: 'teething',    label: 'Teething',    emoji: '🦷', desc: 'Comfort & timing'                },
-  { value: 'motor',       label: 'Motor',       emoji: '💪', desc: 'Movement & strength'             },
+  { value: null,          label: 'All',         emoji: '✨' },
+  { value: 'sleep',       label: 'Sleep',       emoji: '🌙' },
+  { value: 'feeding',     label: 'Feeding',     emoji: '🍼' },
+  { value: 'development', label: 'Development', emoji: '🧠' },
+  { value: 'activity',    label: 'Activities',  emoji: '🎨' },
+  { value: 'teething',    label: 'Teething',    emoji: '🦷' },
+  { value: 'motor',       label: 'Motor',       emoji: '💪' },
 ]
 
 const STAT_COLORS = [
@@ -56,8 +52,10 @@ export default function HomeScreen({ onResetProfile }) {
   const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
   const { babyName, dateOfBirth, parentingStyle, momName } = profile
   const ageInMonths = getBabyAgeInMonths(dateOfBirth)
-  const contentMonth = Math.max(1, Math.min(ageInMonths, 12))
-  const stats = AGE_STATS[contentMonth] || AGE_STATS[12]
+  const currentMonth = Math.max(1, Math.min(ageInMonths, 12))
+  const [browseMonth, setBrowseMonth] = useState(currentMonth)
+
+  const stats = AGE_STATS[browseMonth] || AGE_STATS[12]
   const STAT_ITEMS = [
     { icon: '🍼', label: 'Milk/day',    value: stats.milk    },
     { icon: '⏱️', label: 'Wake window', value: stats.wake    },
@@ -66,23 +64,11 @@ export default function HomeScreen({ onResetProfile }) {
   ]
 
   const activeStyle = viewStyle || parentingStyle
+  const allTips = getTipsForProfile(browseMonth, activeStyle, selectedTopic)
+  const [tipOfDay, ...remainingTips] = allTips
+  const extraTips = remainingTips.slice(0, 2)
 
-  const dailyTip = getTipsForProfile(contentMonth, parentingStyle)[0]
-  const topicTips = selectedTopic
-    ? getTipsForProfile(contentMonth, activeStyle, selectedTopic)
-    : []
-
-  const activeTopic = TOPICS.find(t => t.value === selectedTopic)
-
-  function openTopic(topic) {
-    setSelectedTopic(topic)
-    setViewStyle(null)
-  }
-
-  function closeTopic() {
-    setSelectedTopic(null)
-    setViewStyle(null)
-  }
+  const isCurrentMonth = browseMonth === currentMonth
 
   return (
     <div style={{
@@ -120,6 +106,83 @@ export default function HomeScreen({ onResetProfile }) {
         </span>
       </div>
 
+      {/* Month navigator */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '14px',
+        background: '#fff',
+        borderRadius: '16px',
+        padding: '10px 14px',
+        boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+      }}>
+        <button
+          onClick={() => setBrowseMonth(m => Math.max(1, m - 1))}
+          disabled={browseMonth === 1}
+          style={{
+            width: '32px', height: '32px',
+            borderRadius: '50%',
+            border: 'none',
+            background: browseMonth === 1 ? '#f3f4f6' : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+            color: browseMonth === 1 ? '#c4c4d4' : '#fff',
+            fontSize: '16px',
+            cursor: browseMonth === 1 ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          ‹
+        </button>
+
+        <div style={{ textAlign: 'center' }}>
+          <span style={{ fontSize: '15px', fontWeight: '700', color: '#1e1b4b' }}>
+            Month {browseMonth}
+          </span>
+          {!isCurrentMonth && (
+            <button
+              onClick={() => setBrowseMonth(currentMonth)}
+              style={{
+                display: 'block',
+                margin: '2px auto 0',
+                background: 'none',
+                border: 'none',
+                fontSize: '11px',
+                color: '#a78bfa',
+                cursor: 'pointer',
+                fontWeight: '600',
+                padding: 0,
+              }}
+            >
+              Back to now
+            </button>
+          )}
+          {isCurrentMonth && (
+            <span style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>
+              Current age
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={() => setBrowseMonth(m => Math.min(12, m + 1))}
+          disabled={browseMonth === 12}
+          style={{
+            width: '32px', height: '32px',
+            borderRadius: '50%',
+            border: 'none',
+            background: browseMonth === 12 ? '#f3f4f6' : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+            color: browseMonth === 12 ? '#c4c4d4' : '#fff',
+            fontSize: '16px',
+            cursor: browseMonth === 12 ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          ›
+        </button>
+      </div>
+
       {/* Stats banner */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', overflowX: 'auto', paddingBottom: '2px' }}>
         {STAT_ITEMS.map((stat, i) => (
@@ -155,157 +218,148 @@ export default function HomeScreen({ onResetProfile }) {
         ))}
       </div>
 
-      {/* Tip of the Day */}
-      {dailyTip && (
-        <div style={{
-          background: '#fff',
-          borderRadius: '20px',
-          padding: '20px',
-          marginBottom: '20px',
-          boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
-          borderLeft: '4px solid #a78bfa',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <span style={{ fontSize: '16px' }}>💡</span>
-            <span style={{ fontSize: '11px', fontWeight: '700', color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Tip of the Day
-            </span>
-          </div>
-          <p style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '600', color: '#1e1b4b', lineHeight: 1.5 }}>
-            {dailyTip.title}
-          </p>
-          <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.65', color: '#6b7280' }}>
-            {dailyTip.body}
-          </p>
-        </div>
-      )}
-
-      {/* Topic browser */}
-      {!selectedTopic ? (
-        <div style={{ animation: 'fadeIn 0.2s ease' }}>
-          <p style={{ margin: '0 0 14px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
-            What do you want to explore?
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {TOPICS.map((topic, i) => (
-              <button
-                key={topic.value}
-                onClick={() => openTopic(topic.value)}
-                style={{
-                  background: '#fff',
-                  border: 'none',
-                  borderRadius: '18px',
-                  padding: '18px 16px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
-                  transition: 'transform 0.12s, box-shadow 0.12s',
-                  gridColumn: TOPICS.length % 2 !== 0 && i === TOPICS.length - 1 ? 'span 2' : undefined,
-                }}
-                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
-                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-                onTouchStart={e => e.currentTarget.style.transform = 'scale(0.97)'}
-                onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                <span style={{ fontSize: '28px', display: 'block', marginBottom: '8px' }}>{topic.emoji}</span>
-                <span style={{ display: 'block', fontSize: '14px', fontWeight: '700', color: '#1e1b4b', marginBottom: '4px' }}>
-                  {topic.label}
+      {/* Tips section */}
+      <div key={`${activeStyle}-${selectedTopic}-${browseMonth}`} style={{ animation: 'fadeIn 0.2s ease' }}>
+        {tipOfDay ? (
+          <>
+            {/* Tip of the Day */}
+            <div style={{
+              background: '#fff',
+              borderRadius: '20px',
+              padding: '20px',
+              marginBottom: '12px',
+              boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+              borderLeft: '4px solid #a78bfa',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <span style={{ fontSize: '16px' }}>💡</span>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  Tip of the Day
                 </span>
-                <span style={{ display: 'block', fontSize: '12px', color: '#9ca3af', lineHeight: 1.4 }}>
-                  {topic.desc}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div style={{ animation: 'fadeIn 0.2s ease' }}>
-          {/* Back button */}
-          <button
-            onClick={closeTopic}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '0 0 16px',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#7C6FF7',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 5l-7 7 7 7"/>
-            </svg>
-            {activeTopic.emoji} {activeTopic.label}
-          </button>
-
-          {/* Style toggle */}
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            marginBottom: '16px',
-            background: '#f3f4f6',
-            borderRadius: '14px',
-            padding: '4px',
-          }}>
-            {[parentingStyle, otherStyle[parentingStyle]].map(s => {
-              const isActive = activeStyle === s
-              const isOwn = s === parentingStyle
-              return (
-                <button
-                  key={s}
-                  onClick={() => setViewStyle(s)}
-                  style={{
-                    flex: 1,
-                    padding: '9px 12px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    background: isActive ? '#fff' : 'transparent',
-                    boxShadow: isActive ? '0 2px 8px rgba(100,100,180,0.12)' : 'none',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    color: isActive ? '#1e1b4b' : '#9ca3af',
-                    transition: 'all 0.15s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '5px',
-                  }}
-                >
-                  <span>{styleEmoji[s]}</span>
-                  <span>{isOwn ? 'Your style' : styleLabels[s]}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Tips */}
-          <div key={activeStyle} style={{ animation: 'fadeIn 0.18s ease' }}>
-            {topicTips.length > 0 ? (
-              topicTips.map(tip => (
-                <TipCard
-                  key={tip.id}
-                  title={tip.title}
-                  body={tip.body}
-                  style={tip.style}
-                  source={tip.source}
-                />
-              ))
-            ) : (
-              <p style={{ color: '#9ca3af', fontSize: '14px', padding: '0 4px' }}>
-                No {activeTopic.label.toLowerCase()} tips for this month yet — check back soon!
+              </div>
+              <p style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '600', color: '#1e1b4b', lineHeight: 1.5 }}>
+                {tipOfDay.title}
               </p>
-            )}
-          </div>
+              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.65', color: '#6b7280' }}>
+                {tipOfDay.body}
+              </p>
+              {tipOfDay.source && (
+                <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#c4b5fd' }}>
+                  Source: {tipOfDay.source}
+                </p>
+              )}
+            </div>
+
+            {/* Two more tips */}
+            {extraTips.map(tip => (
+              <TipCard
+                key={tip.id}
+                title={tip.title}
+                body={tip.body}
+                style={tip.style}
+                source={tip.source}
+              />
+            ))}
+          </>
+        ) : (
+          <p style={{ color: '#9ca3af', fontSize: '14px', padding: '0 4px', marginBottom: '12px' }}>
+            No tips for this filter yet — try another topic!
+          </p>
+        )}
+      </div>
+
+      {/* Style toggle */}
+      <div style={{
+        display: 'flex',
+        gap: '8px',
+        margin: '20px 0 16px',
+        background: '#f3f4f6',
+        borderRadius: '14px',
+        padding: '4px',
+      }}>
+        {[parentingStyle, parentingStyle === 'gentle' ? 'schedule' : 'gentle'].map(s => {
+          const isActive = activeStyle === s
+          const isOwn = s === parentingStyle
+          return (
+            <button
+              key={s}
+              onClick={() => setViewStyle(s)}
+              style={{
+                flex: 1,
+                padding: '9px 12px',
+                borderRadius: '10px',
+                border: 'none',
+                background: isActive ? '#fff' : 'transparent',
+                boxShadow: isActive ? '0 2px 8px rgba(100,100,180,0.12)' : 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: isActive ? '#1e1b4b' : '#9ca3af',
+                transition: 'all 0.15s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+              }}
+            >
+              <span>{styleEmoji[s]}</span>
+              <span>{isOwn ? 'Your style' : styleLabels[s]}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Topic chips */}
+      <div>
+        <p style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
+          Explore by Topic
+        </p>
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          overflowX: 'auto',
+          paddingBottom: '4px',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}>
+          {TOPICS.map(topic => {
+            const isSelected = selectedTopic === topic.value
+            return (
+              <button
+                key={String(topic.value)}
+                onClick={() => setSelectedTopic(topic.value)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '8px 14px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  background: isSelected
+                    ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)'
+                    : '#fff',
+                  color: isSelected ? '#fff' : '#6b7280',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  boxShadow: isSelected
+                    ? '0 4px 12px rgba(124,111,247,0.35)'
+                    : '0 2px 8px rgba(100,100,180,0.08)',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <span>{topic.emoji}</span>
+                <span>{topic.label}</span>
+              </button>
+            )
+          })}
         </div>
-      )}
+      </div>
 
       {/* Edit profile */}
-      <div style={{ textAlign: 'center', marginTop: '36px', paddingBottom: '16px' }}>
+      <div style={{ textAlign: 'center', marginTop: '32px', paddingBottom: '16px' }}>
         <button
           onClick={onResetProfile}
           style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
