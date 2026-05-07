@@ -19,7 +19,7 @@ function openDb() {
 
 export async function getEntries() {
   const db = await openDb()
-  return new Promise((resolve, reject) => {
+  const raw = await new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readonly')
     const req = tx.objectStore(STORE_NAME).index('createdAt').openCursor(null, 'prev')
     const out = []
@@ -34,16 +34,24 @@ export async function getEntries() {
     }
     req.onerror = () => reject(req.error)
   })
+  return raw.map(e => ({
+    ...e,
+    photoBlob: e.photoBuffer ? new Blob([e.photoBuffer], { type: e.photoType || 'image/jpeg' }) : null,
+  }))
 }
 
 export async function addEntry({ note, photoBlob, photoType }) {
+  let photoBuffer = null
+  if (photoBlob) {
+    photoBuffer = await photoBlob.arrayBuffer()
+  }
   const db = await openDb()
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite')
     const req = tx.objectStore(STORE_NAME).add({
       note: note || '',
-      photoBlob,
-      photoType,
+      photoBuffer,
+      photoType: photoType || 'image/jpeg',
       createdAt: Date.now(),
     })
     req.onsuccess = () => resolve(req.result)
