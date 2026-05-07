@@ -82,11 +82,20 @@ function AddForm({ onSave, onCancel }) {
       let photoBlob = null
       let photoType = null
       if (file) {
-        photoBlob = await compressImage(file)
-        photoType = 'image/jpeg'
+        try {
+          photoBlob = await compressImage(file)
+          photoType = 'image/jpeg'
+        } catch (err) {
+          console.warn('Compress failed, falling back to original file', err)
+          photoBlob = file
+          photoType = file.type || 'image/jpeg'
+        }
       }
       await addEntry({ note: note.trim(), photoBlob, photoType })
       onSave()
+    } catch (err) {
+      console.error('Save failed', err)
+      alert('Could not save this memory. Try again, or pick a smaller photo.')
     } finally {
       setSaving(false)
     }
