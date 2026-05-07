@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getEntries, addEntry, deleteEntry, compressImage } from '../data/journalStore'
+import { getEntries, addEntry, deleteEntry } from '../data/journalStore'
 
 function formatDate(ts) {
   const d = new Date(ts)
@@ -79,23 +79,13 @@ function AddForm({ onSave, onCancel }) {
     if (!file && !note.trim()) return
     setSaving(true)
     try {
-      let photoBlob = null
-      let photoType = null
-      if (file) {
-        try {
-          photoBlob = await compressImage(file)
-          photoType = 'image/jpeg'
-        } catch (err) {
-          console.warn('Compress failed, falling back to original file', err)
-          photoBlob = file
-          photoType = file.type || 'image/jpeg'
-        }
-      }
+      const photoBlob = file || null
+      const photoType = file ? (file.type || 'image/jpeg') : null
       await addEntry({ note: note.trim(), photoBlob, photoType })
       onSave()
     } catch (err) {
       console.error('Save failed', err)
-      alert('Could not save this memory. Try again, or pick a smaller photo.')
+      alert(`Could not save: ${err?.message || err}`)
     } finally {
       setSaving(false)
     }
@@ -135,6 +125,12 @@ function AddForm({ onSave, onCancel }) {
         onChange={e => setFile(e.target.files?.[0] || null)}
         style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
       />
+
+      {file && (
+        <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#888' }}>
+          {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
+        </p>
+      )}
 
       <textarea
         value={note}
