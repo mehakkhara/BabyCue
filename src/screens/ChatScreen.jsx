@@ -44,7 +44,10 @@ export default function ChatScreen() {
       })
 
       const data = await res.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
+      const content = res.ok && data.reply
+        ? data.reply
+        : data.error || 'Something went wrong — please try again.'
+      setMessages(prev => [...prev, { role: 'assistant', content }])
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
