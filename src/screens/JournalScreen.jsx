@@ -100,28 +100,32 @@ function AddForm({ onSave, onCancel }) {
       marginBottom: '16px',
       boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
     }}>
-      <label style={{
-        display: 'block',
-        border: '2px dashed #d4d8e3',
-        borderRadius: '12px',
-        padding: previewUrl ? 0 : '32px 16px',
-        textAlign: 'center',
-        cursor: 'pointer',
-        marginBottom: '12px',
-        overflow: 'hidden',
-      }}>
+      <label
+        htmlFor="journal-photo-input"
+        style={{
+          display: 'block',
+          border: '2px dashed #d4d8e3',
+          borderRadius: '12px',
+          padding: previewUrl ? 0 : '32px 16px',
+          textAlign: 'center',
+          cursor: 'pointer',
+          marginBottom: '12px',
+          overflow: 'hidden',
+        }}
+      >
         {previewUrl ? (
           <img src={previewUrl} alt="preview" style={{ width: '100%', display: 'block', maxHeight: '320px', objectFit: 'cover' }} />
         ) : (
           <span style={{ color: '#888', fontSize: '14px' }}>Tap to add a photo</span>
         )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={e => setFile(e.target.files?.[0] || null)}
-          style={{ display: 'none' }}
-        />
       </label>
+      <input
+        id="journal-photo-input"
+        type="file"
+        accept="image/*"
+        onChange={e => setFile(e.target.files?.[0] || null)}
+        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+      />
 
       <textarea
         value={note}
