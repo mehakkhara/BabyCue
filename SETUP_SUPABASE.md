@@ -6,7 +6,7 @@ This is a one-time setup to give the app a real database and accounts. Until you
 
 1. Go to https://app.supabase.com and sign in with GitHub (free).
 2. Click **New project**.
-3. Pick a name (e.g. `baby-app`), choose a region close to you, and set a database password. You can ignore the password — Supabase manages it for you.
+3. Pick a name (e.g. `babycue`), choose a region close to you, and set a database password. You can ignore the password — Supabase manages it for you.
 4. Wait ~1 minute for the project to provision.
 
 ## 2. Run the schema SQL

@@ -1,4 +1,4 @@
-# Baby App — Build Plan
+# BabyCue — Build Plan
 
 ## Current State
 React/Vite frontend. Baby profile stored in localStorage. 76 hardcoded tips across months 1–12, filtered by age and parenting style. Deployed on GitHub Pages.

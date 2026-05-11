@@ -1,4 +1,4 @@
-# Baby App — Project Context
+# BabyCue — Project Context
 
 ## What the Product Does
 
