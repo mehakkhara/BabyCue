@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { getBabyAgeInMonths } from '../data/tips'
+import { getEntries as getJournalEntries } from '../data/journalStore'
+import { getPercentile, ordinal, monthsBetween } from '../data/whoStandards'
 
 const SUGGESTED_QUESTIONS = [
   "Why won't my baby sleep through the night?",
@@ -9,6 +11,42 @@ const SUGGESTED_QUESTIONS = [
 ]
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
+
+function loadLatestGrowth(profile) {
+  try {
+    const raw = JSON.parse(localStorage.getItem('growthEntries') || '[]')
+    if (!raw.length || !profile.dateOfBirth) return null
+    const sorted = [...raw].sort((a, b) => new Date(b.date) - new Date(a.date))
+    const e = sorted[0]
+    const ageMonths = monthsBetween(profile.dateOfBirth, e.date)
+    const sex = profile.babySex
+    const out = { date: e.date, ageMonths, weight: e.weight, height: e.height }
+    if (sex && e.weight != null) {
+      out.weightPercentile = ordinal(getPercentile(ageMonths, e.weight / 2.205, sex, 'weight'))
+    }
+    if (sex && e.height != null) {
+      out.heightPercentile = ordinal(getPercentile(ageMonths, e.height, sex, 'height'))
+    }
+    return out
+  } catch {
+    return null
+  }
+}
+
+async function loadRecentJournalNotes(limit = 5) {
+  try {
+    const entries = await getJournalEntries()
+    return entries
+      .filter(e => e.note && e.note.trim().length > 0)
+      .slice(0, limit)
+      .map(e => ({
+        date: new Date(e.createdAt).toISOString().split('T')[0],
+        note: e.note.length > 200 ? e.note.slice(0, 200) + '…' : e.note,
+      }))
+  } catch {
+    return []
+  }
+}
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState([])
@@ -33,12 +71,16 @@ export default function ChatScreen() {
     setLoading(true)
 
     try {
+      const latestGrowth = loadLatestGrowth(profile)
+      const recentJournal = await loadRecentJournalNotes(5)
+
       const res = await fetch(`${SERVER_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
           profile: { ...profile, ageInMonths },
+          context: { latestGrowth, recentJournal },
           history: updatedMessages.slice(-10),
         }),
       })

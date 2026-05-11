@@ -100,7 +100,10 @@ function loadEntries() {
   try { return JSON.parse(localStorage.getItem('growthEntries') || '[]') } catch { return [] }
 }
 function loadSex() {
-  try { return localStorage.getItem('babySex') || null } catch { return null }
+  try {
+    const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
+    return profile.babySex || localStorage.getItem('babySex') || null
+  } catch { return null }
 }
 
 export default function StatsScreen() {
@@ -124,6 +127,11 @@ export default function StatsScreen() {
   function chooseSex(s) {
     setSex(s)
     localStorage.setItem('babySex', s)
+    try {
+      const stored = JSON.parse(localStorage.getItem('babyProfile') || '{}')
+      stored.babySex = s
+      localStorage.setItem('babyProfile', JSON.stringify(stored))
+    } catch { /* profile missing — legacy key still set above */ }
   }
 
   function saveEntry() {
