@@ -88,7 +88,7 @@ GitHub Pages is a free hosting service built into GitHub. It takes the files in 
 Our deploy process:
 1. `vite build` — compiles the React app into plain HTML/CSS/JS files in a `dist/` folder
 2. `gh-pages -d dist` — pushes those files to a special `gh-pages` branch on GitHub
-3. GitHub serves that branch at `mehakkhara.github.io/babycue`
+3. GitHub serves that branch at `mehakkhara.github.io/BabyCue`
 
 **Limitation:** GitHub Pages only serves static files. It can't run a server or keep secrets. This is why we need a separate backend for the AI feature — the Claude API key has to be kept server-side.
 
