@@ -16,23 +16,97 @@ app.use(express.json())
 
 app.get('/health', (_req, res) => res.json({ ok: true }))
 
+const STYLE_DESCRIPTIONS = {
+  gentle: 'gentle parenting — responsive, baby-led, minimal crying, strong focus on connection and emotional attunement',
+  schedule: 'schedule-based parenting — predictable routines, structured naps, gradual independence',
+}
+
+const FEEDING_DESCRIPTIONS = {
+  breast:  'exclusively breastfed',
+  formula: 'formula fed',
+  mixed:   'mixed feeding (breast and formula)',
+  solids:  'mostly on solids now',
+}
+
+const SLEEP_DESCRIPTIONS = {
+  own_room:   'sleeps in their own room',
+  room_share: 'room-shares with parents',
+  bed_share:  'bed-shares / co-sleeps with parents',
+}
+
+const BIRTH_DESCRIPTIONS = {
+  full_term: 'born full-term',
+  preterm:   'born preterm (before 37 weeks) — adjust developmental expectations for corrected age',
+}
+
+const SIBLING_DESCRIPTIONS = {
+  only:     'is an only child or first baby in the home',
+  siblings: 'has older sibling(s) at home',
+}
+
+function buildContextLines(profile, context) {
+  const lines = []
+  const sex = profile.babySex === 'F' ? 'girl' : profile.babySex === 'M' ? 'boy' : null
+  if (sex) lines.push(`${profile.babyName} is a ${sex}.`)
+
+  if (FEEDING_DESCRIPTIONS[profile.feedingMethod]) {
+    lines.push(`Feeding: ${FEEDING_DESCRIPTIONS[profile.feedingMethod]}.`)
+  }
+  if (SLEEP_DESCRIPTIONS[profile.sleepArrangement]) {
+    lines.push(`Sleep setup: ${SLEEP_DESCRIPTIONS[profile.sleepArrangement]}.`)
+  }
+  if (BIRTH_DESCRIPTIONS[profile.birthContext]) {
+    lines.push(BIRTH_DESCRIPTIONS[profile.birthContext] + '.')
+  }
+  if (SIBLING_DESCRIPTIONS[profile.siblings]) {
+    lines.push(`Family: ${SIBLING_DESCRIPTIONS[profile.siblings]}.`)
+  }
+  if (profile.notes && profile.notes.trim()) {
+    lines.push(`Parent's notes about this baby: ${profile.notes.trim()}`)
+  }
+
+  const g = context?.latestGrowth
+  if (g && (g.weight != null || g.height != null)) {
+    const parts = []
+    if (g.weight != null) {
+      parts.push(`${g.weight} lbs${g.weightPercentile ? ` (${g.weightPercentile} percentile WHO)` : ''}`)
+    }
+    if (g.height != null) {
+      parts.push(`${g.height} cm${g.heightPercentile ? ` (${g.heightPercentile} percentile WHO)` : ''}`)
+    }
+    lines.push(`Most recent growth (${g.date}, ~${Math.round(g.ageMonths)} months old): ${parts.join(', ')}.`)
+  }
+
+  const journal = Array.isArray(context?.recentJournal) ? context.recentJournal : []
+  if (journal.length) {
+    const formatted = journal
+      .map(j => `- ${j.date}: ${j.note}`)
+      .join('\n')
+    lines.push(`Recent notes the parent has written in their journal (use only if relevant to the question):\n${formatted}`)
+  }
+
+  return lines
+}
+
 app.post('/api/chat', async (req, res) => {
-  const { message, profile, history = [] } = req.body
+  const { message, profile, context, history = [] } = req.body
 
   if (!message || !profile) {
     return res.status(400).json({ error: 'Message and profile are required' })
   }
 
   const { babyName, ageInMonths, parentingStyle } = profile
-
-  const styleDescriptions = {
-    gentle: 'gentle parenting — responsive, baby-led, minimal crying, strong focus on connection and emotional attunement',
-    schedule: 'schedule-based parenting — predictable routines, structured naps, gradual independence',
-  }
+  const styleText = STYLE_DESCRIPTIONS[parentingStyle] || parentingStyle
+  const contextLines = buildContextLines(profile, context)
+  const contextBlock = contextLines.length
+    ? `\n\nAdditional context about this specific baby and family:\n${contextLines.join('\n')}`
+    : ''
 
   const systemPrompt = `You are a knowledgeable assistant for parents of infants and toddlers, with expertise in pediatric development. You give personalized, evidence-based guidance.
 
-You are helping a parent of a baby named ${babyName} who is ${ageInMonths} month${ageInMonths === 1 ? '' : 's'} old. Their parenting approach is ${styleDescriptions[parentingStyle] || parentingStyle}.
+You are helping a parent of a baby named ${babyName} who is ${ageInMonths} month${ageInMonths === 1 ? '' : 's'} old. Their parenting approach is ${styleText}.${contextBlock}
+
+Use the context above to make answers specific to ${babyName} when it's relevant. Don't recite the context back to the parent — just let it shape your response. If a question is unrelated to a piece of context, ignore that piece.
 
 Format your reply as plain conversational text. Do not use markdown — no headers (##), no bold (**), no bullet points (- or *), no numbered lists. Use short paragraphs separated by blank lines. Keep replies under 150 words unless the question genuinely requires more.
 

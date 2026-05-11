@@ -15,13 +15,97 @@ const styleOptions = [
   },
 ]
 
+const sexOptions = [
+  { value: 'F', label: 'Girl', emoji: '👧' },
+  { value: 'M', label: 'Boy',  emoji: '👦' },
+]
+
+const feedingOptions = [
+  { value: 'breast',   label: 'Breastfed' },
+  { value: 'formula',  label: 'Formula' },
+  { value: 'mixed',    label: 'Mixed (breast + formula)' },
+  { value: 'solids',   label: 'Mostly solids now' },
+]
+
+const sleepOptions = [
+  { value: 'own_room',   label: 'Own room' },
+  { value: 'room_share', label: 'Room-sharing' },
+  { value: 'bed_share',  label: 'Bed-sharing / co-sleeping' },
+]
+
+const birthOptions = [
+  { value: 'full_term', label: 'Full-term (37+ weeks)' },
+  { value: 'preterm',   label: 'Preterm (before 37 weeks)' },
+]
+
+const siblingOptions = [
+  { value: 'only',     label: 'No older siblings' },
+  { value: 'siblings', label: 'Has older sibling(s)' },
+]
+
 function loadExisting() {
   try {
     const saved = localStorage.getItem('babyProfile')
-    return saved ? JSON.parse(saved) : null
+    const profile = saved ? JSON.parse(saved) : null
+    if (!profile) return null
+    if (!profile.babySex) {
+      const legacySex = localStorage.getItem('babySex')
+      if (legacySex) profile.babySex = legacySex
+    }
+    return profile
   } catch {
     return null
   }
+}
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '13px',
+  fontWeight: '600',
+  color: '#555',
+  marginBottom: '8px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+}
+
+const inputStyle = {
+  width: '100%',
+  fontSize: '17px',
+  padding: '14px 16px',
+  borderRadius: '12px',
+  border: '2px solid #E5E7EB',
+  outline: 'none',
+  boxSizing: 'border-box',
+}
+
+function ChoiceRow({ options, value, onChange }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+      {options.map(opt => {
+        const selected = value === opt.value
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(selected ? '' : opt.value)}
+            style={{
+              padding: '10px 14px',
+              borderRadius: '10px',
+              border: `2px solid ${selected ? '#7C3AED' : '#E5E7EB'}`,
+              backgroundColor: selected ? '#F3E8FF' : '#fff',
+              color: selected ? '#5b21b6' : '#444',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            {opt.emoji ? `${opt.emoji} ` : ''}{opt.label}
+          </button>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function OnboardingScreen({ onComplete }) {
@@ -30,17 +114,38 @@ export default function OnboardingScreen({ onComplete }) {
   const [babyName, setBabyName] = useState(existing?.babyName || '')
   const [dateOfBirth, setDateOfBirth] = useState(existing?.dateOfBirth || '')
   const [parentingStyle, setParentingStyle] = useState(existing?.parentingStyle || '')
+  const [babySex, setBabySex] = useState(existing?.babySex || '')
+  const [feedingMethod, setFeedingMethod] = useState(existing?.feedingMethod || '')
+  const [sleepArrangement, setSleepArrangement] = useState(existing?.sleepArrangement || '')
+  const [birthContext, setBirthContext] = useState(existing?.birthContext || '')
+  const [siblings, setSiblings] = useState(existing?.siblings || '')
+  const [notes, setNotes] = useState(existing?.notes || '')
+
+  const isEditing = !!existing
+  const hasOptionalDetails =
+    babySex || feedingMethod || sleepArrangement || birthContext || siblings || notes
+  const [showMore, setShowMore] = useState(isEditing && hasOptionalDetails)
 
   const canSave = babyName.trim().length > 0 && dateOfBirth.length > 0 && parentingStyle.length > 0
 
   function handleSave() {
     if (!canSave) return
-    const profile = { momName: momName.trim() || 'Mama', babyName: babyName.trim(), dateOfBirth, parentingStyle }
+    const profile = {
+      momName: momName.trim() || 'Mama',
+      babyName: babyName.trim(),
+      dateOfBirth,
+      parentingStyle,
+      babySex: babySex || null,
+      feedingMethod: feedingMethod || null,
+      sleepArrangement: sleepArrangement || null,
+      birthContext: birthContext || null,
+      siblings: siblings || null,
+      notes: notes.trim() || null,
+    }
     localStorage.setItem('babyProfile', JSON.stringify(profile))
+    if (babySex) localStorage.setItem('babySex', babySex)
     onComplete(profile)
   }
-
-  const isEditing = !!existing
 
   return (
     <div style={{
@@ -77,24 +182,14 @@ export default function OnboardingScreen({ onComplete }) {
 
       {/* Mom's name */}
       <label style={{ display: 'block', marginBottom: '24px' }}>
-        <span style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#555', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Your Name
-        </span>
+        <span style={labelStyle}>Your Name</span>
         <input
           type="text"
           placeholder="e.g. Sarah"
           value={momName}
           onChange={e => setMomName(e.target.value)}
           autoFocus={!existing}
-          style={{
-            width: '100%',
-            fontSize: '17px',
-            padding: '14px 16px',
-            borderRadius: '12px',
-            border: '2px solid #E5E7EB',
-            outline: 'none',
-            boxSizing: 'border-box',
-          }}
+          style={inputStyle}
           onFocus={e => e.target.style.borderColor = '#7C3AED'}
           onBlur={e => e.target.style.borderColor = '#E5E7EB'}
         />
@@ -102,23 +197,13 @@ export default function OnboardingScreen({ onComplete }) {
 
       {/* Baby name */}
       <label style={{ display: 'block', marginBottom: '24px' }}>
-        <span style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#555', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Baby's Name
-        </span>
+        <span style={labelStyle}>Baby's Name</span>
         <input
           type="text"
           placeholder="e.g. Lila"
           value={babyName}
           onChange={e => setBabyName(e.target.value)}
-          style={{
-            width: '100%',
-            fontSize: '17px',
-            padding: '14px 16px',
-            borderRadius: '12px',
-            border: '2px solid #E5E7EB',
-            outline: 'none',
-            boxSizing: 'border-box',
-          }}
+          style={inputStyle}
           onFocus={e => e.target.style.borderColor = '#7C3AED'}
           onBlur={e => e.target.style.borderColor = '#E5E7EB'}
         />
@@ -126,32 +211,19 @@ export default function OnboardingScreen({ onComplete }) {
 
       {/* Date of birth */}
       <label style={{ display: 'block', marginBottom: '32px' }}>
-        <span style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#555', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Date of Birth
-        </span>
+        <span style={labelStyle}>Date of Birth</span>
         <input
           type="date"
           value={dateOfBirth}
           onChange={e => setDateOfBirth(e.target.value)}
           max={new Date().toISOString().split('T')[0]}
-          style={{
-            width: '100%',
-            fontSize: '17px',
-            padding: '14px 16px',
-            borderRadius: '12px',
-            border: '2px solid #E5E7EB',
-            outline: 'none',
-            boxSizing: 'border-box',
-            color: '#1a1a2e',
-          }}
+          style={{ ...inputStyle, color: '#1a1a2e' }}
         />
       </label>
 
       {/* Parenting style */}
-      <div style={{ marginBottom: '40px' }}>
-        <span style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#555', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Parenting Style
-        </span>
+      <div style={{ marginBottom: '32px' }}>
+        <span style={labelStyle}>Parenting Style</span>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {styleOptions.map(option => (
             <button
@@ -183,6 +255,86 @@ export default function OnboardingScreen({ onComplete }) {
           ))}
         </div>
       </div>
+
+      {/* Tell us more — collapsible optional section */}
+      <button
+        type="button"
+        onClick={() => setShowMore(v => !v)}
+        style={{
+          background: '#fff',
+          border: '2px dashed #E5E7EB',
+          borderRadius: '12px',
+          padding: '14px 16px',
+          fontSize: '14px',
+          fontWeight: 600,
+          color: '#7C3AED',
+          cursor: 'pointer',
+          marginBottom: showMore ? '20px' : '40px',
+          textAlign: 'left',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <span>✨ Tell us more for better answers</span>
+        <span style={{ fontSize: '18px', color: '#9ca3af' }}>{showMore ? '−' : '+'}</span>
+      </button>
+
+      {showMore && (
+        <div style={{ marginBottom: '40px' }}>
+          <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#888', lineHeight: 1.6 }}>
+            All optional. The more we know, the more personalized your AI answers will be.
+          </p>
+
+          <div style={{ marginBottom: '20px' }}>
+            <span style={labelStyle}>Baby's Sex</span>
+            <ChoiceRow options={sexOptions} value={babySex} onChange={setBabySex} />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <span style={labelStyle}>Feeding</span>
+            <ChoiceRow options={feedingOptions} value={feedingMethod} onChange={setFeedingMethod} />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <span style={labelStyle}>Sleep Setup</span>
+            <ChoiceRow options={sleepOptions} value={sleepArrangement} onChange={setSleepArrangement} />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <span style={labelStyle}>Birth</span>
+            <ChoiceRow options={birthOptions} value={birthContext} onChange={setBirthContext} />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <span style={labelStyle}>Siblings</span>
+            <ChoiceRow options={siblingOptions} value={siblings} onChange={setSiblings} />
+          </div>
+
+          <label style={{ display: 'block', marginBottom: '8px' }}>
+            <span style={labelStyle}>Anything else we should know?</span>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="e.g. reflux, currently sleep training, recovering from an ear infection..."
+              rows={3}
+              maxLength={500}
+              style={{
+                ...inputStyle,
+                fontSize: '15px',
+                resize: 'vertical',
+                fontFamily: 'inherit',
+                lineHeight: 1.5,
+              }}
+              onFocus={e => e.target.style.borderColor = '#7C3AED'}
+              onBlur={e => e.target.style.borderColor = '#E5E7EB'}
+            />
+            <span style={{ display: 'block', textAlign: 'right', fontSize: '11px', color: '#aab', marginTop: '4px' }}>
+              {notes.length}/500
+            </span>
+          </label>
+        </div>
+      )}
 
       <button
         onClick={handleSave}
