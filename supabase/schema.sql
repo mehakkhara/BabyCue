@@ -1,4 +1,4 @@
--- Baby App — Supabase schema (Phase 1 of Level 2)
+-- BabyCue — Supabase schema (Phase 1 of Level 2)
 -- Paste this into the Supabase SQL editor and click Run.
 -- Safe to re-run: every statement is guarded with "if not exists" or "or replace".
 

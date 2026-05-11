@@ -1,8 +1,8 @@
-# Baby App
+# BabyCue
 
 A personalized assistant for new moms. Answers questions about your baby with advice tailored to their exact age and your parenting style — instead of generic Google searches.
 
-**Live app:** https://mehakkhara.github.io/baby-app/
+**Live app:** https://mehakkhara.github.io/babycue/
 
 ---
 
@@ -21,7 +21,7 @@ A personalized assistant for new moms. Answers questions about your baby with ad
 ┌────────────────────────────────────┐         ┌──────────────────────────────────────┐
 │  Frontend (React + Vite)           │  HTTPS  │  Backend (Node.js + Express)         │
 │  GitHub Pages                      │ ──────► │  Railway                             │
-│  mehakkhara.github.io/baby-app     │         │  baby-app-production.up.railway.app  │
+│  mehakkhara.github.io/babycue     │         │  baby-app-production.up.railway.app  │
 │                                    │         │                                      │
 │  Static bundle, no secrets         │         │  Holds ANTHROPIC_API_KEY              │
 └────────────────────────────────────┘         └──────────────────────────────────────┘
@@ -123,13 +123,13 @@ The frontend reads `VITE_SERVER_URL` and falls back to `http://localhost:3001` f
 npm run deploy
 ```
 
-This runs `vite build` then publishes the `dist/` folder to the `gh-pages` branch. GitHub Pages serves it at https://mehakkhara.github.io/baby-app/.
+This runs `vite build` then publishes the `dist/` folder to the `gh-pages` branch. GitHub Pages serves it at https://mehakkhara.github.io/babycue/.
 
 ### Backend → Railway
 
 The backend redeploys automatically whenever code is pushed to `main`. Railway is configured with:
 
-- **Source:** `mehakkhara/baby-app` repo, `main` branch
+- **Source:** `mehakkhara/babycue` repo, `main` branch
 - **Root Directory:** `server`
 - **Variables:**
   - `ANTHROPIC_API_KEY` — Anthropic API key
@@ -151,8 +151,8 @@ See [`plan.md`](./plan.md) for the full plan. High level:
 
 ## Useful links
 
-- **Live app:** https://mehakkhara.github.io/baby-app/
-- **Repo:** https://github.com/mehakkhara/baby-app
+- **Live app:** https://mehakkhara.github.io/babycue/
+- **Repo:** https://github.com/mehakkhara/babycue
 - **Backend:** https://baby-app-production.up.railway.app
 - **Anthropic console:** https://console.anthropic.com (manage API keys, usage)
 - **Railway dashboard:** https://railway.com/dashboard (manage backend deploys, env vars)
