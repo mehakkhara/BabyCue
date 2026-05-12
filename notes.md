@@ -51,10 +51,64 @@ We take today's date and subtract the baby's date of birth to get age in months.
 **GitHub** is a website that stores your git repository in the cloud. It's like Google Drive for code — your work is backed up, shareable, and has a full history of every change.
 
 ### Key git commands used:
-- `git add .` — stage all changed files (tell git "I want to include these in the next snapshot")
+- `git add <filename>` — stage a specific changed file (tell git "I want to include this in the next snapshot"). Prefer naming files explicitly over `git add .`, which can sweep up unrelated files like `.Rhistory`.
 - `git commit -m "message"` — save the snapshot with a description
 - `git push` — send your local commits up to GitHub
 - `git pull` — bring down changes from GitHub to your local machine
+
+---
+
+## Branches and Pull Requests
+
+When you build a new feature, you don't edit `main` directly. You create a **branch** — a temporary, parallel line of work — make your changes there, and then merge it back into `main` when it's ready. This way `main` always reflects working, shipped code, while messy in-progress work happens off to the side.
+
+### The full lifecycle of a feature
+
+**1. Create a branch when you start the feature**
+```
+git checkout -b show-different-tips-button
+```
+`-b` means "create and switch to." The branch name should describe the feature. From this point, every edit lives on this branch, not on `main`.
+
+**2. Work and commit as you go**
+```
+git add src/screens/HomeScreen.jsx
+git commit -m "Add 'Show me different tips' button on Home"
+```
+
+**3. Push the branch to GitHub when ready**
+```
+git push -u origin show-different-tips-button
+```
+`-u` sets the "upstream" link between your local branch and the GitHub branch — after the first push, future `git push` / `git pull` know which remote branch to use without arguments.
+
+**4. Open a pull request (PR) on GitHub**
+A PR is the formal request: "I'd like to merge this branch into `main`, please review the diff." For solo projects, this is a checkpoint where you can eyeball what you're about to ship. You can create one by visiting the URL GitHub prints after the push, or via `gh pr create` if the GitHub CLI is set up.
+
+**5. Merge the PR (also on GitHub)**
+Click the green Merge button. GitHub combines your branch into `main` on its servers. Your local laptop doesn't know about this yet.
+
+**6. Sync your local main + clean up the now-stale branch**
+```
+git checkout main                                # switch back to main locally
+git pull origin main                             # download the merge into local main
+git branch -d show-different-tips-button         # delete the local branch
+git push origin --delete show-different-tips-button   # delete the branch on GitHub
+```
+
+That last `git branch -d` (lowercase d) is safe — git refuses if the branch has unmerged work. Use `-D` (uppercase) only when you're sure you want to throw away unmerged work.
+
+### Why bother with branches at all?
+
+Three reasons, in order of how often they matter:
+
+1. **Safety net for `main`.** If a branch turns out to be a bad idea, you just delete it — `main` is untouched. No "oh no, I broke the live site" moments.
+2. **Permanent record of intent.** A PR ties a set of changes to a description, a review, and a date. Six months from now, when you're wondering "why did I write this weird code?", you can find the PR and read your past self's reasoning.
+3. **Trigger for deploys / CI / other automation.** Many setups deploy automatically when something merges into `main`. Working on a branch lets you fully finish + test before that automation fires.
+
+### When you don't need a branch
+
+For tiny single-line fixes to docs or comments on a solo project, committing directly to `main` is fine. The branching workflow is overhead — worth it when the change is meaningful enough that you might want to see it as a discrete unit later, overkill for a typo fix.
 
 ---
 
