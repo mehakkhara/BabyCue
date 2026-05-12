@@ -4,6 +4,9 @@ import OnboardingScreen from './screens/OnboardingScreen'
 import ChatScreen from './screens/ChatScreen'
 import StatsScreen from './screens/StatsScreen'
 import JournalScreen from './screens/JournalScreen'
+import AuthScreen from './screens/AuthScreen'
+import { isSupabaseConfigured } from './lib/supabase'
+import { useSession, signOut } from './lib/useSession'
 
 function loadProfile() {
   try {
@@ -52,17 +55,50 @@ const NAV_ITEMS = [
 ]
 
 export default function App() {
+  const { status, session } = useSession()
   const [profile, setProfile] = useState(loadProfile)
   const [activeTab, setActiveTab] = useState('home')
+
+  // Wait for Supabase to tell us whether there's an existing session before
+  // we decide which screen to render — avoids a flash of the auth screen on
+  // refresh for already-signed-in users.
+  if (status === 'loading') {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#9ca3af',
+        fontSize: '14px',
+      }}>
+        Loading…
+      </div>
+    )
+  }
+
+  // When Supabase is wired up, require sign-in before anything else.
+  // When it isn't, fall straight through to guest mode (localStorage).
+  if (isSupabaseConfigured && !session) {
+    return <AuthScreen />
+  }
 
   if (!profile) {
     return <OnboardingScreen onComplete={setProfile} />
   }
 
+  const handleSignOut = async () => {
+    await signOut()
+    // Auth state change will re-render the app into AuthScreen. We also clear
+    // the in-memory profile so the next signed-in user starts from onboarding
+    // (their profile will come from Supabase once migration lands).
+    setProfile(null)
+  }
+
   return (
     <div style={{ maxWidth: '480px', margin: '0 auto', position: 'relative', minHeight: '100vh' }}>
       <div style={{ paddingBottom: '72px' }}>
-        {activeTab === 'home'    && <HomeScreen onResetProfile={() => setProfile(null)} />}
+        {activeTab === 'home'    && <HomeScreen onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} />}
         {activeTab === 'chat'    && <ChatScreen />}
         {activeTab === 'stats'   && <StatsScreen />}
         {activeTab === 'journal' && <JournalScreen />}

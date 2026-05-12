@@ -63,7 +63,7 @@ const STAT_COLORS = [
   { accent: '#E91E8C' },
 ]
 
-export default function HomeScreen({ onResetProfile }) {
+export default function HomeScreen({ onResetProfile, onSignOut }) {
   const [selectedTopic, setSelectedTopic] = useState(null)
   const [viewStyle, setViewStyle] = useState(null)
   const [showOtherTopics, setShowOtherTopics] = useState(false)
@@ -514,14 +514,22 @@ export default function HomeScreen({ onResetProfile }) {
         )}
       </div>
 
-      {/* Edit profile */}
-      <div style={{ textAlign: 'center', marginTop: '32px', paddingBottom: '16px' }}>
+      {/* Edit profile / Sign out */}
+      <div style={{ textAlign: 'center', marginTop: '32px', paddingBottom: '16px', display: 'flex', gap: '14px', justifyContent: 'center' }}>
         <button
           onClick={onResetProfile}
           style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
         >
           Edit Profile
         </button>
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Sign Out
+          </button>
+        )}
       </div>
     </div>
   )
