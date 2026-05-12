@@ -50,6 +50,32 @@ React/Vite frontend. Baby profile stored in localStorage. 76 hardcoded tips acro
 
 ---
 
+## Content Enhancement — AI Tip of the Day
+
+**Goal:** Make the home screen feel fresh every day with a personalized, AI-generated tip that knows the baby's exact age, parenting style, growth data, and recent journal entries. Curated AAP/WHO-cited tips stay below as the evidence-based base — the AI tip sits on top as the "today, just for you" hero card.
+
+**Why this matters:** The curated pool is ~5–8 tips per month per style. Once you've seen them, you've seen them. An AI-generated daily tip never repeats and can react to actual context (e.g., "Kabir hasn't gained weight in 2 weeks per your growth log — here's what to watch for") in a way curated content can't.
+
+### What to Build
+- [ ] New `/api/daily-tip` endpoint on the existing Railway server. Same Claude call pattern as `/api/chat`, but a different system prompt focused on producing one focused tip.
+- [ ] System prompt that returns a tip with: a 4–8 word title, 2–3 sentence body, and a cited source (must reference AAP, WHO, CDC, or a peer-reviewed study — no made-up citations). If Claude can't cite real evidence, it must say so and the app falls back to a curated tip.
+- [ ] Frontend: fetch once on home screen mount, cache the result in `localStorage` with today's date as the key so it doesn't re-call Claude on every navigation. Show a small "✨ AI" badge on the card so the mom knows it's personalized vs. curated.
+- [ ] Pass the same enriched context the chat endpoint already builds (`server/index.js` `buildContextLines`): age, sex, feeding method, sleep arrangement, latest growth + WHO percentiles, recent journal entries.
+- [ ] Loading state: skeleton card while the request is in flight. Curated tips still render below so the screen is never blank.
+- [ ] Failure handling: if the endpoint errors or Claude can't produce a sourced tip, hide the AI card entirely and show only curated tips. Never show a fake citation.
+
+### Why the Caching Matters
+Without caching, every time the mom switches tabs and comes back to Home, we'd hit Claude again. With one call per day per user, cost is ~$0.01/day even for daily active use. The cache key should be `dailyTip:YYYY-MM-DD:<profileFingerprint>` so changing the baby's age (next month) or profile fields invalidates it.
+
+### Open Questions
+- Should the AI tip also rotate within a day if context changes (e.g., new growth entry added)? Probably yes — invalidate the cache when the profile is edited.
+- Should we let the mom see *yesterday's* AI tip too? Probably not — keep one card, keep it simple.
+
+### Cost Estimate
+- ~$0.30–1.00/month per daily user at current Claude pricing. Effectively free for personal use.
+
+---
+
 ## Level 2 — Accounts & Persistence
 
 **Goal:** Move the baby profile off localStorage so it persists across devices and browsers. Let the mom log in from her phone, tablet, and laptop.

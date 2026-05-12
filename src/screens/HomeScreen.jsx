@@ -97,9 +97,15 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
   const activeStyle = viewStyle || parentingStyle
   const allTips = getTipsForProfile(browseMonth, activeStyle, selectedTopic)
   const dayIndex = Math.floor(Date.now() / 86400000)
-  const todayTipIndex = allTips.length > 0 ? dayIndex % allTips.length : 0
-  const tipOfDay = allTips[todayTipIndex]
-  const extraTips = allTips.filter((_, i) => i !== todayTipIndex).slice(0, 2)
+  // Show 3 consecutive tips per day, sliding the window by 1 each day so
+  // every card rotates — not just the top "Tip of the Day".
+  const start = allTips.length > 0 ? dayIndex % allTips.length : 0
+  const dailyThree = Array.from(
+    { length: Math.min(3, allTips.length) },
+    (_, i) => allTips[(start + i) % allTips.length],
+  )
+  const tipOfDay = dailyThree[0]
+  const extraTips = dailyThree.slice(1)
 
   const isCurrentMonth = browseMonth === currentMonth
 
