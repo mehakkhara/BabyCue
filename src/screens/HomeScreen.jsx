@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import TipCard from '../components/TipCard'
 import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 
@@ -71,6 +71,7 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
     try { return JSON.parse(localStorage.getItem('savedTips') || '[]') } catch { return [] }
   })
   const [gotItId, setGotItId] = useState(null)
+  const [manualOffset, setManualOffset] = useState(0)
 
   function saveTip(id) {
     setSavedTips(prev => {
@@ -97,15 +98,24 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
   const activeStyle = viewStyle || parentingStyle
   const allTips = getTipsForProfile(browseMonth, activeStyle, selectedTopic)
   const dayIndex = Math.floor(Date.now() / 86400000)
-  // Show 3 consecutive tips per day, sliding the window by 1 each day so
-  // every card rotates — not just the top "Tip of the Day".
-  const start = allTips.length > 0 ? dayIndex % allTips.length : 0
+  // Show 3 consecutive tips per day, sliding the window by 1 each day. The
+  // "Show me different tips" button bumps manualOffset, which advances the
+  // window by 3 (a full batch) per click without affecting tomorrow's tips.
+  const start = allTips.length > 0
+    ? (dayIndex + manualOffset * 3) % allTips.length
+    : 0
   const dailyThree = Array.from(
     { length: Math.min(3, allTips.length) },
     (_, i) => allTips[(start + i) % allTips.length],
   )
   const tipOfDay = dailyThree[0]
   const extraTips = dailyThree.slice(1)
+
+  // Reset to today's batch whenever the user changes month/style/topic — the
+  // manual offset is meaningful only for the current filter, not across filters.
+  useEffect(() => {
+    setManualOffset(0)
+  }, [browseMonth, viewStyle, selectedTopic])
 
   const isCurrentMonth = browseMonth === currentMonth
 
@@ -335,6 +345,31 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
                 source={tip.source}
               />
             ))}
+
+            {allTips.length > 3 && (
+              <button
+                onClick={() => setManualOffset(o => o + 1)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  marginTop: '4px',
+                  background: 'transparent',
+                  border: '1px dashed #c4b5fd',
+                  borderRadius: '14px',
+                  color: '#7C6FF7',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span style={{ fontSize: '15px' }}>↻</span>
+                <span>Show me different tips</span>
+              </button>
+            )}
           </>
         ) : (
           <p style={{ color: '#9ca3af', fontSize: '14px', padding: '0 4px', marginBottom: '12px' }}>
