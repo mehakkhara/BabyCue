@@ -3,14 +3,51 @@ import { getBabyAgeInMonths } from '../data/tips'
 import { getEntries as getJournalEntries } from '../data/journalStore'
 import { getPercentile, ordinal, monthsBetween } from '../data/whoStandards'
 
-const SUGGESTED_QUESTIONS = [
-  "Why won't my baby sleep through the night?",
-  'Is this amount of crying normal?',
-  'When should I start solid foods?',
-  'How do I know if my baby is hitting their milestones?',
-]
+const SUGGESTIONS_BY_AGE = {
+  newborn: [
+    'Is cluster feeding normal at this age?',
+    'How much should my baby be sleeping?',
+    'Why does my baby cry so much in the evening?',
+    'When will my baby start to smile?',
+  ],
+  early: [
+    "Why won't my baby sleep through the night?",
+    'When should I start tummy time?',
+    "Is the 4-month sleep regression real?",
+    'How do I know my baby is getting enough milk?',
+  ],
+  middle: [
+    'When should I start solid foods?',
+    'What foods should I introduce first?',
+    'How do I help my baby learn to sit up?',
+    'Is separation anxiety normal at this age?',
+  ],
+  late: [
+    'How do I drop the morning nap?',
+    'Should I be worried about a tantrum like this?',
+    'When should I phase out the bottle?',
+    'How do I handle a picky eater?',
+  ],
+}
+
+function getSuggestions(ageInMonths) {
+  if (ageInMonths < 4) return SUGGESTIONS_BY_AGE.newborn
+  if (ageInMonths < 7) return SUGGESTIONS_BY_AGE.early
+  if (ageInMonths < 13) return SUGGESTIONS_BY_AGE.middle
+  return SUGGESTIONS_BY_AGE.late
+}
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
+const CHAT_STORAGE_KEY = 'chatMessages'
+
+function loadMessages() {
+  try {
+    const saved = localStorage.getItem(CHAT_STORAGE_KEY)
+    return saved ? JSON.parse(saved) : []
+  } catch {
+    return []
+  }
+}
 
 function loadLatestGrowth(profile) {
   try {
@@ -49,13 +86,19 @@ async function loadRecentJournalNotes(limit = 5) {
 }
 
 export default function ChatScreen() {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState(loadMessages)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef(null)
 
   const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
   const ageInMonths = getBabyAgeInMonths(profile.dateOfBirth)
+
+  // Persist messages so they survive tab switches (each tab unmounts ChatScreen)
+  // and full refreshes.
+  useEffect(() => {
+    try { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages)) } catch { /* quota */ }
+  }, [messages])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -132,7 +175,7 @@ export default function ChatScreen() {
               What's on your mind?
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {SUGGESTED_QUESTIONS.map(q => (
+              {getSuggestions(ageInMonths).map(q => (
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}

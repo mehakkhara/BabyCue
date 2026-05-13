@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function AuthScreen() {
-  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
+  // Default new visitors to 'signup' — the auth screen is the first thing they
+  // see, and they almost certainly don't have an account yet. Returning users
+  // can flip to 'signin' via the toggle below the form.
+  const [mode, setMode] = useState('signup') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phase, setPhase] = useState('idle') // 'idle' | 'submitting' | 'magicLinkSent' | 'confirmEmail' | 'error'
@@ -119,9 +122,7 @@ export default function AuthScreen() {
           textAlign: 'center',
           lineHeight: 1.5,
         }}>
-          {mode === 'signin'
-            ? "Sign in to keep your baby's profile and chats safe across devices."
-            : "Create an account to keep your baby's profile and chats safe across devices."}
+          Age-aware, evidence-based tips for your baby's exact month, in the parenting style that fits you.
         </p>
 
         {phase === 'magicLinkSent' ? (

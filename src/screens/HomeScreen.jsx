@@ -273,7 +273,17 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
       </div>
 
       {/* Stats banner */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', overflowX: 'auto', paddingBottom: '2px' }}>
+      <p style={{
+        margin: '0 4px 6px',
+        fontSize: '11px',
+        fontWeight: '700',
+        color: '#9ca3af',
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+      }}>
+        Typical for month {browseMonth}
+      </p>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
         {STAT_ITEMS.map((stat, i) => (
           <div key={stat.label} style={{
             flex: '1 0 76px',
@@ -306,6 +316,15 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
           </div>
         ))}
       </div>
+      <p style={{
+        margin: '0 4px 14px',
+        fontSize: '10px',
+        color: '#c4c4d4',
+        textAlign: 'center',
+        lineHeight: 1.5,
+      }}>
+        Based on American Academy of Pediatrics guidance
+      </p>
 
       {/* Tips section */}
       <div key={`${activeStyle}-${selectedTopic}-${browseMonth}`} style={{ animation: 'fadeIn 0.2s ease' }}>
@@ -608,7 +627,7 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
             onClick={openPasswordModal}
             style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
           >
-            Set Password
+            Change Password
           </button>
         )}
         {onSignOut && (
@@ -647,10 +666,10 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
             }}
           >
             <h2 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: '700', color: '#1e1b4b' }}>
-              Set a password
+              Change your password
             </h2>
             <p style={{ margin: '0 0 18px', fontSize: '13px', color: '#6b7280', lineHeight: 1.5 }}>
-              Add a password so you can sign in without waiting for a magic-link email.
+              Pick a new password to sign in with. If you signed in via magic link before, this is the first one — set it now and you can skip the email step next time.
             </p>
 
             {pwdSuccess ? (

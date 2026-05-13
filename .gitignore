@@ -7,3 +7,4 @@ dist/
 !.env.example
 !.env.production
 server/.env
+dogfood-output/
