@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import TipCard from '../components/TipCard'
 import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/tips'
+import { supabase } from '../lib/supabase'
 
 const AGE_STATS = {
   0:  { milk: '16–24 oz', wake: '45–60 min', naps: '4–5', diapers: '8–12' },
@@ -72,6 +73,45 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
   })
   const [gotItId, setGotItId] = useState(null)
   const [manualOffset, setManualOffset] = useState(0)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [newPwd, setNewPwd] = useState('')
+  const [confirmPwd, setConfirmPwd] = useState('')
+  const [pwdSubmitting, setPwdSubmitting] = useState(false)
+  const [pwdError, setPwdError] = useState('')
+  const [pwdSuccess, setPwdSuccess] = useState(false)
+
+  function openPasswordModal() {
+    setNewPwd('')
+    setConfirmPwd('')
+    setPwdError('')
+    setPwdSuccess(false)
+    setShowPasswordModal(true)
+  }
+
+  async function handleSetPassword(e) {
+    e.preventDefault()
+    if (newPwd.length < 6) {
+      setPwdError('Password must be at least 6 characters.')
+      return
+    }
+    if (newPwd !== confirmPwd) {
+      setPwdError('Passwords do not match.')
+      return
+    }
+
+    setPwdSubmitting(true)
+    setPwdError('')
+
+    const { error } = await supabase.auth.updateUser({ password: newPwd })
+    setPwdSubmitting(false)
+
+    if (error) {
+      setPwdError(error.message || 'Could not update password. Please try again.')
+    } else {
+      setPwdSuccess(true)
+      setTimeout(() => setShowPasswordModal(false), 1500)
+    }
+  }
 
   function saveTip(id) {
     setSavedTips(prev => {
@@ -565,6 +605,14 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
         </button>
         {onSignOut && (
           <button
+            onClick={openPasswordModal}
+            style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Set Password
+          </button>
+        )}
+        {onSignOut && (
+          <button
             onClick={onSignOut}
             style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
           >
@@ -572,6 +620,151 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
           </button>
         )}
       </div>
+
+      {showPasswordModal && (
+        <div
+          onClick={() => !pwdSubmitting && setShowPasswordModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.45)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 200,
+            padding: '24px',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: '20px',
+              padding: '24px',
+              width: '100%',
+              maxWidth: '360px',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+            }}
+          >
+            <h2 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: '700', color: '#1e1b4b' }}>
+              Set a password
+            </h2>
+            <p style={{ margin: '0 0 18px', fontSize: '13px', color: '#6b7280', lineHeight: 1.5 }}>
+              Add a password so you can sign in without waiting for a magic-link email.
+            </p>
+
+            {pwdSuccess ? (
+              <div style={{
+                background: '#ecfdf5',
+                border: '1px solid #a7f3d0',
+                borderRadius: '12px',
+                padding: '14px',
+                color: '#065f46',
+                fontSize: '14px',
+                textAlign: 'center',
+              }}>
+                Password updated. You can sign in with it next time.
+              </div>
+            ) : (
+              <form onSubmit={handleSetPassword}>
+                <input
+                  type="password"
+                  required
+                  autoFocus
+                  autoComplete="new-password"
+                  placeholder="New password"
+                  value={newPwd}
+                  onChange={(e) => setNewPwd(e.target.value)}
+                  disabled={pwdSubmitting}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: '15px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    marginBottom: '10px',
+                  }}
+                />
+                <input
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  placeholder="Confirm new password"
+                  value={confirmPwd}
+                  onChange={(e) => setConfirmPwd(e.target.value)}
+                  disabled={pwdSubmitting}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: '15px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    marginBottom: '12px',
+                  }}
+                />
+
+                {pwdError && (
+                  <p style={{
+                    margin: '0 0 12px',
+                    fontSize: '13px',
+                    color: '#b91c1c',
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '10px',
+                    padding: '10px 12px',
+                  }}>
+                    {pwdError}
+                  </p>
+                )}
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordModal(false)}
+                    disabled={pwdSubmitting}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: '#f3f4f6',
+                      color: '#374151',
+                      border: 'none',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: pwdSubmitting ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={pwdSubmitting || !newPwd || !confirmPwd}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: pwdSubmitting || !newPwd || !confirmPwd
+                        ? '#c4b5fd'
+                        : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: pwdSubmitting || !newPwd || !confirmPwd ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {pwdSubmitting ? 'Saving…' : 'Save'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
