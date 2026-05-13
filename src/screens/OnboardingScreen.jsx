@@ -128,6 +128,12 @@ export default function OnboardingScreen({ onComplete }) {
 
   const canSave = babyName.trim().length > 0 && dateOfBirth.length > 0 && parentingStyle.length > 0
 
+  const missingFields = [
+    babyName.trim().length === 0 && "baby's name",
+    dateOfBirth.length === 0 && 'date of birth',
+    parentingStyle.length === 0 && 'parenting style',
+  ].filter(Boolean)
+
   function handleSave() {
     if (!canSave) return
     const profile = {
@@ -334,6 +340,22 @@ export default function OnboardingScreen({ onComplete }) {
             </span>
           </label>
         </div>
+      )}
+
+      {!isEditing && !canSave && missingFields.length > 0 && (
+        <p style={{
+          margin: '0 0 8px',
+          fontSize: '12px',
+          color: '#9ca3af',
+          textAlign: 'center',
+          lineHeight: 1.5,
+        }}>
+          Add {missingFields.length === 1
+            ? missingFields[0]
+            : missingFields.length === 2
+              ? `${missingFields[0]} and ${missingFields[1]}`
+              : `${missingFields.slice(0, -1).join(', ')}, and ${missingFields[missingFields.length - 1]}`} to continue
+        </p>
       )}
 
       <button

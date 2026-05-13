@@ -5,6 +5,36 @@ React/Vite frontend. Baby profile stored in localStorage. 76 hardcoded tips acro
 
 ---
 
+## Deferred from Dogfood UX Review (2026-05-12)
+
+The first dogfood pass surfaced 8 findings; 6 shipped in the `polish-onboarding-and-home` PR. Two are deferred here because each has nontrivial ripple beyond a single-screen change.
+
+### Finding 4 — Add "Balanced / still figuring it out" parenting style
+
+**Why this is bigger than a copy change:** the parenting style isn't just a label — it drives which tips surface on Home via `getTipsForProfile()` in `src/data/tips.js`. Every tip is tagged with `gentle` or `schedule`. Adding a third style needs a content-modelling decision:
+
+- [ ] Option A: tag a subset of existing tips as `balanced` too (a curated mix). Means writing fresh tags across ~76 tips.
+- [ ] Option B: at runtime, treat `balanced` as "show tips tagged with either style, interleaved" — no content changes, but means slightly less style-coherent advice.
+- [ ] Option C: route `balanced` to a new tip pool. Most work; highest authorial control.
+- [ ] Rewrite the existing Gentle description to drop the comparative phrasing ("minimal crying") regardless of which option above is chosen.
+- [ ] Update `styleLabels` and `styleEmoji` in `HomeScreen.jsx` to include the new value.
+- [ ] Default new users to `balanced` in onboarding (vs. forcing a choice).
+
+**Recommended:** Option B first (zero content cost, validates user demand), then Option A if balanced becomes the dominant choice.
+
+### Finding 7 — Chat retry + typed error states
+
+**What's needed:** the current `ChatScreen` collapses every failure mode (network, server error, rate-limit, safety refusal) into one bubble in the conversation, with no way to retry without retyping.
+
+- [ ] Change message shape from `{role, content}` to `{role, content, status, errorType?}` where status is `ok | failed`. Hydrate handling in `loadMessages()` so old saved messages without these fields still render.
+- [ ] In `sendMessage`, distinguish `catch` (network) vs `!res.ok` (server, with HTTP status) vs `res.ok && data.error` (Claude refused or upstream error). Set `errorType` accordingly.
+- [ ] Render failed assistant turns with red styling, an icon, and an inline **Retry** button. Retry should re-fire `sendMessage` with the prior user message (track the source user turn via index or id).
+- [ ] Update copy per error type — e.g. network → "Check your connection", 429 → "Too many questions in a row, wait a moment", 5xx → "Server hiccup, try again."
+
+**Why deferred:** state refactor + retry plumbing is ~30–45 min of careful work. Best done as its own focused PR so the diff is easy to review and revert if the new message shape breaks anything.
+
+---
+
 ## UI Improvements
 
 ### Polish & Feel
