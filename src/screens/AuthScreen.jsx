@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function AuthScreen() {
-  // Default new visitors to 'signup' — the auth screen is the first thing they
-  // see, and they almost certainly don't have an account yet. Returning users
-  // can flip to 'signin' via the toggle below the form.
-  const [mode, setMode] = useState('signup') // 'signin' | 'signup'
+  // Default to 'signin' — most visits are returning users. First-time visitors
+  // can flip to 'signup' via the toggle below the form.
+  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phase, setPhase] = useState('idle') // 'idle' | 'submitting' | 'magicLinkSent' | 'confirmEmail' | 'error'
