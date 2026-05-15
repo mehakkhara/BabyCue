@@ -99,24 +99,17 @@ function GrowthChart({ entries, sex, metric }) {
 function loadEntries() {
   try { return JSON.parse(localStorage.getItem('growthEntries') || '[]') } catch { return [] }
 }
-function loadSex() {
-  try {
-    const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
-    return profile.babySex || localStorage.getItem('babySex') || null
-  } catch { return null }
-}
 
-export default function StatsScreen() {
+export default function StatsScreen({ profile, onProfileChange }) {
   const [entries, setEntries] = useState(loadEntries)
-  const [sex, setSex] = useState(loadSex)
   const [metric, setMetric] = useState('weight')
   const [showForm, setShowForm] = useState(false)
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0])
   const [formWeight, setFormWeight] = useState('')
   const [formHeight, setFormHeight] = useState('')
 
-  const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
   const { babyName, dateOfBirth } = profile
+  const sex = profile.babySex || null
 
   const enriched = entries
     .map(e => ({ ...e, ageMonths: monthsBetween(dateOfBirth, e.date) }))
@@ -124,14 +117,12 @@ export default function StatsScreen() {
 
   const latest = enriched[0]
 
-  function chooseSex(s) {
-    setSex(s)
-    localStorage.setItem('babySex', s)
+  async function chooseSex(s) {
     try {
-      const stored = JSON.parse(localStorage.getItem('babyProfile') || '{}')
-      stored.babySex = s
-      localStorage.setItem('babyProfile', JSON.stringify(stored))
-    } catch { /* profile missing — legacy key still set above */ }
+      await onProfileChange({ ...profile, babySex: s })
+    } catch (err) {
+      console.error('Failed to save babySex:', err)
+    }
   }
 
   function saveEntry() {
@@ -421,7 +412,7 @@ export default function StatsScreen() {
 
           {/* Sex change */}
           <div style={{ textAlign: 'center', paddingBottom: '16px' }}>
-            <button onClick={() => { setSex(null); localStorage.removeItem('babySex') }}
+            <button onClick={() => chooseSex(null)}
               style={{ background: 'none', border: 'none', color: '#c4c4d4', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>
               Change boy/girl setting
             </button>

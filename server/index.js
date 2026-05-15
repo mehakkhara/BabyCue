@@ -143,5 +143,68 @@ Style and tone:
   }
 })
 
+app.post('/api/daily-tip', async (req, res) => {
+  const { profile, context } = req.body
+
+  if (!profile || !profile.babyName || profile.ageInMonths == null) {
+    return res.status(400).json({ error: 'Profile is required' })
+  }
+
+  const { babyName, ageInMonths, parentingStyle } = profile
+  const styleText = STYLE_DESCRIPTIONS[parentingStyle] || parentingStyle
+  const contextLines = buildContextLines(profile, context)
+  const contextBlock = contextLines.length
+    ? `\n\nAdditional context about this specific baby and family:\n${contextLines.join('\n')}`
+    : ''
+
+  const systemPrompt = `You are a pediatric-development expert generating one personalized daily tip for the parent of ${babyName}, who is ${ageInMonths} month${ageInMonths === 1 ? '' : 's'} old. Their parenting approach is ${styleText}.${contextBlock}
+
+Produce exactly ONE tip tailored to ${babyName}'s exact age, the parenting style, and the context above.
+
+Output strict JSON only, no prose before or after, no markdown fence. Schema:
+{"title": string, "body": string, "source": string}
+
+Rules:
+- title: 4–8 words, sentence case, no trailing period.
+- body: 2–3 sentences, plain text, gender-neutral, no "mama"/"mom"/"dad", no preamble like "Great question". Directly actionable for this exact age and style.
+- source: must be a real, verifiable citation — AAP (American Academy of Pediatrics), WHO, CDC, NIH, or a named peer-reviewed study/journal. Do NOT fabricate citations or specific paper titles you are unsure of. Prefer well-known organizational guidance ("AAP", "WHO", "CDC", "AAP Bright Futures") over specific paper names.
+- If you cannot produce a tip with a real, verifiable source, return exactly: {"tip": null}
+
+Return JSON only.`
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 400,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: 'Generate the tip now.' }],
+    })
+
+    const raw = response.content[0].text.trim()
+
+    let parsed
+    try {
+      parsed = JSON.parse(raw)
+    } catch {
+      return res.json({ tip: null })
+    }
+
+    if (parsed.tip === null) {
+      return res.json({ tip: null })
+    }
+
+    const { title, body, source } = parsed
+    if (typeof title !== 'string' || typeof body !== 'string' || typeof source !== 'string'
+        || !title.trim() || !body.trim() || !source.trim()) {
+      return res.json({ tip: null })
+    }
+
+    res.json({ tip: { title: title.trim(), body: body.trim(), source: source.trim() } })
+  } catch (err) {
+    console.error('Daily tip error:', err.status, err.message)
+    res.status(500).json({ tip: null })
+  }
+})
+
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

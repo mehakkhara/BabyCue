@@ -2,6 +2,21 @@ import { useEffect, useState } from 'react'
 import TipCard from '../components/TipCard'
 import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { supabase } from '../lib/supabase'
+import { loadLatestGrowth, loadRecentJournalNotes } from '../lib/aiContext'
+
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
+
+function todayKey() {
+  return new Date().toISOString().split('T')[0]
+}
+
+function profileFingerprint(profile, ageInMonths) {
+  return [
+    profile.babyName, ageInMonths, profile.parentingStyle,
+    profile.babySex, profile.feedingMethod, profile.sleepArrangement,
+    profile.birthContext, profile.siblings,
+  ].map(v => v ?? '').join('|')
+}
 
 const AGE_STATS = {
   0:  { milk: '16–24 oz', wake: '45–60 min', naps: '4–5', diapers: '8–12' },
@@ -64,7 +79,7 @@ const STAT_COLORS = [
   { accent: '#E91E8C' },
 ]
 
-export default function HomeScreen({ onResetProfile, onSignOut }) {
+export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
   const [selectedTopic, setSelectedTopic] = useState(null)
   const [viewStyle, setViewStyle] = useState(null)
   const [showOtherTopics, setShowOtherTopics] = useState(false)
@@ -73,6 +88,8 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
   })
   const [gotItId, setGotItId] = useState(null)
   const [manualOffset, setManualOffset] = useState(0)
+  const [aiTip, setAiTip] = useState(null)
+  const [aiTipLoading, setAiTipLoading] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [newPwd, setNewPwd] = useState('')
   const [confirmPwd, setConfirmPwd] = useState('')
@@ -121,7 +138,6 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
     })
   }
 
-  const profile = JSON.parse(localStorage.getItem('babyProfile') || '{}')
   const { babyName, dateOfBirth, parentingStyle, momName } = profile
   const ageInMonths = getBabyAgeInMonths(dateOfBirth)
   const currentMonth = Math.max(1, Math.min(ageInMonths, 24))
@@ -158,6 +174,60 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
   }, [browseMonth, viewStyle, selectedTopic])
 
   const isCurrentMonth = browseMonth === currentMonth
+  // AI tip is anchored to the user's actual baby + actual style — not whatever
+  // month/style they're browsing. Only fetch when they're on their own context.
+  const showAiTip = isCurrentMonth && (viewStyle === null || viewStyle === parentingStyle)
+
+  useEffect(() => {
+    if (!showAiTip || !babyName || !dateOfBirth) return
+    let cancelled = false
+
+    const fp = profileFingerprint(profile, ageInMonths)
+    const cacheKey = `dailyTip:${todayKey()}:${fp}`
+
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        if (parsed && parsed.title) setAiTip(parsed)
+        return
+      } catch { /* fall through and refetch */ }
+    }
+
+    async function fetchTip() {
+      setAiTipLoading(true)
+      try {
+        const latestGrowth = loadLatestGrowth(profile)
+        const recentJournal = await loadRecentJournalNotes(5)
+
+        const res = await fetch(`${SERVER_URL}/api/daily-tip`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            profile: { ...profile, ageInMonths },
+            context: { latestGrowth, recentJournal },
+          }),
+        })
+        const data = await res.json()
+        if (cancelled) return
+        if (res.ok && data.tip && data.tip.title) {
+          setAiTip(data.tip)
+          try { localStorage.setItem(cacheKey, JSON.stringify(data.tip)) } catch { /* quota */ }
+        } else {
+          setAiTip(null)
+        }
+      } catch {
+        if (!cancelled) setAiTip(null)
+      } finally {
+        if (!cancelled) setAiTipLoading(false)
+      }
+    }
+
+    fetchTip()
+    return () => { cancelled = true }
+  }, [showAiTip, babyName, dateOfBirth, ageInMonths, parentingStyle,
+      profile.babySex, profile.feedingMethod, profile.sleepArrangement,
+      profile.birthContext, profile.siblings])
 
   return (
     <div style={{
@@ -330,69 +400,102 @@ export default function HomeScreen({ onResetProfile, onSignOut }) {
       <div key={`${activeStyle}-${selectedTopic}-${browseMonth}`} style={{ animation: 'fadeIn 0.2s ease' }}>
         {tipOfDay ? (
           <>
-            {/* Tip of the Day */}
-            <div style={{
-              background: '#fff',
-              borderRadius: '20px',
-              padding: '20px',
-              marginBottom: '12px',
-              boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
-              borderLeft: '4px solid #a78bfa',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                <span style={{ fontSize: '16px' }}>💡</span>
-                <span style={{ fontSize: '11px', fontWeight: '700', color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  Tip of the Day
-                </span>
-              </div>
-              <p style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '600', color: '#1e1b4b', lineHeight: 1.5 }}>
-                {tipOfDay.title}
-              </p>
-              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.65', color: '#6b7280' }}>
-                {tipOfDay.body}
-              </p>
-              {tipOfDay.source && (
-                <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#c4b5fd' }}>
-                  Source: {tipOfDay.source}
-                </p>
-              )}
-              <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
-                <button
-                  onClick={() => saveTip(tipOfDay.id)}
-                  style={{
-                    flex: 1,
-                    padding: '9px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    background: savedTips.includes(tipOfDay.id) ? '#ede9fe' : '#f5f3ff',
-                    color: savedTips.includes(tipOfDay.id) ? '#7C6FF7' : '#9ca3af',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {savedTips.includes(tipOfDay.id) ? '🔖 Saved' : '🔖 Save tip'}
-                </button>
-                <button
-                  onClick={() => setGotItId(tipOfDay.id)}
-                  style={{
-                    flex: 1,
-                    padding: '9px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    background: gotItId === tipOfDay.id ? '#ecfdf5' : '#f0fdf4',
-                    color: gotItId === tipOfDay.id ? '#15803d' : '#9ca3af',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {gotItId === tipOfDay.id ? '✓ Done!' : '✓ Got it'}
-                </button>
-              </div>
-            </div>
+            {/* Tip of the Day — AI-generated when available, curated otherwise */}
+            {(() => {
+              const useAi = showAiTip && aiTip && !aiTipLoading
+              const heroTitle = useAi ? aiTip.title : tipOfDay.title
+              const heroBody = useAi ? aiTip.body : tipOfDay.body
+              const heroSource = useAi ? aiTip.source : tipOfDay.source
+              const heroId = useAi ? `ai:${todayKey()}` : tipOfDay.id
+              const accent = useAi ? '#7C6FF7' : '#a78bfa'
+              return (
+                <div style={{
+                  background: '#fff',
+                  borderRadius: '20px',
+                  padding: '20px',
+                  marginBottom: '12px',
+                  boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+                  borderLeft: `4px solid ${accent}`,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '16px' }}>{useAi ? '✨' : '💡'}</span>
+                    <span style={{ fontSize: '11px', fontWeight: '700', color: accent, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      Tip of the Day
+                    </span>
+                    {useAi && (
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: '700',
+                        color: '#fff',
+                        background: '#7C6FF7',
+                        padding: '2px 7px',
+                        borderRadius: '10px',
+                        letterSpacing: '0.04em',
+                      }}>
+                        ✨ AI · for {babyName}
+                      </span>
+                    )}
+                  </div>
+                  {aiTipLoading && showAiTip && !aiTip ? (
+                    <>
+                      <div style={{ height: '14px', width: '70%', background: '#f1edff', borderRadius: '6px', marginBottom: '10px' }} />
+                      <div style={{ height: '11px', width: '95%', background: '#f5f3ff', borderRadius: '6px', marginBottom: '6px' }} />
+                      <div style={{ height: '11px', width: '85%', background: '#f5f3ff', borderRadius: '6px' }} />
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '600', color: '#1e1b4b', lineHeight: 1.5 }}>
+                        {heroTitle}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.65', color: '#6b7280' }}>
+                        {heroBody}
+                      </p>
+                      {heroSource && (
+                        <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#c4b5fd' }}>
+                          Source: {heroSource}
+                        </p>
+                      )}
+                    </>
+                  )}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+                    <button
+                      onClick={() => saveTip(heroId)}
+                      style={{
+                        flex: 1,
+                        padding: '9px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: savedTips.includes(heroId) ? '#ede9fe' : '#f5f3ff',
+                        color: savedTips.includes(heroId) ? '#7C6FF7' : '#9ca3af',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {savedTips.includes(heroId) ? '🔖 Saved' : '🔖 Save tip'}
+                    </button>
+                    <button
+                      onClick={() => setGotItId(heroId)}
+                      style={{
+                        flex: 1,
+                        padding: '9px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: gotItId === heroId ? '#ecfdf5' : '#f0fdf4',
+                        color: gotItId === heroId ? '#15803d' : '#9ca3af',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {gotItId === heroId ? '✓ Done!' : '✓ Got it'}
+                    </button>
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Two more tips */}
             {extraTips.map(tip => (

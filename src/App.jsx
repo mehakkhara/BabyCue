@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import HomeScreen from './screens/HomeScreen'
 import OnboardingScreen from './screens/OnboardingScreen'
 import ChatScreen from './screens/ChatScreen'
@@ -7,15 +7,7 @@ import JournalScreen from './screens/JournalScreen'
 import AuthScreen from './screens/AuthScreen'
 import { isSupabaseConfigured } from './lib/supabase'
 import { useSession, signOut } from './lib/useSession'
-
-function loadProfile() {
-  try {
-    const saved = localStorage.getItem('babyProfile')
-    return saved ? JSON.parse(saved) : null
-  } catch {
-    return null
-  }
-}
+import { getProfile, saveProfile, backfillLocalProfileIfNeeded } from './lib/db'
 
 const HomeIcon = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -56,13 +48,44 @@ const NAV_ITEMS = [
 
 export default function App() {
   const { status, session } = useSession()
-  const [profile, setProfile] = useState(loadProfile)
+  // undefined = loading, null = no profile yet, object = ready
+  const [profile, setProfile] = useState(undefined)
   const [activeTab, setActiveTab] = useState('home')
+
+  useEffect(() => {
+    if (status !== 'ready') return
+    // Not signed in (and Supabase is configured) — don't load anything yet.
+    if (isSupabaseConfigured && !session) {
+      setProfile(null)
+      return
+    }
+
+    let cancelled = false
+    ;(async () => {
+      try {
+        // First sign-in: push any guest-mode localStorage profile up to Supabase.
+        const backfilled = isSupabaseConfigured && session
+          ? await backfillLocalProfileIfNeeded()
+          : null
+        const p = backfilled ?? (await getProfile())
+        if (!cancelled) setProfile(p)
+      } catch (err) {
+        console.error('Profile load failed:', err)
+        if (!cancelled) setProfile(null)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [status, session])
+
+  async function handleProfileChange(next) {
+    await saveProfile(next)
+    setProfile(next)
+  }
 
   // Wait for Supabase to tell us whether there's an existing session before
   // we decide which screen to render — avoids a flash of the auth screen on
   // refresh for already-signed-in users.
-  if (status === 'loading') {
+  if (status === 'loading' || profile === undefined) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -84,23 +107,20 @@ export default function App() {
   }
 
   if (!profile) {
-    return <OnboardingScreen onComplete={setProfile} />
+    return <OnboardingScreen onComplete={handleProfileChange} />
   }
 
   const handleSignOut = async () => {
     await signOut()
-    // Auth state change will re-render the app into AuthScreen. We also clear
-    // the in-memory profile so the next signed-in user starts from onboarding
-    // (their profile will come from Supabase once migration lands).
     setProfile(null)
   }
 
   return (
     <div style={{ maxWidth: '480px', margin: '0 auto', position: 'relative', minHeight: '100vh' }}>
       <div style={{ paddingBottom: '72px' }}>
-        {activeTab === 'home'    && <HomeScreen onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} />}
-        {activeTab === 'chat'    && <ChatScreen />}
-        {activeTab === 'stats'   && <StatsScreen />}
+        {activeTab === 'home'    && <HomeScreen profile={profile} onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} />}
+        {activeTab === 'chat'    && <ChatScreen profile={profile} />}
+        {activeTab === 'stats'   && <StatsScreen profile={profile} onProfileChange={handleProfileChange} />}
         {activeTab === 'journal' && <JournalScreen />}
       </div>
 

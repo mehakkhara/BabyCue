@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getProfile } from '../lib/db'
 
 const styleOptions = [
   {
@@ -42,21 +43,6 @@ const siblingOptions = [
   { value: 'only',     label: 'No older siblings' },
   { value: 'siblings', label: 'Has older sibling(s)' },
 ]
-
-function loadExisting() {
-  try {
-    const saved = localStorage.getItem('babyProfile')
-    const profile = saved ? JSON.parse(saved) : null
-    if (!profile) return null
-    if (!profile.babySex) {
-      const legacySex = localStorage.getItem('babySex')
-      if (legacySex) profile.babySex = legacySex
-    }
-    return profile
-  } catch {
-    return null
-  }
-}
 
 const labelStyle = {
   display: 'block',
@@ -109,22 +95,49 @@ function ChoiceRow({ options, value, onChange }) {
 }
 
 export default function OnboardingScreen({ onComplete }) {
-  const existing = loadExisting()
-  const [momName, setMomName] = useState(existing?.momName || '')
-  const [babyName, setBabyName] = useState(existing?.babyName || '')
-  const [dateOfBirth, setDateOfBirth] = useState(existing?.dateOfBirth || '')
-  const [parentingStyle, setParentingStyle] = useState(existing?.parentingStyle || '')
-  const [babySex, setBabySex] = useState(existing?.babySex || '')
-  const [feedingMethod, setFeedingMethod] = useState(existing?.feedingMethod || '')
-  const [sleepArrangement, setSleepArrangement] = useState(existing?.sleepArrangement || '')
-  const [birthContext, setBirthContext] = useState(existing?.birthContext || '')
-  const [siblings, setSiblings] = useState(existing?.siblings || '')
-  const [notes, setNotes] = useState(existing?.notes || '')
+  // undefined while loading existing profile, null when none, object when found
+  const [existing, setExisting] = useState(undefined)
+  const [momName, setMomName] = useState('')
+  const [babyName, setBabyName] = useState('')
+  const [dateOfBirth, setDateOfBirth] = useState('')
+  const [parentingStyle, setParentingStyle] = useState('')
+  const [babySex, setBabySex] = useState('')
+  const [feedingMethod, setFeedingMethod] = useState('')
+  const [sleepArrangement, setSleepArrangement] = useState('')
+  const [birthContext, setBirthContext] = useState('')
+  const [siblings, setSiblings] = useState('')
+  const [notes, setNotes] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    getProfile().then(p => {
+      if (cancelled) return
+      setExisting(p)
+      if (p) {
+        setMomName(p.momName || '')
+        setBabyName(p.babyName || '')
+        setDateOfBirth(p.dateOfBirth || '')
+        setParentingStyle(p.parentingStyle || '')
+        setBabySex(p.babySex || '')
+        setFeedingMethod(p.feedingMethod || '')
+        setSleepArrangement(p.sleepArrangement || '')
+        setBirthContext(p.birthContext || '')
+        setSiblings(p.siblings || '')
+        setNotes(p.notes || '')
+      }
+    })
+    return () => { cancelled = true }
+  }, [])
 
   const isEditing = !!existing
   const hasOptionalDetails =
     babySex || feedingMethod || sleepArrangement || birthContext || siblings || notes
-  const [showMore, setShowMore] = useState(isEditing && hasOptionalDetails)
+  const [showMore, setShowMore] = useState(false)
+  useEffect(() => {
+    if (isEditing && hasOptionalDetails) setShowMore(true)
+  }, [isEditing, hasOptionalDetails])
 
   const canSave = babyName.trim().length > 0 && dateOfBirth.length > 0 && parentingStyle.length > 0
 
@@ -134,8 +147,8 @@ export default function OnboardingScreen({ onComplete }) {
     parentingStyle.length === 0 && 'parenting style',
   ].filter(Boolean)
 
-  function handleSave() {
-    if (!canSave) return
+  async function handleSave() {
+    if (!canSave || saving) return
     const profile = {
       momName: momName.trim() || 'Mama',
       babyName: babyName.trim(),
@@ -148,9 +161,16 @@ export default function OnboardingScreen({ onComplete }) {
       siblings: siblings || null,
       notes: notes.trim() || null,
     }
-    localStorage.setItem('babyProfile', JSON.stringify(profile))
-    if (babySex) localStorage.setItem('babySex', babySex)
-    onComplete(profile)
+    setSaving(true)
+    setSaveError('')
+    try {
+      await onComplete(profile)
+    } catch (err) {
+      console.error('Profile save failed:', err)
+      setSaveError(err?.message || 'Could not save. Please try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -358,23 +378,35 @@ export default function OnboardingScreen({ onComplete }) {
         </p>
       )}
 
+      {saveError && (
+        <p style={{
+          margin: '0 0 8px',
+          fontSize: '13px',
+          color: '#dc2626',
+          textAlign: 'center',
+          lineHeight: 1.5,
+        }}>
+          {saveError}
+        </p>
+      )}
+
       <button
         onClick={handleSave}
-        disabled={!canSave}
+        disabled={!canSave || saving}
         style={{
           width: '100%',
           padding: '16px',
           borderRadius: '14px',
           border: 'none',
-          backgroundColor: canSave ? '#7C3AED' : '#E5E7EB',
-          color: canSave ? '#fff' : '#999',
+          backgroundColor: canSave && !saving ? '#7C3AED' : '#E5E7EB',
+          color: canSave && !saving ? '#fff' : '#999',
           fontSize: '16px',
           fontWeight: '600',
-          cursor: canSave ? 'pointer' : 'not-allowed',
+          cursor: canSave && !saving ? 'pointer' : 'not-allowed',
           transition: 'background-color 0.2s',
         }}
       >
-        {isEditing ? 'Save Changes' : 'Get Started'}
+        {saving ? 'Saving…' : (isEditing ? 'Save Changes' : 'Get Started')}
       </button>
     </div>
   )
