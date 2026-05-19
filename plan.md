@@ -3,6 +3,8 @@
 ## Current State
 React/Vite frontend. Baby profile stored in localStorage. 76 hardcoded tips across months 1–12, filtered by age and parenting style. Deployed on GitHub Pages.
 
+**Shipped 2026-05-18 — PWA (service worker phase).** `vite-plugin-pwa` configured in `vite.config.js`. Service worker precaches the app shell (~518 KiB, 12 entries) for instant + offline load. Runtime caching split: `/api/daily-tip` uses NetworkFirst (24h offline fallback), `/api/chat` uses NetworkOnly (no stale answers). Still TODO from `pwa-scope.md`: iOS splash screens (Step 3), real-iPhone install test (Step 5), and replacing the placeholder "BC" icons with a real BabyCue logo before sharing with real users.
+
 ---
 
 ## Deferred from Dogfood UX Review (2026-05-12)
