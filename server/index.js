@@ -138,7 +138,9 @@ Style and tone:
     console.error('Anthropic API error:', err.status, err.message)
     const status = err.status && err.status >= 400 && err.status < 600 ? err.status : 500
     res.status(status).json({
-      error: 'Sorry, I had trouble responding just now. Please try again in a moment.',
+      error: err.message
+        ? `Backend (${err.status || 'unknown'}): ${err.message}`
+        : 'Sorry, I had trouble responding just now. Please try again in a moment.',
     })
   }
 })
@@ -202,7 +204,7 @@ Return JSON only.`
     res.json({ tip: { title: title.trim(), body: body.trim(), source: source.trim() } })
   } catch (err) {
     console.error('Daily tip error:', err.status, err.message)
-    res.status(500).json({ tip: null })
+    res.status(500).json({ tip: null, _error: { status: err.status, message: err.message } })
   }
 })
 
