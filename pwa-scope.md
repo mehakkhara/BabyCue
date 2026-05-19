@@ -6,14 +6,14 @@ This work is **purely additive** and doesn't conflict with a future App Store wr
 
 ---
 
-## Progress (paused 2026-05-16)
+## Progress (updated 2026-05-18)
 
 - [x] **Step 1 — Web manifest.** `public/manifest.webmanifest` created with name, theme color `#7C6FF7`, background `#dce8f8`, standalone display, and 4 icon entries. `index.html` updated with `<link rel="manifest">` and `<meta name="theme-color">`.
 - [x] **Step 2 — Placeholder icons.** Generated via `/tmp/gen_icons.py` using PIL: `public/icons/icon-192.png`, `icon-512.png`, `icon-maskable-192.png`, `icon-maskable-512.png`. Purple "BC" wordmark on theme-color background. Replace with real BabyCue logo (1024×1024 source) before shipping to real users — recommend [realfavicongenerator.net](https://realfavicongenerator.net) for the full set.
 - [ ] **Step 3 — iOS splash screens.** Not started. Needs per-device PNGs + `<link rel="apple-touch-startup-image">` tags.
-- [ ] **Step 4 — Service worker via `vite-plugin-pwa`.** Not started. This is the bigger functional win (offline + instant load). Recommended next.
-- [ ] **Step 5 — Test on a real iPhone** (Share → Add to Home Screen, then airplane-mode test).
-- [ ] **Step 6 — Deploy** (`npm run deploy`) and update `plan.md`.
+- [x] **Step 4 — Service worker via `vite-plugin-pwa`.** Installed `vite-plugin-pwa` (dev dep) and configured `VitePWA` in `vite.config.js` with `registerType: 'autoUpdate'`, `manifest: false` (existing manifest at `public/manifest.webmanifest` is reused), and Workbox runtime caching: NetworkFirst for `/api/*` (8s timeout, 1-day cache), StaleWhileRevalidate for `fonts.googleapis.com`, CacheFirst for `fonts.gstatic.com`. Build verified — generates `dist/sw.js`, `dist/workbox-*.js`, and precaches 12 entries (~518 KiB).
+- [ ] **Step 5 — Test on a real iPhone** (Share → Add to Home Screen, then airplane-mode test). On user.
+- [x] **Step 6 — Deploy.** `npm run deploy` shipped on 2026-05-18 to https://mehakkhara.github.io/BabyCue/. `plan.md` updated.
 
 ---
 
