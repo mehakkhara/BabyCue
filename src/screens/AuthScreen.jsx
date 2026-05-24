@@ -121,7 +121,7 @@ export default function AuthScreen() {
           textAlign: 'center',
           lineHeight: 1.5,
         }}>
-          Age-aware, evidence-based tips for your baby's exact month, in the parenting style that fits you.
+          Age-aware, evidence-based tips for your baby's exact month.
         </p>
 
         {phase === 'magicLinkSent' ? (

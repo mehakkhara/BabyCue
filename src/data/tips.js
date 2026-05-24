@@ -372,10 +372,9 @@ export const funActivities = [
   { id: 'f6', month: 6, topic: 'play', title: 'Messy Food Painting', body: 'Put a small amount of pureed sweet potato or avocado on their tray and let them go wild. Yes it\'s messy. Yes it\'s absolutely worth it for the photos and the giggles.' },
 ]
 
-export function getTipsForProfile(month, style, topic = null) {
+export function getTipsForProfile(month, topic = null) {
   return tips.filter(tip =>
     tip.month === month &&
-    tip.style === style &&
     (topic === null || tip.topic === topic)
   )
 }

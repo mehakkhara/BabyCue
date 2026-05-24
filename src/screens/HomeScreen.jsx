@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import TipCard from '../components/TipCard'
 import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/tips'
+import { addEntry, getEntries } from '../data/journalStore'
 import { supabase } from '../lib/supabase'
 import { loadLatestGrowth, loadRecentJournalNotes } from '../lib/aiContext'
 
@@ -12,7 +12,7 @@ function todayKey() {
 
 function profileFingerprint(profile, ageInMonths) {
   return [
-    profile.babyName, ageInMonths, profile.parentingStyle,
+    profile.babyName, ageInMonths,
     profile.babySex, profile.feedingMethod, profile.sleepArrangement,
     profile.birthContext, profile.siblings,
   ].map(v => v ?? '').join('|')
@@ -46,30 +46,20 @@ const AGE_STATS = {
   24: { milk: '14–20 oz', wake: '6+ hr',     naps: '1',   diapers: '2–4'  },
 }
 
-const styleLabels = {
-  gentle: 'Gentle Parenting',
-  schedule: 'Schedule-Based',
-}
-
-const styleEmoji = {
-  gentle: '🌿',
-  schedule: '📅',
-}
-
 const PRIMARY_TOPICS = [
   { value: null,          label: 'All',         emoji: '✨' },
   { value: 'sleep',       label: 'Sleep',       emoji: '🌙' },
   { value: 'feeding',     label: 'Feeding',     emoji: '🍼' },
   { value: 'development', label: 'Development', emoji: '🧠' },
   { value: 'motor',       label: 'Motor',       emoji: '💪' },
+  { value: 'regression',  label: 'Regression',  emoji: '🔄' },
 ]
 
 const OTHER_TOPICS = [
-  { value: 'activity',   label: 'Activities',  emoji: '🎨' },
-  { value: 'teething',   label: 'Teething',    emoji: '🦷' },
-  { value: 'fussy',      label: 'Fussy Phase', emoji: '😮‍💨' },
-  { value: 'leap',       label: 'Dev Leap',    emoji: '🧩' },
-  { value: 'regression', label: 'Regression',  emoji: '🔄' },
+  { value: 'activity', label: 'Activities',  emoji: '🎨' },
+  { value: 'teething', label: 'Teething',    emoji: '🦷' },
+  { value: 'fussy',    label: 'Fussy Phase', emoji: '😮‍💨' },
+  { value: 'leap',     label: 'Dev Leap',    emoji: '🧩' },
 ]
 
 const STAT_COLORS = [
@@ -79,10 +69,8 @@ const STAT_COLORS = [
   { accent: '#E91E8C' },
 ]
 
-export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
+export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJournal }) {
   const [selectedTopic, setSelectedTopic] = useState(null)
-  const [viewStyle, setViewStyle] = useState(null)
-  const [showOtherTopics, setShowOtherTopics] = useState(false)
   const [savedTips, setSavedTips] = useState(() => {
     try { return JSON.parse(localStorage.getItem('savedTips') || '[]') } catch { return [] }
   })
@@ -96,6 +84,71 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
   const [pwdSubmitting, setPwdSubmitting] = useState(false)
   const [pwdError, setPwdError] = useState('')
   const [pwdSuccess, setPwdSuccess] = useState(false)
+
+  const [potdFile, setPotdFile] = useState(null)
+  const [potdPreviewUrl, setPotdPreviewUrl] = useState(null)
+  const [potdNote, setPotdNote] = useState('')
+  const [potdSaving, setPotdSaving] = useState(false)
+  const [potdError, setPotdError] = useState('')
+  const [potdSavedToday, setPotdSavedToday] = useState(false)
+  const [potdSavedPreviewUrl, setPotdSavedPreviewUrl] = useState(null)
+
+  useEffect(() => {
+    if (!potdFile) { setPotdPreviewUrl(null); return }
+    const url = URL.createObjectURL(potdFile)
+    setPotdPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [potdFile])
+
+  // Check if a photo was already saved to the journal today, and reset at
+  // midnight so "today's photo" rolls over.
+  useEffect(() => {
+    let cancelled = false
+    let savedUrl = null
+    ;(async () => {
+      try {
+        const entries = await getEntries()
+        const startOfDay = new Date()
+        startOfDay.setHours(0, 0, 0, 0)
+        const todays = entries.find(e => e.photoBlob && e.createdAt >= startOfDay.getTime())
+        if (cancelled) return
+        if (todays) {
+          savedUrl = URL.createObjectURL(todays.photoBlob)
+          setPotdSavedPreviewUrl(savedUrl)
+          setPotdSavedToday(true)
+        } else {
+          setPotdSavedToday(false)
+          setPotdSavedPreviewUrl(null)
+        }
+      } catch { /* ignore — uploader still works */ }
+    })()
+    return () => {
+      cancelled = true
+      if (savedUrl) URL.revokeObjectURL(savedUrl)
+    }
+  }, [])
+
+  async function handleSavePhotoOfDay() {
+    if (!potdFile) return
+    setPotdSaving(true)
+    setPotdError('')
+    try {
+      await addEntry({
+        note: potdNote.trim(),
+        photoBlob: potdFile,
+        photoType: potdFile.type || 'image/jpeg',
+      })
+      const url = URL.createObjectURL(potdFile)
+      setPotdSavedPreviewUrl(url)
+      setPotdSavedToday(true)
+      setPotdFile(null)
+      setPotdNote('')
+    } catch (err) {
+      setPotdError(err?.message || 'Could not save. Try again.')
+    } finally {
+      setPotdSaving(false)
+    }
+  }
 
   function openPasswordModal() {
     setNewPwd('')
@@ -138,7 +191,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
     })
   }
 
-  const { babyName, dateOfBirth, parentingStyle, momName } = profile
+  const { babyName, dateOfBirth, momName } = profile
   const ageInMonths = getBabyAgeInMonths(dateOfBirth)
   const currentMonth = Math.max(1, Math.min(ageInMonths, 24))
   const [browseMonth, setBrowseMonth] = useState(currentMonth)
@@ -151,32 +204,28 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
     { icon: '🩹', label: 'Diapers',     value: stats.diapers },
   ]
 
-  const activeStyle = viewStyle || parentingStyle
-  const allTips = getTipsForProfile(browseMonth, activeStyle, selectedTopic)
+  const otherTopicValues = OTHER_TOPICS.map(t => t.value)
+  const allTips = selectedTopic === 'other'
+    ? getTipsForProfile(browseMonth).filter(t => otherTopicValues.includes(t.topic))
+    : getTipsForProfile(browseMonth, selectedTopic)
   const dayIndex = Math.floor(Date.now() / 86400000)
-  // Show 3 consecutive tips per day, sliding the window by 1 each day. The
-  // "Show me different tips" button bumps manualOffset, which advances the
-  // window by 3 (a full batch) per click without affecting tomorrow's tips.
-  const start = allTips.length > 0
-    ? (dayIndex + manualOffset * 3) % allTips.length
-    : 0
-  const dailyThree = Array.from(
-    { length: Math.min(3, allTips.length) },
-    (_, i) => allTips[(start + i) % allTips.length],
-  )
-  const tipOfDay = dailyThree[0]
-  const extraTips = dailyThree.slice(1)
+  // One tip per day, advancing by 1 each day so it changes daily. The
+  // "Show me a different tip" button bumps manualOffset for the current filter
+  // only — it doesn't shift tomorrow's tip.
+  const tipOfDay = allTips.length > 0
+    ? allTips[(dayIndex + manualOffset) % allTips.length]
+    : null
 
   // Reset to today's batch whenever the user changes month/style/topic — the
   // manual offset is meaningful only for the current filter, not across filters.
   useEffect(() => {
     setManualOffset(0)
-  }, [browseMonth, viewStyle, selectedTopic])
+  }, [browseMonth, selectedTopic])
 
   const isCurrentMonth = browseMonth === currentMonth
   // AI tip is anchored to the user's actual baby + actual style — not whatever
   // month/style they're browsing. Only fetch when they're on their own context.
-  const showAiTip = isCurrentMonth && (viewStyle === null || viewStyle === parentingStyle)
+  const showAiTip = isCurrentMonth
 
   useEffect(() => {
     if (!showAiTip || !babyName || !dateOfBirth) return
@@ -225,7 +274,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
 
     fetchTip()
     return () => { cancelled = true }
-  }, [showAiTip, babyName, dateOfBirth, ageInMonths, parentingStyle,
+  }, [showAiTip, babyName, dateOfBirth, ageInMonths,
       profile.babySex, profile.feedingMethod, profile.sleepArrangement,
       profile.birthContext, profile.siblings])
 
@@ -248,21 +297,9 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
         <p style={{ margin: '0 0 4px', fontSize: '14px', color: '#9ca3af', fontWeight: '500' }}>
           Hi {momName}!
         </p>
-        <h1 style={{ margin: '0 0 12px', fontSize: '24px', fontWeight: '700', color: '#1e1b4b', lineHeight: 1.2 }}>
+        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '700', color: '#1e1b4b', lineHeight: 1.2 }}>
           {babyName} is {formatBabyAge(dateOfBirth)}
         </h1>
-        <span style={{
-          display: 'inline-block',
-          background: 'linear-gradient(135deg, #ede8ff, #dce8f8)',
-          color: '#6d5fe6',
-          fontSize: '12px',
-          fontWeight: '600',
-          padding: '5px 12px',
-          borderRadius: '20px',
-          letterSpacing: '0.02em',
-        }}>
-          {styleLabels[parentingStyle]}
-        </span>
       </div>
 
       {/* Month navigator */}
@@ -396,13 +433,62 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
         Based on American Academy of Pediatrics guidance
       </p>
 
+      {/* Topic chips — primary inline + Other expands the rest */}
+      <div style={{ marginBottom: '14px' }}>
+        <p style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
+          Explore by Topic
+        </p>
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          overflowX: 'auto',
+          paddingBottom: '4px',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}>
+          {[...PRIMARY_TOPICS, { value: 'other', label: 'Other', emoji: '＋' }].map(topic => {
+            const isSelected = selectedTopic === topic.value
+            return (
+              <button
+                key={String(topic.value)}
+                onClick={() => setSelectedTopic(topic.value)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '8px 14px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  background: isSelected
+                    ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)'
+                    : '#fff',
+                  color: isSelected ? '#fff' : '#6b7280',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  boxShadow: isSelected
+                    ? '0 4px 12px rgba(124,111,247,0.35)'
+                    : '0 2px 8px rgba(100,100,180,0.08)',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <span>{topic.emoji}</span>
+                <span>{topic.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Tips section */}
-      <div key={`${activeStyle}-${selectedTopic}-${browseMonth}`} style={{ animation: 'fadeIn 0.2s ease' }}>
+      <div key={`${selectedTopic}-${browseMonth}`} style={{ animation: 'fadeIn 0.2s ease' }}>
         {tipOfDay ? (
           <>
             {/* Tip of the Day — AI-generated when available, curated otherwise */}
             {(() => {
-              const useAi = showAiTip && aiTip && !aiTipLoading
+              const useAi = showAiTip && aiTip && !aiTipLoading && selectedTopic === null && manualOffset === 0
               const heroTitle = useAi ? aiTip.title : tipOfDay.title
               const heroBody = useAi ? aiTip.body : tipOfDay.body
               const heroSource = useAi ? aiTip.source : tipOfDay.source
@@ -497,18 +583,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
               )
             })()}
 
-            {/* Two more tips */}
-            {extraTips.map(tip => (
-              <TipCard
-                key={tip.id}
-                title={tip.title}
-                body={tip.body}
-                style={tip.style}
-                source={tip.source}
-              />
-            ))}
-
-            {allTips.length > 3 && (
+            {allTips.length > 1 && (
               <button
                 onClick={() => setManualOffset(o => o + 1)}
                 style={{
@@ -529,191 +604,211 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut }) {
                 }}
               >
                 <span style={{ fontSize: '15px' }}>↻</span>
-                <span>Show me different tips</span>
+                <span>Show me a different tip</span>
               </button>
             )}
           </>
-        ) : (
-          <p style={{ color: '#9ca3af', fontSize: '14px', padding: '0 4px', marginBottom: '12px' }}>
-            No tips for this filter yet — try another topic!
-          </p>
-        )}
+        ) : null}
       </div>
 
-      {/* Style toggle */}
-      <p style={{ margin: '20px 0 8px', fontSize: '12px', color: '#9ca3af', fontStyle: 'italic' }}>
-        Curious what the other approach says?
-      </p>
+      {/* Memory book — saves to Journal */}
       <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '16px',
-        background: '#f3f4f6',
-        borderRadius: '14px',
-        padding: '4px',
+        background: '#fff',
+        borderRadius: '20px',
+        padding: '18px',
+        marginTop: '24px',
+        marginBottom: '4px',
+        boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+        borderLeft: '4px solid #E91E8C',
       }}>
-        {[parentingStyle, parentingStyle === 'gentle' ? 'schedule' : 'gentle'].map(s => {
-          const isActive = activeStyle === s
-          const isOwn = s === parentingStyle
-          return (
-            <button
-              key={s}
-              onClick={() => setViewStyle(s)}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <span style={{ fontSize: '16px' }}>📸</span>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: '#E91E8C', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            {babyName}'s memory book
+          </span>
+        </div>
+        <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#9ca3af', lineHeight: 1.5 }}>
+          A tiny moment from today — saved straight to your journal.
+        </p>
+
+        {potdSavedToday ? (
+          <div>
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              alignItems: 'center',
+              background: '#fef7fb',
+              border: '1px solid #fbcfe8',
+              borderRadius: '14px',
+              padding: '12px',
+            }}>
+              {potdSavedPreviewUrl ? (
+                <img
+                  src={potdSavedPreviewUrl}
+                  alt="Today's photo"
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    objectFit: 'cover',
+                    borderRadius: '12px',
+                    flexShrink: 0,
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '12px',
+                  background: '#fce7f3',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  flexShrink: 0,
+                }}>📷</div>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '700', color: '#9d174d' }}>
+                  ✓ Saved to your journal
+                </p>
+                <p style={{ margin: '0 0 6px', fontSize: '12px', color: '#9ca3af' }}>
+                  Come back tomorrow for another moment.
+                </p>
+                {onOpenJournal && (
+                  <button
+                    onClick={onOpenJournal}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      color: '#E91E8C',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    View in journal →
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <label
+              htmlFor="potd-photo-input"
               style={{
-                flex: 1,
-                padding: '9px 12px',
-                borderRadius: '10px',
-                border: 'none',
-                background: isActive ? '#fff' : 'transparent',
-                boxShadow: isActive ? '0 2px 8px rgba(100,100,180,0.12)' : 'none',
+                display: 'block',
+                border: '2px dashed #fbcfe8',
+                borderRadius: '14px',
+                padding: potdPreviewUrl ? 0 : '28px 16px',
+                textAlign: 'center',
                 cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: isActive ? '#1e1b4b' : '#9ca3af',
-                transition: 'all 0.15s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '5px',
+                marginBottom: '12px',
+                overflow: 'hidden',
+                background: potdPreviewUrl ? 'transparent' : '#fef7fb',
               }}
             >
-              <span>{styleEmoji[s]}</span>
-              <span>{isOwn ? 'Your style' : styleLabels[s]}</span>
-            </button>
-          )
-        })}
-      </div>
+              {potdPreviewUrl ? (
+                <img
+                  src={potdPreviewUrl}
+                  alt="preview"
+                  style={{ width: '100%', display: 'block', maxHeight: '280px', objectFit: 'cover' }}
+                />
+              ) : (
+                <>
+                  <div style={{ fontSize: '28px', marginBottom: '4px' }}>📷</div>
+                  <span style={{ color: '#9d174d', fontSize: '13px', fontWeight: '600' }}>
+                    Tap to add today's photo
+                  </span>
+                </>
+              )}
+            </label>
+            <input
+              id="potd-photo-input"
+              type="file"
+              accept="image/*"
+              onChange={e => setPotdFile(e.target.files?.[0] || null)}
+              style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+            />
 
-      {/* Topic chips */}
-      <div>
-        <p style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
-          Explore by Topic
-        </p>
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          overflowX: 'auto',
-          paddingBottom: '4px',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}>
-          {PRIMARY_TOPICS.map(topic => {
-            const isSelected = selectedTopic === topic.value
-            return (
-              <button
-                key={String(topic.value)}
-                onClick={() => {
-                  setSelectedTopic(topic.value)
-                  setShowOtherTopics(false)
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  padding: '8px 14px',
-                  borderRadius: '20px',
-                  border: 'none',
-                  background: isSelected
-                    ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)'
-                    : '#fff',
-                  color: isSelected ? '#fff' : '#6b7280',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  boxShadow: isSelected
-                    ? '0 4px 12px rgba(124,111,247,0.35)'
-                    : '0 2px 8px rgba(100,100,180,0.08)',
-                  transition: 'all 0.15s',
-                }}
-              >
-                <span>{topic.emoji}</span>
-                <span>{topic.label}</span>
-              </button>
-            )
-          })}
-          {/* Other chip */}
-          {(() => {
-            const otherSelected = OTHER_TOPICS.some(t => t.value === selectedTopic)
-            const isActive = showOtherTopics || otherSelected
-            return (
-              <button
-                onClick={() => setShowOtherTopics(v => !v)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  padding: '8px 14px',
-                  borderRadius: '20px',
-                  border: 'none',
-                  background: isActive
-                    ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)'
-                    : '#fff',
-                  color: isActive ? '#fff' : '#6b7280',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  boxShadow: isActive
-                    ? '0 4px 12px rgba(124,111,247,0.35)'
-                    : '0 2px 8px rgba(100,100,180,0.08)',
-                  transition: 'all 0.15s',
-                }}
-              >
-                <span>＋</span>
-                <span>Other</span>
-              </button>
-            )
-          })()}
-        </div>
-
-        {/* Other topics expanded row */}
-        {showOtherTopics && (
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            paddingBottom: '4px',
-            marginTop: '8px',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            animation: 'fadeIn 0.15s ease',
-          }}>
-            {OTHER_TOPICS.map(topic => {
-              const isSelected = selectedTopic === topic.value
-              return (
-                <button
-                  key={topic.value}
-                  onClick={() => setSelectedTopic(isSelected ? null : topic.value)}
+            {potdFile && (
+              <>
+                <textarea
+                  value={potdNote}
+                  onChange={e => setPotdNote(e.target.value)}
+                  placeholder="Add a note... (optional)"
+                  rows={2}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    padding: '8px 14px',
-                    borderRadius: '20px',
-                    border: 'none',
-                    background: isSelected
-                      ? 'linear-gradient(135deg, #e879f9, #a78bfa)'
-                      : '#faf5ff',
-                    color: isSelected ? '#fff' : '#7c3aed',
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    border: '1.5px solid #fbcfe8',
                     fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    boxShadow: isSelected
-                      ? '0 4px 12px rgba(168,85,247,0.35)'
-                      : '0 2px 8px rgba(168,85,247,0.08)',
-                    transition: 'all 0.15s',
+                    resize: 'vertical',
+                    fontFamily: 'inherit',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    marginBottom: '10px',
                   }}
-                >
-                  <span>{topic.emoji}</span>
-                  <span>{topic.label}</span>
-                </button>
-              )
-            })}
-          </div>
+                />
+
+                {potdError && (
+                  <p style={{
+                    margin: '0 0 10px',
+                    fontSize: '12px',
+                    color: '#b91c1c',
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '10px',
+                    padding: '8px 10px',
+                  }}>
+                    {potdError}
+                  </p>
+                )}
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => { setPotdFile(null); setPotdNote(''); setPotdError('') }}
+                    disabled={potdSaving}
+                    style={{
+                      flex: 1,
+                      padding: '10px',
+                      borderRadius: '10px',
+                      border: '1.5px solid #f3f4f6',
+                      background: '#fff',
+                      color: '#6b7280',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: potdSaving ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSavePhotoOfDay}
+                    disabled={potdSaving}
+                    style={{
+                      flex: 2,
+                      padding: '10px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      background: potdSaving
+                        ? '#f9a8d4'
+                        : 'linear-gradient(135deg, #E91E8C, #f472b6)',
+                      color: '#fff',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: potdSaving ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {potdSaving ? 'Saving…' : 'Save to journal'}
+                  </button>
+                </div>
+              </>
+            )}
+          </>
         )}
       </div>
 

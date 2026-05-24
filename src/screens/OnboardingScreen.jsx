@@ -1,21 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getProfile } from '../lib/db'
 
-const styleOptions = [
-  {
-    value: 'gentle',
-    label: 'Gentle Parenting',
-    description: 'Follow your baby\'s cues, responsive feeding, minimal crying',
-    emoji: '🌿',
-  },
-  {
-    value: 'schedule',
-    label: 'Schedule-Based',
-    description: 'Predictable routines, structured naps, gradual independence',
-    emoji: '📅',
-  },
-]
-
 const sexOptions = [
   { value: 'F', label: 'Girl', emoji: '👧' },
   { value: 'M', label: 'Boy',  emoji: '👦' },
@@ -100,7 +85,6 @@ export default function OnboardingScreen({ onComplete }) {
   const [momName, setMomName] = useState('')
   const [babyName, setBabyName] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
-  const [parentingStyle, setParentingStyle] = useState('')
   const [babySex, setBabySex] = useState('')
   const [feedingMethod, setFeedingMethod] = useState('')
   const [sleepArrangement, setSleepArrangement] = useState('')
@@ -119,7 +103,6 @@ export default function OnboardingScreen({ onComplete }) {
         setMomName(p.momName || '')
         setBabyName(p.babyName || '')
         setDateOfBirth(p.dateOfBirth || '')
-        setParentingStyle(p.parentingStyle || '')
         setBabySex(p.babySex || '')
         setFeedingMethod(p.feedingMethod || '')
         setSleepArrangement(p.sleepArrangement || '')
@@ -139,12 +122,11 @@ export default function OnboardingScreen({ onComplete }) {
     if (isEditing && hasOptionalDetails) setShowMore(true)
   }, [isEditing, hasOptionalDetails])
 
-  const canSave = babyName.trim().length > 0 && dateOfBirth.length > 0 && parentingStyle.length > 0
+  const canSave = babyName.trim().length > 0 && dateOfBirth.length > 0
 
   const missingFields = [
     babyName.trim().length === 0 && "baby's name",
     dateOfBirth.length === 0 && 'date of birth',
-    parentingStyle.length === 0 && 'parenting style',
   ].filter(Boolean)
 
   async function handleSave() {
@@ -153,7 +135,6 @@ export default function OnboardingScreen({ onComplete }) {
       momName: momName.trim() || 'Mama',
       babyName: babyName.trim(),
       dateOfBirth,
-      parentingStyle,
       babySex: babySex || null,
       feedingMethod: feedingMethod || null,
       sleepArrangement: sleepArrangement || null,
@@ -202,7 +183,7 @@ export default function OnboardingScreen({ onComplete }) {
           lineHeight: 1.6,
           textAlign: 'center',
         }}>
-          🌿 Daily tips personalized to your baby's exact age and your parenting style.
+          🌿 Daily tips personalized to your baby's exact age.
         </div>
       )}
 
@@ -246,41 +227,6 @@ export default function OnboardingScreen({ onComplete }) {
           style={{ ...inputStyle, color: '#1a1a2e' }}
         />
       </label>
-
-      {/* Parenting style */}
-      <div style={{ marginBottom: '32px' }}>
-        <span style={labelStyle}>Parenting Style</span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {styleOptions.map(option => (
-            <button
-              key={option.value}
-              onClick={() => setParentingStyle(option.value)}
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '14px',
-                padding: '16px',
-                borderRadius: '14px',
-                border: `2px solid ${parentingStyle === option.value ? '#7C3AED' : '#E5E7EB'}`,
-                backgroundColor: parentingStyle === option.value ? '#F3E8FF' : '#fff',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.2s',
-              }}
-            >
-              <span style={{ fontSize: '26px' }}>{option.emoji}</span>
-              <div>
-                <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: '600', color: '#1a1a2e' }}>
-                  {option.label}
-                </p>
-                <p style={{ margin: 0, fontSize: '13px', color: '#666', lineHeight: 1.5 }}>
-                  {option.description}
-                </p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Tell us more — collapsible optional section */}
       <button
