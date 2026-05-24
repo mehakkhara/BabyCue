@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { getBabyAgeInMonths } from '../data/tips'
 import { loadLatestGrowth, loadRecentJournalNotes } from '../lib/aiContext'
+import { loadLocalChat, loadChatMessages, appendChatMessage } from '../lib/chatStore'
 
 const SUGGESTIONS_BY_AGE = {
   newborn: [
@@ -37,30 +38,26 @@ function getSuggestions(ageInMonths) {
 }
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
-const CHAT_STORAGE_KEY = 'chatMessages'
-
-function loadMessages() {
-  try {
-    const saved = localStorage.getItem(CHAT_STORAGE_KEY)
-    return saved ? JSON.parse(saved) : []
-  } catch {
-    return []
-  }
-}
 
 export default function ChatScreen({ profile }) {
-  const [messages, setMessages] = useState(loadMessages)
+  // Seed instantly from localStorage so signed-in users see the previous
+  // session while the Supabase fetch is in flight, then overwrite with the
+  // authoritative remote history on mount.
+  const [messages, setMessages] = useState(loadLocalChat)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef(null)
 
   const ageInMonths = getBabyAgeInMonths(profile.dateOfBirth)
 
-  // Persist messages so they survive tab switches (each tab unmounts ChatScreen)
-  // and full refreshes.
   useEffect(() => {
-    try { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages)) } catch { /* quota */ }
-  }, [messages])
+    let cancelled = false
+    ;(async () => {
+      const remote = await loadChatMessages()
+      if (!cancelled) setMessages(remote)
+    })()
+    return () => { cancelled = true }
+  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -71,8 +68,10 @@ export default function ChatScreen({ profile }) {
     if (!userMessage || loading) return
 
     setInput('')
-    const updatedMessages = [...messages, { role: 'user', content: userMessage }]
+    const userMsg = { role: 'user', content: userMessage }
+    const updatedMessages = [...messages, userMsg]
     setMessages(updatedMessages)
+    appendChatMessage(userMsg)
     setLoading(true)
 
     try {
@@ -94,12 +93,16 @@ export default function ChatScreen({ profile }) {
       const content = res.ok && data.reply
         ? data.reply
         : data.error || 'Something went wrong — please try again.'
-      setMessages(prev => [...prev, { role: 'assistant', content }])
+      const assistantMsg = { role: 'assistant', content }
+      setMessages(prev => [...prev, assistantMsg])
+      appendChatMessage(assistantMsg)
     } catch {
-      setMessages(prev => [...prev, {
+      const errorMsg = {
         role: 'assistant',
         content: 'Something went wrong — please check your connection and try again.',
-      }])
+      }
+      setMessages(prev => [...prev, errorMsg])
+      appendChatMessage(errorMsg)
     } finally {
       setLoading(false)
     }

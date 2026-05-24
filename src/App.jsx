@@ -8,6 +8,7 @@ import AuthScreen from './screens/AuthScreen'
 import { isSupabaseConfigured } from './lib/supabase'
 import { useSession, signOut } from './lib/useSession'
 import { getProfile, saveProfile, backfillLocalProfileIfNeeded } from './lib/db'
+import { backfillLocalChatIfNeeded } from './lib/chatStore'
 
 const HomeIcon = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -69,6 +70,10 @@ export default function App() {
           : null
         const p = backfilled ?? (await getProfile())
         if (!cancelled) setProfile(p)
+        // Once the profile row exists, also push any local chat history up.
+        if (isSupabaseConfigured && session && p) {
+          await backfillLocalChatIfNeeded()
+        }
       } catch (err) {
         console.error('Profile load failed:', err)
         if (!cancelled) setProfile(null)
