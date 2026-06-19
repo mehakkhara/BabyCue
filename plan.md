@@ -7,6 +7,62 @@ React/Vite frontend. Baby profile stored in localStorage. 76 hardcoded tips acro
 
 ---
 
+## Up Next — 2026-05-25
+
+Three forward-looking changes captured at end-of-day 2026-05-24. Each touches multiple files / external services, so each gets its own focused PR.
+
+### Rename BabyCue → Nubae
+
+**Why:** product rebrand. All user-facing copy + URLs need to follow.
+
+- [ ] Decide if the GitHub repo gets renamed too (`mehakkhara/BabyCue` → `mehakkhara/Nubae`) or only the product name. Repo rename changes the Pages URL from `mehakkhara.github.io/BabyCue/` to `mehakkhara.github.io/Nubae/` — and the Vite `base` in `vite.config.js` plus the Railway `ALLOWED_ORIGINS` CORS list need to match.
+- [ ] Update `package.json` `name`, `README.md` headings + URLs, `index.html` `<title>` + meta, and the PWA manifest's `name` + `short_name`.
+- [ ] Update all user-facing copy: `AuthScreen` tagline ("Welcome to BabyCue"), `OnboardingScreen` welcome banner, `HomeScreen` header, `CLAUDE.md` product context.
+- [ ] Search for "BabyCue" string globally — every reference in `src/`, `server/`, `.env.production`, `supabase/`, docs. Update with care; some may be intentional historical references in commit messages or notes (leave those).
+- [ ] Re-run `npm run deploy` after the rename so the new bundle goes live at the new URL. Old URL will 404 until the repo is renamed (or stays alive if only the product name changes).
+
+**Open questions:**
+- Logo: keep the pastel-lavender heart, or commission a new mark for Nubae?
+- Domain: any plan to point a custom domain at it (e.g. `nubae.app`)? That'd let us avoid the `/Nubae/` path entirely.
+
+### Persist all user details (full Supabase memory)
+
+**Why:** today the app is split storage: profile + auth in Supabase, but journal photos/notes are in IndexedDB (device-local) and chat history + AI tip cache are in `localStorage`. If a mom signs in from a different device, she sees a blank journal. Goal: every detail the user enters should survive across devices.
+
+- [ ] **Journal → Supabase**. Schema: `journal_entries` table (id, user_id, note, photo_path, created_at, RLS by user_id). Photos go in Supabase Storage bucket `journal-photos/{user_id}/{uuid}.jpg`. Migrate the current `journalStore.js` IndexedDB layer to dual-write during transition, then read-from-Supabase only.
+- [ ] **Chat history → Supabase**. Schema: `chat_messages` (id, user_id, role, content, status, error_type, created_at). Replace `ChatScreen`'s `localStorage` history with a Supabase query on mount. Index on `(user_id, created_at)` so the timeline reads fast.
+- [ ] **AI tip cache → Supabase or skip**. The per-day AI tip cache could move too, but the cost saving is marginal ($0.01/day) and the device-local cache is fine — decide whether it's worth the trip.
+- [ ] **Backfill on first sign-in**. When a previously-guest user signs in, do a one-time push of their local data up (similar to `backfillLocalProfileIfNeeded` in `lib/db.js`). Don't lose anything.
+- [ ] **RLS policies**: each new table needs `auth.uid() = user_id` policies before going live. Test that user A can't read user B's journal.
+
+**Open questions:**
+- Storage cost: Supabase free tier is 1 GB storage. Photos at ~500 KB each → ~2,000 photos before paid tier kicks in. Set per-user upload quota or compress aggressively (the existing `compressImage` helper in `journalStore.js` already does max 1200px @ 0.8 jpeg quality — keep it).
+- Privacy posture: with all data server-side, GDPR / "delete my account" obligations grow. Add a "Delete everything" button in the password modal area.
+
+### Community feature — Q&A for moms
+
+**Why:** moms ask the AI for personalized advice, but sometimes they want validation from other moms ("did your 6-month-old also do this?"). A community tab gives that, without losing the AI as the personalized layer.
+
+- [ ] **Tab in bottom nav.** Add a 5th nav item between Growth and Journal (or replace Growth if cramped — decide). Icon: speech-bubble or people-circle.
+- [ ] **Posts feed.** Schema: `posts` (id, user_id, body, baby_age_in_months_at_post, topic_tag, created_at, reply_count). Display name = mom's first name from profile; never show last name or email. Topic tags reuse the existing `PRIMARY_TOPICS` + `OTHER_TOPICS` taxonomy so filtering matches the home screen.
+- [ ] **Replies.** Schema: `post_replies` (id, post_id, user_id, body, created_at). Linear thread (no nested replies) for v1 simplicity.
+- [ ] **Composer.** Tap "+" → modal with topic dropdown + body textarea (500 char limit). Submit → insert + optimistic UI.
+- [ ] **Moderation.** Three layers needed before this goes public:
+  1. Client-side: rate-limit (one post per 60s, three replies per 60s) to slow spam.
+  2. Server-side: a moderation pass on every submitted post via Claude (`/api/moderate-post` — flag medical advice, harmful content, personal info). Reject with a clear message before insert.
+  3. Reporting: each post has a "Report" button → flagged posts go to a `reports` table; admin (you, for now) reviews.
+- [ ] **Content policy banner** on first visit to the tab: "This is moms helping moms. Not medical advice. For anything urgent, call your pediatrician." Same energy as the rest of the app.
+- [ ] **Read-only fallback** for guest mode (Supabase not configured / not signed in): show the feed but disable composing — drives sign-in.
+
+**Open questions:**
+- Do we let moms reply anonymously, or always show their first name? Probably show first name (accountability), but allow a "hide my baby's age" toggle per post.
+- Push notifications when someone replies to your post? Defer to Level 3 (push notifications was already there).
+- Migration risk: a community tab raises the support burden a lot. Validate with a small invite group before public launch.
+
+**Build order for these three:** rename first (smallest, cosmetic), then full-Supabase persistence (foundation for community since community = more rows in more tables), then community (the big one).
+
+---
+
 ## Deferred from Dogfood UX Review (2026-05-12)
 
 The first dogfood pass surfaced 8 findings; 6 shipped in the `polish-onboarding-and-home` PR. Two are deferred here because each has nontrivial ripple beyond a single-screen change.
