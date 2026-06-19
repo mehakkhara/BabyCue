@@ -88,6 +88,24 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
   const [potdFile, setPotdFile] = useState(null)
   const [potdPreviewUrl, setPotdPreviewUrl] = useState(null)
   const [potdNote, setPotdNote] = useState('')
+
+  // Track the current UTC day so day-bounded effects (AI tip, "today's photo")
+  // re-run when the app stays open across midnight — e.g., an installed PWA
+  // resumed from background the next morning would otherwise keep yesterday's
+  // tip frozen because nothing triggers a re-render.
+  const [today, setToday] = useState(() => todayKey())
+  useEffect(() => {
+    function checkDay() {
+      const t = todayKey()
+      setToday(prev => (prev === t ? prev : t))
+    }
+    document.addEventListener('visibilitychange', checkDay)
+    window.addEventListener('focus', checkDay)
+    return () => {
+      document.removeEventListener('visibilitychange', checkDay)
+      window.removeEventListener('focus', checkDay)
+    }
+  }, [])
   const [potdSaving, setPotdSaving] = useState(false)
   const [potdError, setPotdError] = useState('')
   const [potdSavedToday, setPotdSavedToday] = useState(false)
@@ -126,7 +144,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
       cancelled = true
       if (savedUrl) URL.revokeObjectURL(savedUrl)
     }
-  }, [])
+  }, [today])
 
   async function handleSavePhotoOfDay() {
     if (!potdFile) return
@@ -274,7 +292,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
 
     fetchTip()
     return () => { cancelled = true }
-  }, [showAiTip, babyName, dateOfBirth, ageInMonths,
+  }, [today, showAiTip, babyName, dateOfBirth, ageInMonths,
       profile.babySex, profile.feedingMethod, profile.sleepArrangement,
       profile.birthContext, profile.siblings])
 
