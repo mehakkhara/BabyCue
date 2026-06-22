@@ -7,6 +7,60 @@ React/Vite frontend. Baby profile stored in localStorage. 76 hardcoded tips acro
 
 ---
 
+## Tip Expansion — 2026-06-21
+
+**Goal:** grow tip pool from ~12/month to **30/month** (720 total) so the home-screen rotation feels fresh for longer and the "+Other" bucket isn't dominated by repeats.
+
+### Phase 1 — CDC Milestones pass ✅ Shipped 2026-06-21
+
+Added **80 new tips** (ids 438–517) sourced from CDC's "Learn the Signs. Act Early." milestone pages. All framed action-first with soft age language ("around X months", "some babies do this earlier — both are normal") so parents of slower-tracking babies don't feel behind. `style` field dropped — filter was removed 2026-05-24.
+
+**Per-month tip count after CDC pass:**
+
+| Month | Count | Gap to 30 |     | Month | Count | Gap to 30 |
+|------:|------:|----------:|-----|------:|------:|----------:|
+| 1     | 11    | -19       |     | 13    | 12    | -18       |
+| **2** | **20**| **-10**   |     | 14    | 11    | -19       |
+| 3     | 12    | -18       |     | **15**| **21**| **-9**    |
+| **4** | **25**| **-5**    |     | 16    | 12    | -18       |
+| 5     | 10    | -20       |     | 17    | 12    | -18       |
+| **6** | **24**| **-6**    |     | **18**| **23**| **-7**    |
+| 7     | 10    | -20       |     | 19    | 11    | -19       |
+| 8     | 16    | -14       |     | 20    | 11    | -19       |
+| **9** | **24**| **-6**    |     | 21    | 11    | -19       |
+| 10    | 14    | -16       |     | 22    | 10    | -20       |
+| 11    | 10    | -20       |     | 23    | 10    | -20       |
+| **12**| **26**| **-4**    |     | **24**| **24**| **-6**    |
+
+(Bold rows = well-visit months that the CDC pass directly boosted.)
+
+**Total tips now:** 364 of 720 target. Need **~350 more**, mostly on the off-visit months (1, 3, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19-23).
+
+### Phase 2 — AAP Bright Futures pull (next)
+
+AAP's Bright Futures anticipatory guidance covers more month-checkpoints than CDC, including 1mo, 2mo, 4mo, 6mo, 9mo, 12mo, 15mo, 18mo, 24mo. Richer content (10-20 actionable items per visit) but harder to extract — PDF-formatted, behind a navigation tree on aap.org / healthychildren.org.
+
+- [ ] Pull HealthyChildren.org age pages (1mo, 3mo, 5mo, 7mo, 11mo, 13mo, 17mo, 23mo are all browsable) — should yield ~5-10 tips per off-visit month, taking us closer to 25/month.
+- [ ] Pull Bright Futures previsit handouts for each well-child visit — should bump visit-months from ~24 to ~30.
+- [ ] Use same framing rules: action-first, soft age language, drop diagnostic-only items.
+- [ ] Source attribution: `'AAP'` or `'AAP Bright Futures'` (be consistent).
+
+### Phase 3 — AI generation for remaining gaps
+
+After Phases 1 + 2, the still-thin months (likely 5, 7, 11, 19-23 — older toddler months poorly covered by both CDC and AAP) get topped up with AI generation.
+
+- [ ] One-off Node script: loop `month × topic` combos still short of 30, call `/api/daily-tip`-style endpoint, parse JSON, append to `tips.js`.
+- [ ] Human-review each output before commit — kill weak/duplicate tips, keep the rest.
+- [ ] Batch by **topic, not month** — generates 24 months of "sleep" tips in one sitting so reviewer judgment stays consistent within a topic.
+- [ ] Estimated cost: $2-5 in Claude API spend total; ~2 hours review time.
+
+### Open Questions
+
+- **Topic distribution per month**: should every month have ≥3 tips per primary topic (sleep/feeding/development/motor/regression), or should distribution vary by what's developmentally relevant (e.g., regression spikes at 4mo, 9mo, 18mo)? Current preference: let it vary naturally.
+- **Source diversity**: most existing tips cite AAP/WHO/CDC. Adding more from Zero to Three, Harvard Center on the Developing Child, Pediatric Sleep Council — when does source diversity matter for parent trust?
+
+---
+
 ## Up Next — 2026-05-25
 
 Three forward-looking changes captured at end-of-day 2026-05-24. Each touches multiple files / external services, so each gets its own focused PR.
