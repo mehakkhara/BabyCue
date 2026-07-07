@@ -1,5 +1,14 @@
 # BabyCue — Project Context
 
+## Git Workflow (IMPORTANT)
+
+- **Always open a pull request before merging to `main`.** Never commit or push directly to `main`.
+- For any change: create a branch, push the branch, and open a PR with `gh pr create`. Let Mehak review/merge the PR.
+- **Deploys are automatic.** Merging a PR to `main` triggers `.github/workflows/deploy.yml`, which builds the app and publishes `dist/` to the `gh-pages` branch (GitHub Pages source). No manual step needed — watch the run under the repo's **Actions** tab.
+- The CI build needs two repo secrets — `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` — because they live only in the gitignored `.env.local` locally. `VITE_SERVER_URL` is committed in `.env.production`.
+- Manual deploy is still available if ever needed: Actions tab → "Deploy to GitHub Pages" → **Run workflow**, or locally `npm run deploy`.
+- PWA note: after any deploy, an installed app needs an open → close → reopen to pick up the new service worker.
+
 ## What the Product Does
 
 A personalized mom assistant app that delivers age-specific, evidence-based guidance to new mothers. Instead of overwhelming generic advice, the app surfaces the *right* information at the *right* time — based on the baby's exact age and the mother's chosen parenting style. As the baby grows month by month, the content evolves with them. For example, a mom in month 4 gets targeted sleep training guidance; a mom in month 8 gets guidance on introducing solids. Every suggestion is backed by pediatric research and studies.
