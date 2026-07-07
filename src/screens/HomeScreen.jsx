@@ -233,6 +233,9 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
   const tipOfDay = allTips.length > 0
     ? allTips[(dayIndex + manualOffset) % allTips.length]
     : null
+  // The curated sourced tip is always the daily hero. The AI tip is only a
+  // fallback for when the curated pool has nothing to show for this filter.
+  const hasCuratedTip = tipOfDay != null
 
   // Reset to today's batch whenever the user changes month/style/topic — the
   // manual offset is meaningful only for the current filter, not across filters.
@@ -246,7 +249,9 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
   const showAiTip = isCurrentMonth
 
   useEffect(() => {
-    if (!showAiTip || !babyName || !dateOfBirth) return
+    // Only reach for an AI tip when the curated pool is empty for this view.
+    // With a sourced tip available, skip the fetch entirely (no cost, no stale cache).
+    if (!showAiTip || !babyName || !dateOfBirth || hasCuratedTip) return
     let cancelled = false
 
     const fp = profileFingerprint(profile, ageInMonths)
@@ -292,7 +297,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
 
     fetchTip()
     return () => { cancelled = true }
-  }, [today, showAiTip, babyName, dateOfBirth, ageInMonths,
+  }, [today, showAiTip, hasCuratedTip, babyName, dateOfBirth, ageInMonths,
       profile.babySex, profile.feedingMethod, profile.sleepArrangement,
       profile.birthContext, profile.siblings])
 
@@ -502,11 +507,12 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
 
       {/* Tips section */}
       <div key={`${selectedTopic}-${browseMonth}`} style={{ animation: 'fadeIn 0.2s ease' }}>
-        {tipOfDay ? (
+        {(tipOfDay || (showAiTip && (aiTip || aiTipLoading))) ? (
           <>
-            {/* Tip of the Day — AI-generated when available, curated otherwise */}
+            {/* Tip of the Day — curated sourced tip is the daily hero; AI only fills in
+                when the curated pool has nothing to show for this filter. */}
             {(() => {
-              const useAi = showAiTip && aiTip && !aiTipLoading && selectedTopic === null && manualOffset === 0
+              const useAi = !tipOfDay && showAiTip && aiTip && !aiTipLoading
               const heroTitle = useAi ? aiTip.title : tipOfDay.title
               const heroBody = useAi ? aiTip.body : tipOfDay.body
               const heroSource = useAi ? aiTip.source : tipOfDay.source
@@ -540,7 +546,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                       </span>
                     )}
                   </div>
-                  {aiTipLoading && showAiTip && !aiTip ? (
+                  {!tipOfDay && aiTipLoading && showAiTip && !aiTip ? (
                     <>
                       <div style={{ height: '14px', width: '70%', background: '#f1edff', borderRadius: '6px', marginBottom: '10px' }} />
                       <div style={{ height: '11px', width: '95%', background: '#f5f3ff', borderRadius: '6px', marginBottom: '6px' }} />
