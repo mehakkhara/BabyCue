@@ -792,11 +792,11 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
         marginTop: '24px',
         marginBottom: '4px',
         boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
-        borderLeft: '4px solid #E91E8C',
+        borderLeft: '4px solid #7C6FF7',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <span style={{ fontSize: '16px' }}>📸</span>
-          <span style={{ fontSize: '11px', fontWeight: '700', color: '#E91E8C', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: '#7C6FF7', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             {babyName}'s memory book
           </span>
         </div>
@@ -810,8 +810,8 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               display: 'flex',
               gap: '12px',
               alignItems: 'center',
-              background: '#fef7fb',
-              border: '1px solid #fbcfe8',
+              background: '#f5f3ff',
+              border: '1px solid #ddd6fe',
               borderRadius: '14px',
               padding: '12px',
             }}>
@@ -832,7 +832,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                   width: '64px',
                   height: '64px',
                   borderRadius: '12px',
-                  background: '#fce7f3',
+                  background: '#ede9fe',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -841,7 +841,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                 }}>📷</div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '700', color: '#9d174d' }}>
+                <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '700', color: '#7C6FF7' }}>
                   ✓ Saved to your journal
                 </p>
                 <p style={{ margin: '0 0 6px', fontSize: '12px', color: '#9ca3af' }}>
@@ -854,7 +854,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                       background: 'none',
                       border: 'none',
                       padding: 0,
-                      color: '#E91E8C',
+                      color: '#7C6FF7',
                       fontSize: '12px',
                       fontWeight: '600',
                       cursor: 'pointer',
@@ -873,14 +873,14 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               htmlFor="potd-photo-input"
               style={{
                 display: 'block',
-                border: '2px dashed #fbcfe8',
+                border: '2px dashed #ddd6fe',
                 borderRadius: '14px',
                 padding: potdPreviewUrl ? 0 : '28px 16px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 marginBottom: '12px',
                 overflow: 'hidden',
-                background: potdPreviewUrl ? 'transparent' : '#fef7fb',
+                background: potdPreviewUrl ? 'transparent' : '#f5f3ff',
               }}
             >
               {potdPreviewUrl ? (
@@ -892,7 +892,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               ) : (
                 <>
                   <div style={{ fontSize: '28px', marginBottom: '4px' }}>📷</div>
-                  <span style={{ color: '#9d174d', fontSize: '13px', fontWeight: '600' }}>
+                  <span style={{ color: '#7C6FF7', fontSize: '13px', fontWeight: '600' }}>
                     Tap to add today's photo
                   </span>
                 </>
@@ -917,7 +917,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '10px',
-                    border: '1.5px solid #fbcfe8',
+                    border: '1.5px solid #ddd6fe',
                     fontSize: '13px',
                     resize: 'vertical',
                     fontFamily: 'inherit',
@@ -968,8 +968,8 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                       borderRadius: '10px',
                       border: 'none',
                       background: potdSaving
-                        ? '#f9a8d4'
-                        : 'linear-gradient(135deg, #E91E8C, #f472b6)',
+                        ? '#c4b5fd'
+                        : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
                       color: '#fff',
                       fontSize: '13px',
                       fontWeight: '600',
