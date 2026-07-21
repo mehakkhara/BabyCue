@@ -3,6 +3,8 @@ import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/ti
 import { addEntry, getEntries } from '../data/journalStore'
 import { supabase } from '../lib/supabase'
 import { loadLatestGrowth, loadRecentJournalNotes } from '../lib/aiContext'
+import { REACTIONS, getTodayReaction, recordReaction, clearReaction, computeStreak, streakMessage } from '../lib/engagement'
+import { loadSaved, isSaved, toggleSaved, removeSaved } from '../lib/savedTips'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
 
@@ -71,10 +73,10 @@ const STAT_COLORS = [
 
 export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJournal }) {
   const [selectedTopic, setSelectedTopic] = useState(null)
-  const [savedTips, setSavedTips] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('savedTips') || '[]') } catch { return [] }
-  })
-  const [gotItId, setGotItId] = useState(null)
+  const [savedTips, setSavedTips] = useState(() => loadSaved())
+  const [showSaved, setShowSaved] = useState(false)
+  const [todayReaction, setTodayReaction] = useState(() => getTodayReaction()?.reaction ?? null)
+  const [streak, setStreak] = useState(() => computeStreak())
   const [manualOffset, setManualOffset] = useState(0)
   const [aiTip, setAiTip] = useState(null)
   const [aiTipLoading, setAiTipLoading] = useState(false)
@@ -106,6 +108,20 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
       window.removeEventListener('focus', checkDay)
     }
   }, [])
+
+  // When the day rolls over, today's check-in resets and the streak is recomputed
+  // (yesterday's run still shows as alive until midnight — see engagement.js).
+  useEffect(() => {
+    setTodayReaction(getTodayReaction()?.reaction ?? null)
+    setStreak(computeStreak())
+  }, [today])
+
+  function handleReaction(tipId, reaction) {
+    // Tapping the active reaction again clears the check-in.
+    const next = todayReaction === reaction ? null : reaction
+    setTodayReaction(next)
+    setStreak(next ? recordReaction(tipId, next) : clearReaction())
+  }
   const [potdSaving, setPotdSaving] = useState(false)
   const [potdError, setPotdError] = useState('')
   const [potdSavedToday, setPotdSavedToday] = useState(false)
@@ -201,12 +217,14 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
     }
   }
 
-  function saveTip(id) {
-    setSavedTips(prev => {
-      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-      localStorage.setItem('savedTips', JSON.stringify(next))
-      return next
-    })
+  // Pass the full tip object so AI tips (whose text isn't otherwise stored)
+  // persist into the Saved collection.
+  function saveTip(tip) {
+    setSavedTips(toggleSaved(tip))
+  }
+
+  function unsaveTip(id) {
+    setSavedTips(removeSaved(id))
   }
 
   const { babyName, dateOfBirth, momName } = profile
@@ -324,6 +342,113 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
           {babyName} is {formatBabyAge(dateOfBirth)}
         </h1>
       </div>
+
+      {/* Saved tips sheet */}
+      {showSaved && (
+        <div
+          onClick={() => setShowSaved(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(30,27,75,0.35)',
+            zIndex: 50,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '480px',
+              maxHeight: '80vh',
+              background: '#faf9ff',
+              borderRadius: '24px 24px 0 0',
+              padding: '20px 18px calc(20px + env(safe-area-inset-bottom))',
+              overflowY: 'auto',
+              boxShadow: '0 -8px 40px rgba(100,100,180,0.25)',
+              animation: 'fadeIn 0.2s ease',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#1e1b4b' }}>
+                🔖 Saved tips
+              </h2>
+              <button
+                onClick={() => setShowSaved(false)}
+                aria-label="Close"
+                style={{
+                  border: 'none',
+                  background: '#ece9f6',
+                  borderRadius: '50%',
+                  width: '30px',
+                  height: '30px',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  color: '#6b7280',
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {savedTips.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '30px 10px', color: '#9ca3af' }}>
+                <div style={{ fontSize: '34px', marginBottom: '8px' }}>🔖</div>
+                <p style={{ margin: 0, fontSize: '14px', lineHeight: 1.6 }}>
+                  No saved tips yet.<br />Tap <strong>Save tip</strong> on any tip to keep it here.
+                </p>
+              </div>
+            ) : (
+              savedTips.map(t => (
+                <div
+                  key={String(t.id)}
+                  style={{
+                    background: '#fff',
+                    borderRadius: '16px',
+                    padding: '14px 16px',
+                    marginBottom: '10px',
+                    boxShadow: '0 2px 12px rgba(100,100,180,0.06)',
+                    borderLeft: '4px solid #a78bfa',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'flex-start' }}>
+                    <p style={{ margin: '0 0 6px', fontSize: '14px', fontWeight: '600', color: '#1e1b4b', lineHeight: 1.4 }}>
+                      {t.title}
+                    </p>
+                    <button
+                      onClick={() => unsaveTip(t.id)}
+                      aria-label="Remove from saved"
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        color: '#c4b5fd',
+                        fontSize: '15px',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        padding: 0,
+                        lineHeight: 1,
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: '#6b7280' }}>
+                    {t.body}
+                  </p>
+                  {t.source && (
+                    <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#c4b5fd' }}>
+                      Source: {t.source}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Month navigator */}
       <div style={{
@@ -517,6 +642,8 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               const heroBody = useAi ? aiTip.body : tipOfDay.body
               const heroSource = useAi ? aiTip.source : tipOfDay.source
               const heroId = useAi ? `ai:${todayKey()}` : tipOfDay.id
+              const heroTopic = useAi ? (aiTip.topic ?? selectedTopic ?? null) : tipOfDay.topic
+              const heroSaved = isSaved(heroId, savedTips)
               const accent = useAi ? '#7C6FF7' : '#a78bfa'
               return (
                 <div style={{
@@ -567,40 +694,62 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                       )}
                     </>
                   )}
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+                  <div style={{ marginTop: '14px' }}>
+                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: '600', color: '#9ca3af' }}>
+                      Did you try this?
+                    </p>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {REACTIONS.map(r => {
+                        const active = todayReaction === r.value
+                        return (
+                          <button
+                            key={r.value}
+                            onClick={() => handleReaction(heroId, r.value)}
+                            style={{
+                              flex: 1,
+                              padding: '9px 6px',
+                              borderRadius: '10px',
+                              border: active ? '1.5px solid #a78bfa' : '1.5px solid transparent',
+                              background: active ? '#f5f3ff' : '#f7f7fb',
+                              color: active ? '#7C6FF7' : '#9ca3af',
+                              fontSize: '12.5px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px',
+                              transition: 'all 0.15s',
+                            }}
+                          >
+                            <span>{r.emoji}</span>
+                            <span>{r.label}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {streak > 0 && (
+                      <p style={{ margin: '10px 0 0', fontSize: '12px', fontWeight: '600', color: '#7C6FF7', textAlign: 'center' }}>
+                        {streakMessage(streak, babyName)}
+                      </p>
+                    )}
                     <button
-                      onClick={() => saveTip(heroId)}
+                      onClick={() => saveTip({ id: heroId, title: heroTitle, body: heroBody, source: heroSource, topic: heroTopic })}
                       style={{
-                        flex: 1,
+                        width: '100%',
+                        marginTop: '10px',
                         padding: '9px',
                         borderRadius: '10px',
                         border: 'none',
-                        background: savedTips.includes(heroId) ? '#ede9fe' : '#f5f3ff',
-                        color: savedTips.includes(heroId) ? '#7C6FF7' : '#9ca3af',
+                        background: heroSaved ? '#ede9fe' : '#f5f3ff',
+                        color: heroSaved ? '#7C6FF7' : '#9ca3af',
                         fontSize: '13px',
                         fontWeight: '600',
                         cursor: 'pointer',
                         transition: 'all 0.15s',
                       }}
                     >
-                      {savedTips.includes(heroId) ? '🔖 Saved' : '🔖 Save tip'}
-                    </button>
-                    <button
-                      onClick={() => setGotItId(heroId)}
-                      style={{
-                        flex: 1,
-                        padding: '9px',
-                        borderRadius: '10px',
-                        border: 'none',
-                        background: gotItId === heroId ? '#ecfdf5' : '#f0fdf4',
-                        color: gotItId === heroId ? '#15803d' : '#9ca3af',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      {gotItId === heroId ? '✓ Done!' : '✓ Got it'}
+                      {heroSaved ? '🔖 Saved' : '🔖 Save tip'}
                     </button>
                   </div>
                 </div>
@@ -835,6 +984,38 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
           </>
         )}
       </div>
+
+      {/* Saved tips entry */}
+      <button
+        onClick={() => setShowSaved(true)}
+        style={{
+          width: '100%',
+          marginTop: '24px',
+          padding: '16px 18px',
+          background: '#fff',
+          border: 'none',
+          borderRadius: '20px',
+          boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+          borderLeft: '4px solid #a78bfa',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+        }}
+      >
+        <span style={{ fontSize: '20px' }}>🔖</span>
+        <div style={{ textAlign: 'left', flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: '15px', fontWeight: '600', color: '#1e1b4b' }}>
+            Saved tips
+          </p>
+          <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#9ca3af' }}>
+            {savedTips.length === 0
+              ? 'Bookmark tips to keep them here'
+              : `${savedTips.length} tip${savedTips.length === 1 ? '' : 's'} saved`}
+          </p>
+        </div>
+        <span style={{ fontSize: '18px', color: '#c4b5fd', flexShrink: 0 }}>›</span>
+      </button>
 
       {/* Edit profile / Sign out */}
       <div style={{ textAlign: 'center', marginTop: '32px', paddingBottom: '16px', display: 'flex', gap: '14px', justifyContent: 'center' }}>
