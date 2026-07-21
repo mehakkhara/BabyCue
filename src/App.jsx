@@ -3,6 +3,7 @@ import HomeScreen from './screens/HomeScreen'
 import OnboardingScreen from './screens/OnboardingScreen'
 import ChatScreen from './screens/ChatScreen'
 import StatsScreen from './screens/StatsScreen'
+import MilestonesScreen from './screens/MilestonesScreen'
 import JournalScreen from './screens/JournalScreen'
 import AuthScreen from './screens/AuthScreen'
 import { isSupabaseConfigured } from './lib/supabase'
@@ -40,11 +41,19 @@ const JournalIcon = ({ active }) => (
   </svg>
 )
 
+const MilestoneIcon = ({ active }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+    <line x1="4" y1="22" x2="4" y2="15"/>
+  </svg>
+)
+
 const NAV_ITEMS = [
-  { id: 'home',    label: 'Today',   Icon: HomeIcon    },
-  { id: 'chat',    label: 'Ask',     Icon: ChatIcon    },
-  { id: 'stats',   label: 'Growth',  Icon: StatsIcon   },
-  { id: 'journal', label: 'Journal', Icon: JournalIcon },
+  { id: 'home',       label: 'Today',      Icon: HomeIcon      },
+  { id: 'chat',       label: 'Ask',        Icon: ChatIcon      },
+  { id: 'stats',      label: 'Growth',     Icon: StatsIcon     },
+  { id: 'milestones', label: 'Milestones', Icon: MilestoneIcon },
+  { id: 'journal',    label: 'Journal',    Icon: JournalIcon   },
 ]
 
 export default function App() {
@@ -125,8 +134,9 @@ export default function App() {
       <div style={{ paddingBottom: '72px' }}>
         {activeTab === 'home'    && <HomeScreen profile={profile} onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} onOpenJournal={() => setActiveTab('journal')} />}
         {activeTab === 'chat'    && <ChatScreen profile={profile} />}
-        {activeTab === 'stats'   && <StatsScreen profile={profile} onProfileChange={handleProfileChange} />}
-        {activeTab === 'journal' && <JournalScreen />}
+        {activeTab === 'stats'      && <StatsScreen profile={profile} onProfileChange={handleProfileChange} />}
+        {activeTab === 'milestones' && <MilestonesScreen profile={profile} />}
+        {activeTab === 'journal'    && <JournalScreen />}
       </div>
 
       {/* Bottom nav */}
