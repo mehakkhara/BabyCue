@@ -3,10 +3,11 @@ import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/ti
 import { addEntry, getEntries } from '../data/journalStore'
 import { supabase } from '../lib/supabase'
 import { loadLatestGrowth, loadRecentJournalNotes } from '../lib/aiContext'
-import { REACTIONS, getTodayReaction, recordReaction, clearReaction, computeStreak, streakMessage } from '../lib/engagement'
 import { loadSaved, isSaved, toggleSaved, removeSaved } from '../lib/savedTips'
 import { BABY_STATES, getStateResponse } from '../data/babyStates'
 import { markHelped, timesHelped } from '../lib/babyPatterns'
+import { pickNudge } from '../data/nudges'
+import { isSupported as notifsSupported, permission as notifPermission, isEnabled as nudgeIsEnabled, setEnabled as setNudgeEnabled, requestPermission as requestNotifPermission, showNudge, lastShownId } from '../lib/notifications'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
 
@@ -78,12 +79,13 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
   const [selectedTopic, setSelectedTopic] = useState(null)
   const [savedTips, setSavedTips] = useState(() => loadSaved())
   const [showSaved, setShowSaved] = useState(false)
-  const [todayReaction, setTodayReaction] = useState(() => getTodayReaction()?.reaction ?? null)
-  const [streak, setStreak] = useState(() => computeStreak())
+  const [gotItId, setGotItId] = useState(null)
   const [activeState, setActiveState] = useState(null) // state key of the open sheet, or null
   const [helpedCause, setHelpedCause] = useState(null) // cause marked "this helped" in the open sheet
   const [triedCauses, setTriedCauses] = useState([])   // causes crossed off in the open sheet
   const [helpedReflection, setHelpedReflection] = useState(null) // pattern surfaced back to her
+  const [nudgeOn, setNudgeOn] = useState(() => nudgeIsEnabled())
+  const [nudgePerm, setNudgePerm] = useState(() => notifPermission())
   const [manualOffset, setManualOffset] = useState(0)
   const [aiTip, setAiTip] = useState(null)
   const [aiTipLoading, setAiTipLoading] = useState(false)
@@ -116,19 +118,6 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
     }
   }, [])
 
-  // When the day rolls over, today's check-in resets and the streak is recomputed
-  // (yesterday's run still shows as alive until midnight — see engagement.js).
-  useEffect(() => {
-    setTodayReaction(getTodayReaction()?.reaction ?? null)
-    setStreak(computeStreak())
-  }, [today])
-
-  function handleReaction(tipId, reaction) {
-    // Tapping the active reaction again clears the check-in.
-    const next = todayReaction === reaction ? null : reaction
-    setTodayReaction(next)
-    setStreak(next ? recordReaction(tipId, next) : clearReaction())
-  }
 
   function openState(stateKey) {
     setActiveState(stateKey)
@@ -157,6 +146,24 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
     markHelped(stateKey, cause)
     setHelpedReflection(priorHelps >= 1 ? `💜 This often helps ${babyName} — good to remember.` : null)
   }
+
+  async function toggleNudge() {
+    if (nudgeOn) {
+      setNudgeEnabled(false)
+      setNudgeOn(false)
+      return
+    }
+    let perm = notifPermission()
+    if (perm === 'default') perm = await requestNotifPermission()
+    setNudgePerm(perm)
+    if (perm === 'granted') {
+      setNudgeEnabled(true)
+      setNudgeOn(true)
+      // Fire one nudge right away so she sees it worked.
+      showNudge(pickNudge(ageInMonths, babyName, lastShownId()))
+    }
+  }
+
   const [potdSaving, setPotdSaving] = useState(false)
   const [potdError, setPotdError] = useState('')
   const [potdSavedToday, setPotdSavedToday] = useState(false)
@@ -867,6 +874,30 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                         ✨ AI · for {babyName}
                       </span>
                     )}
+                    {allTips.length > 1 && (
+                      <button
+                        onClick={() => setManualOffset(o => o + 1)}
+                        aria-label="Show a different tip"
+                        title="Show a different tip"
+                        style={{
+                          marginLeft: 'auto',
+                          flexShrink: 0,
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: '#f5f3ff',
+                          color: '#7C6FF7',
+                          fontSize: '15px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        ↻
+                      </button>
+                    )}
                   </div>
                   {!tipOfDay && aiTipLoading && showAiTip && !aiTip ? (
                     <>
@@ -889,50 +920,11 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                       )}
                     </>
                   )}
-                  <div style={{ marginTop: '14px' }}>
-                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: '600', color: '#9ca3af' }}>
-                      Did you try this?
-                    </p>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      {REACTIONS.map(r => {
-                        const active = todayReaction === r.value
-                        return (
-                          <button
-                            key={r.value}
-                            onClick={() => handleReaction(heroId, r.value)}
-                            style={{
-                              flex: 1,
-                              padding: '9px 6px',
-                              borderRadius: '10px',
-                              border: active ? '1.5px solid #a78bfa' : '1.5px solid transparent',
-                              background: active ? '#f5f3ff' : '#f7f7fb',
-                              color: active ? '#7C6FF7' : '#9ca3af',
-                              fontSize: '12.5px',
-                              fontWeight: '600',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '4px',
-                              transition: 'all 0.15s',
-                            }}
-                          >
-                            <span>{r.emoji}</span>
-                            <span>{r.label}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                    {streak > 0 && (
-                      <p style={{ margin: '10px 0 0', fontSize: '12px', fontWeight: '600', color: '#7C6FF7', textAlign: 'center' }}>
-                        {streakMessage(streak, babyName)}
-                      </p>
-                    )}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
                     <button
                       onClick={() => saveTip({ id: heroId, title: heroTitle, body: heroBody, source: heroSource, topic: heroTopic })}
                       style={{
-                        width: '100%',
-                        marginTop: '10px',
+                        flex: 1,
                         padding: '9px',
                         borderRadius: '10px',
                         border: 'none',
@@ -946,35 +938,28 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                     >
                       {heroSaved ? '🔖 Saved' : '🔖 Save tip'}
                     </button>
+                    <button
+                      onClick={() => setGotItId(heroId)}
+                      style={{
+                        flex: 1,
+                        padding: '9px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: gotItId === heroId ? '#ecfdf5' : '#f0fdf4',
+                        color: gotItId === heroId ? '#15803d' : '#9ca3af',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {gotItId === heroId ? '✓ Done!' : '✓ Got it'}
+                    </button>
                   </div>
                 </div>
               )
             })()}
 
-            {allTips.length > 1 && (
-              <button
-                onClick={() => setManualOffset(o => o + 1)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  marginTop: '4px',
-                  background: 'transparent',
-                  border: '1px dashed #c4b5fd',
-                  borderRadius: '14px',
-                  color: '#7C6FF7',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                }}
-              >
-                <span style={{ fontSize: '15px' }}>↻</span>
-                <span>Show me a different tip</span>
-              </button>
-            )}
           </>
         ) : null}
       </div>
@@ -1253,6 +1238,60 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
         </div>
         <span style={{ fontSize: '18px', color: '#c4b5fd', flexShrink: 0 }}>›</span>
       </button>
+
+      {/* Daily nudge — notification opt-in */}
+      {notifsSupported() && (
+        <div style={{
+          background: '#fff',
+          borderRadius: '20px',
+          padding: '16px 18px',
+          marginTop: '12px',
+          boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: '15px', fontWeight: '600', color: '#1e1b4b' }}>
+                🔔 Daily nudge
+              </p>
+              <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#9ca3af', lineHeight: 1.5 }}>
+                A gentle, curious reminder to check in on {babyName}.
+              </p>
+            </div>
+            <button
+              onClick={toggleNudge}
+              aria-label="Toggle daily nudge"
+              style={{
+                flexShrink: 0,
+                width: '46px',
+                height: '28px',
+                borderRadius: '14px',
+                border: 'none',
+                background: nudgeOn ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)' : '#e5e3ee',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'all 0.15s',
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: '3px',
+                left: nudgeOn ? '21px' : '3px',
+                width: '22px',
+                height: '22px',
+                borderRadius: '50%',
+                background: '#fff',
+                transition: 'left 0.15s',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }} />
+            </button>
+          </div>
+          {nudgePerm === 'denied' && (
+            <p style={{ margin: '10px 0 0', fontSize: '12px', color: '#b45309', lineHeight: 1.5 }}>
+              Notifications are blocked. Enable them for this site in your browser settings to turn this on.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Edit profile / Sign out */}
       <div style={{ textAlign: 'center', marginTop: '32px', paddingBottom: '16px', display: 'flex', gap: '14px', justifyContent: 'center' }}>
