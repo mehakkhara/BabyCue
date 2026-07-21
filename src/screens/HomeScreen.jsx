@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase'
 import { loadLatestGrowth, loadRecentJournalNotes } from '../lib/aiContext'
 import { REACTIONS, getTodayReaction, recordReaction, clearReaction, computeStreak, streakMessage } from '../lib/engagement'
 import { loadSaved, isSaved, toggleSaved, removeSaved } from '../lib/savedTips'
+import { BABY_STATES, getStateResponse } from '../data/babyStates'
+import { markHelped, timesHelped } from '../lib/babyPatterns'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
 
@@ -64,6 +66,7 @@ const OTHER_TOPICS = [
   { value: 'leap',     label: 'Dev Leap',    emoji: '🧩' },
 ]
 
+
 const STAT_COLORS = [
   { accent: '#4F7CF7' },
   { accent: '#8B5CF6' },
@@ -77,6 +80,10 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
   const [showSaved, setShowSaved] = useState(false)
   const [todayReaction, setTodayReaction] = useState(() => getTodayReaction()?.reaction ?? null)
   const [streak, setStreak] = useState(() => computeStreak())
+  const [activeState, setActiveState] = useState(null) // state key of the open sheet, or null
+  const [helpedCause, setHelpedCause] = useState(null) // cause marked "this helped" in the open sheet
+  const [triedCauses, setTriedCauses] = useState([])   // causes crossed off in the open sheet
+  const [helpedReflection, setHelpedReflection] = useState(null) // pattern surfaced back to her
   const [manualOffset, setManualOffset] = useState(0)
   const [aiTip, setAiTip] = useState(null)
   const [aiTipLoading, setAiTipLoading] = useState(false)
@@ -121,6 +128,34 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
     const next = todayReaction === reaction ? null : reaction
     setTodayReaction(next)
     setStreak(next ? recordReaction(tipId, next) : clearReaction())
+  }
+
+  function openState(stateKey) {
+    setActiveState(stateKey)
+    setHelpedCause(null)
+    setTriedCauses([])
+    setHelpedReflection(null)
+  }
+
+  function closeState() {
+    setActiveState(null)
+    setHelpedCause(null)
+    setTriedCauses([])
+    setHelpedReflection(null)
+  }
+
+  // Cross-off checklist: toggle a cause she's already tried.
+  function toggleTried(cause) {
+    setTriedCauses(prev => prev.includes(cause) ? prev.filter(c => c !== cause) : [...prev, cause])
+  }
+
+  // The one signal worth keeping: which cause actually helped this baby.
+  // If it's helped before, reflect that pattern back to her.
+  function handleHelped(stateKey, cause) {
+    const priorHelps = timesHelped(stateKey, cause)
+    setHelpedCause(cause)
+    markHelped(stateKey, cause)
+    setHelpedReflection(priorHelps >= 1 ? `💜 This often helps ${babyName} — good to remember.` : null)
   }
   const [potdSaving, setPotdSaving] = useState(false)
   const [potdError, setPotdError] = useState('')
@@ -342,6 +377,166 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
           {babyName} is {formatBabyAge(dateOfBirth)}
         </h1>
       </div>
+
+      {/* How's baby? responder sheet */}
+      {activeState && (() => {
+        const r = getStateResponse(activeState, ageInMonths)
+        if (!r) return null
+        return (
+          <div
+            onClick={closeState}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(30,27,75,0.35)',
+              zIndex: 50,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: '480px',
+                maxHeight: '85vh',
+                background: '#faf9ff',
+                borderRadius: '24px 24px 0 0',
+                padding: '20px 18px calc(20px + env(safe-area-inset-bottom))',
+                overflowY: 'auto',
+                boxShadow: '0 -8px 40px rgba(100,100,180,0.25)',
+                animation: 'fadeIn 0.2s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px', marginBottom: '4px' }}>
+                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#1e1b4b', lineHeight: 1.3 }}>
+                  {r.state.emoji} {r.state.ask(babyName)}
+                </h2>
+                <button
+                  onClick={closeState}
+                  aria-label="Close"
+                  style={{
+                    border: 'none',
+                    background: '#ece9f6',
+                    borderRadius: '50%',
+                    width: '30px',
+                    height: '30px',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    color: '#6b7280',
+                    lineHeight: 1,
+                    flexShrink: 0,
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+              <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#a78bfa', fontWeight: '600' }}>
+                {r.tone === 'positive' ? "What's blooming right now" : 'Common at this age'} · {r.bandLabel}
+                {r.tone !== 'positive' && triedCauses.length > 0 && (
+                  <span style={{ color: '#c4b5fd' }}> · {triedCauses.length} of {r.reasons.length} tried</span>
+                )}
+              </p>
+
+              {r.reasons.map(reason => {
+                const wasHelp = helpedCause === reason.cause
+                const tried = triedCauses.includes(reason.cause)
+                const dimmed = tried && !wasHelp
+                return (
+                  <div
+                    key={reason.cause}
+                    style={{
+                      background: wasHelp ? '#f0fdf4' : '#fff',
+                      border: wasHelp ? '1.5px solid #86efac' : '1.5px solid transparent',
+                      borderRadius: '16px',
+                      padding: '14px 16px',
+                      marginBottom: '10px',
+                      boxShadow: '0 2px 12px rgba(100,100,180,0.06)',
+                      opacity: dimmed ? 0.55 : 1,
+                      transition: 'opacity 0.15s',
+                    }}
+                  >
+                    <p style={{ margin: '0 0 4px', fontSize: '14px', fontWeight: '700', color: '#1e1b4b', textDecoration: dimmed ? 'line-through' : 'none' }}>
+                      {reason.cause}
+                    </p>
+                    <p style={{ margin: '0 0 10px', fontSize: '13px', lineHeight: 1.6, color: '#6b7280' }}>
+                      {reason.action}
+                    </p>
+                    {r.tone !== 'positive' && (
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button
+                          onClick={() => handleHelped(activeState, reason.cause)}
+                          disabled={wasHelp}
+                          style={{
+                            border: 'none',
+                            background: wasHelp ? 'transparent' : '#f5f3ff',
+                            color: wasHelp ? '#15803d' : '#7C6FF7',
+                            borderRadius: '8px',
+                            padding: wasHelp ? 0 : '5px 10px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: wasHelp ? 'default' : 'pointer',
+                          }}
+                        >
+                          {wasHelp ? '💜 Glad this helped' : 'This helped'}
+                        </button>
+                        {!wasHelp && (
+                          <button
+                            onClick={() => toggleTried(reason.cause)}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              color: tried ? '#a78bfa' : '#c4c4d4',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              padding: '5px 4px',
+                            }}
+                          >
+                            {tried ? '↩︎ Not yet' : 'Tried it'}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {wasHelp && helpedReflection && (
+                      <p style={{ margin: '8px 0 0', fontSize: '12px', color: '#15803d', fontWeight: '600' }}>
+                        {helpedReflection}
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
+
+              {r.tone === 'positive' ? (
+                <div style={{
+                  background: '#fdf4ff',
+                  border: '1px solid #f5d0fe',
+                  borderRadius: '14px',
+                  padding: '12px 14px',
+                  marginTop: '4px',
+                }}>
+                  <p style={{ margin: 0, fontSize: '12px', lineHeight: 1.6, color: '#a21caf' }}>
+                    {r.positiveNote}
+                  </p>
+                </div>
+              ) : r.redFlag ? (
+                <div style={{
+                  background: '#fff7ed',
+                  border: '1px solid #fed7aa',
+                  borderRadius: '14px',
+                  padding: '12px 14px',
+                  marginTop: '4px',
+                }}>
+                  <p style={{ margin: 0, fontSize: '12px', lineHeight: 1.6, color: '#9a3412' }}>
+                    <strong>When to call the doctor:</strong> {r.redFlag}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Saved tips sheet */}
       {showSaved && (
@@ -784,6 +979,48 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
         ) : null}
       </div>
 
+      {/* How's baby feeling today? — chips styled like Explore by Topic */}
+      <div style={{ marginTop: '24px', marginBottom: '14px' }}>
+        <p style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
+          How's {babyName} feeling today?
+        </p>
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          overflowX: 'auto',
+          paddingBottom: '4px',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}>
+          {BABY_STATES.map(s => (
+            <button
+              key={s.key}
+              onClick={() => openState(s.key)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '8px 14px',
+                borderRadius: '20px',
+                border: 'none',
+                background: '#fff',
+                color: '#6b7280',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(100,100,180,0.08)',
+                transition: 'all 0.15s',
+              }}
+            >
+              <span>{s.emoji}</span>
+              <span>{s.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Memory book — saves to Journal */}
       <div style={{
         background: '#fff',
@@ -792,11 +1029,11 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
         marginTop: '24px',
         marginBottom: '4px',
         boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
-        borderLeft: '4px solid #E91E8C',
+        borderLeft: '4px solid #7C6FF7',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <span style={{ fontSize: '16px' }}>📸</span>
-          <span style={{ fontSize: '11px', fontWeight: '700', color: '#E91E8C', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: '#7C6FF7', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             {babyName}'s memory book
           </span>
         </div>
@@ -810,8 +1047,8 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               display: 'flex',
               gap: '12px',
               alignItems: 'center',
-              background: '#fef7fb',
-              border: '1px solid #fbcfe8',
+              background: '#f5f3ff',
+              border: '1px solid #ddd6fe',
               borderRadius: '14px',
               padding: '12px',
             }}>
@@ -832,7 +1069,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                   width: '64px',
                   height: '64px',
                   borderRadius: '12px',
-                  background: '#fce7f3',
+                  background: '#ede9fe',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -841,7 +1078,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                 }}>📷</div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '700', color: '#9d174d' }}>
+                <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '700', color: '#7C6FF7' }}>
                   ✓ Saved to your journal
                 </p>
                 <p style={{ margin: '0 0 6px', fontSize: '12px', color: '#9ca3af' }}>
@@ -854,7 +1091,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                       background: 'none',
                       border: 'none',
                       padding: 0,
-                      color: '#E91E8C',
+                      color: '#7C6FF7',
                       fontSize: '12px',
                       fontWeight: '600',
                       cursor: 'pointer',
@@ -873,14 +1110,14 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               htmlFor="potd-photo-input"
               style={{
                 display: 'block',
-                border: '2px dashed #fbcfe8',
+                border: '2px dashed #ddd6fe',
                 borderRadius: '14px',
                 padding: potdPreviewUrl ? 0 : '28px 16px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 marginBottom: '12px',
                 overflow: 'hidden',
-                background: potdPreviewUrl ? 'transparent' : '#fef7fb',
+                background: potdPreviewUrl ? 'transparent' : '#f5f3ff',
               }}
             >
               {potdPreviewUrl ? (
@@ -892,7 +1129,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               ) : (
                 <>
                   <div style={{ fontSize: '28px', marginBottom: '4px' }}>📷</div>
-                  <span style={{ color: '#9d174d', fontSize: '13px', fontWeight: '600' }}>
+                  <span style={{ color: '#7C6FF7', fontSize: '13px', fontWeight: '600' }}>
                     Tap to add today's photo
                   </span>
                 </>
@@ -917,7 +1154,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '10px',
-                    border: '1.5px solid #fbcfe8',
+                    border: '1.5px solid #ddd6fe',
                     fontSize: '13px',
                     resize: 'vertical',
                     fontFamily: 'inherit',
@@ -968,8 +1205,8 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                       borderRadius: '10px',
                       border: 'none',
                       background: potdSaving
-                        ? '#f9a8d4'
-                        : 'linear-gradient(135deg, #E91E8C, #f472b6)',
+                        ? '#c4b5fd'
+                        : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
                       color: '#fff',
                       fontSize: '13px',
                       fontWeight: '600',
