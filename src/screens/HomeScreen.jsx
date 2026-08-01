@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getTipsForProfile, getBabyAgeInMonths, formatBabyAge } from '../data/tips'
-import { addEntry, getEntries } from '../data/journalStore'
+import { addEntry, getEntries, isVideoType } from '../data/journalStore'
 import { supabase } from '../lib/supabase'
 import { loadLatestGrowth, loadRecentJournalNotes } from '../lib/aiContext'
 import { loadSaved, isSaved, toggleSaved, removeSaved } from '../lib/savedTips'
@@ -166,8 +166,34 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
 
   const [potdSaving, setPotdSaving] = useState(false)
   const [potdError, setPotdError] = useState('')
-  const [potdSavedToday, setPotdSavedToday] = useState(false)
-  const [potdSavedPreviewUrl, setPotdSavedPreviewUrl] = useState(null)
+  const [showUploader, setShowUploader] = useState(false)
+  const [photoVersion, setPhotoVersion] = useState(0)
+  const [recentPhotos, setRecentPhotos] = useState([])
+
+  // Load journal photos so the home screen can feature the most recent one and
+  // show the rest below. Re-runs whenever a new photo is saved (photoVersion).
+  // Object URLs are revoked on cleanup to avoid leaking memory.
+  useEffect(() => {
+    let cancelled = false
+    const urls = []
+    ;(async () => {
+      try {
+        const entries = await getEntries()
+        const withPhotos = entries.filter(e => e.photoBlob).slice(0, 12)
+        const mapped = withPhotos.map(e => {
+          const url = URL.createObjectURL(e.photoBlob)
+          urls.push(url)
+          return { id: e.id, url, note: e.note, createdAt: e.createdAt, type: e.photoType }
+        })
+        if (cancelled) { urls.forEach(u => URL.revokeObjectURL(u)); return }
+        setRecentPhotos(mapped)
+      } catch { /* ignore — strip just stays empty */ }
+    })()
+    return () => {
+      cancelled = true
+      urls.forEach(u => URL.revokeObjectURL(u))
+    }
+  }, [photoVersion])
 
   useEffect(() => {
     if (!potdFile) { setPotdPreviewUrl(null); return }
@@ -176,35 +202,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
     return () => URL.revokeObjectURL(url)
   }, [potdFile])
 
-  // Check if a photo was already saved to the journal today, and reset at
-  // midnight so "today's photo" rolls over.
-  useEffect(() => {
-    let cancelled = false
-    let savedUrl = null
-    ;(async () => {
-      try {
-        const entries = await getEntries()
-        const startOfDay = new Date()
-        startOfDay.setHours(0, 0, 0, 0)
-        const todays = entries.find(e => e.photoBlob && e.createdAt >= startOfDay.getTime())
-        if (cancelled) return
-        if (todays) {
-          savedUrl = URL.createObjectURL(todays.photoBlob)
-          setPotdSavedPreviewUrl(savedUrl)
-          setPotdSavedToday(true)
-        } else {
-          setPotdSavedToday(false)
-          setPotdSavedPreviewUrl(null)
-        }
-      } catch { /* ignore — uploader still works */ }
-    })()
-    return () => {
-      cancelled = true
-      if (savedUrl) URL.revokeObjectURL(savedUrl)
-    }
-  }, [today])
-
-  async function handleSavePhotoOfDay() {
+  async function handleSavePhoto() {
     if (!potdFile) return
     setPotdSaving(true)
     setPotdError('')
@@ -214,11 +212,10 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
         photoBlob: potdFile,
         photoType: potdFile.type || 'image/jpeg',
       })
-      const url = URL.createObjectURL(potdFile)
-      setPotdSavedPreviewUrl(url)
-      setPotdSavedToday(true)
       setPotdFile(null)
       setPotdNote('')
+      setShowUploader(false)
+      setPhotoVersion(v => v + 1) // refresh featured photo + strip
     } catch (err) {
       setPotdError(err?.message || 'Could not save. Try again.')
     } finally {
@@ -1023,73 +1020,10 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
           </span>
         </div>
         <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#9ca3af', lineHeight: 1.5 }}>
-          A tiny moment from today — saved straight to your journal.
+          Little moments to look back on — add a photo or video whenever you like.
         </p>
 
-        {potdSavedToday ? (
-          <div>
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              alignItems: 'center',
-              background: '#f5f3ff',
-              border: '1px solid #ddd6fe',
-              borderRadius: '14px',
-              padding: '12px',
-            }}>
-              {potdSavedPreviewUrl ? (
-                <img
-                  src={potdSavedPreviewUrl}
-                  alt="Today's photo"
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    objectFit: 'cover',
-                    borderRadius: '12px',
-                    flexShrink: 0,
-                  }}
-                />
-              ) : (
-                <div style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '12px',
-                  background: '#ede9fe',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  flexShrink: 0,
-                }}>📷</div>
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '700', color: '#7C6FF7' }}>
-                  ✓ Saved to your journal
-                </p>
-                <p style={{ margin: '0 0 6px', fontSize: '12px', color: '#9ca3af' }}>
-                  Come back tomorrow for another moment.
-                </p>
-                {onOpenJournal && (
-                  <button
-                    onClick={onOpenJournal}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      padding: 0,
-                      color: '#7C6FF7',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                    }}
-                  >
-                    View in journal →
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ) : (
+        {showUploader ? (
           <>
             <label
               htmlFor="potd-photo-input"
@@ -1106,16 +1040,25 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
               }}
             >
               {potdPreviewUrl ? (
-                <img
-                  src={potdPreviewUrl}
-                  alt="preview"
-                  style={{ width: '100%', display: 'block', maxHeight: '280px', objectFit: 'cover' }}
-                />
+                isVideoType(potdFile?.type) ? (
+                  <video
+                    src={potdPreviewUrl}
+                    controls
+                    playsInline
+                    style={{ width: '100%', display: 'block', maxHeight: '280px', objectFit: 'cover', background: '#000' }}
+                  />
+                ) : (
+                  <img
+                    src={potdPreviewUrl}
+                    alt="preview"
+                    style={{ width: '100%', display: 'block', maxHeight: '280px', objectFit: 'cover' }}
+                  />
+                )
               ) : (
                 <>
                   <div style={{ fontSize: '28px', marginBottom: '4px' }}>📷</div>
                   <span style={{ color: '#7C6FF7', fontSize: '13px', fontWeight: '600' }}>
-                    Tap to add today's photo
+                    Tap to choose a photo or video
                   </span>
                 </>
               )}
@@ -1123,89 +1066,275 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
             <input
               id="potd-photo-input"
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               onChange={e => setPotdFile(e.target.files?.[0] || null)}
               style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
             />
 
-            {potdFile && (
-              <>
-                <textarea
-                  value={potdNote}
-                  onChange={e => setPotdNote(e.target.value)}
-                  placeholder="Add a note... (optional)"
-                  rows={2}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '10px',
-                    border: '1.5px solid #ddd6fe',
-                    fontSize: '13px',
-                    resize: 'vertical',
-                    fontFamily: 'inherit',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    marginBottom: '10px',
-                  }}
-                />
+            <textarea
+              value={potdNote}
+              onChange={e => setPotdNote(e.target.value)}
+              placeholder="Add a note... (optional)"
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: '1.5px solid #ddd6fe',
+                fontSize: '13px',
+                resize: 'vertical',
+                fontFamily: 'inherit',
+                outline: 'none',
+                boxSizing: 'border-box',
+                marginBottom: '10px',
+              }}
+            />
 
-                {potdError && (
-                  <p style={{
-                    margin: '0 0 10px',
-                    fontSize: '12px',
-                    color: '#b91c1c',
-                    background: '#fef2f2',
-                    border: '1px solid #fecaca',
-                    borderRadius: '10px',
-                    padding: '8px 10px',
-                  }}>
-                    {potdError}
-                  </p>
-                )}
-
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={() => { setPotdFile(null); setPotdNote(''); setPotdError('') }}
-                    disabled={potdSaving}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      borderRadius: '10px',
-                      border: '1.5px solid #f3f4f6',
-                      background: '#fff',
-                      color: '#6b7280',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      cursor: potdSaving ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSavePhotoOfDay}
-                    disabled={potdSaving}
-                    style={{
-                      flex: 2,
-                      padding: '10px',
-                      borderRadius: '10px',
-                      border: 'none',
-                      background: potdSaving
-                        ? '#c4b5fd'
-                        : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
-                      color: '#fff',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      cursor: potdSaving ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    {potdSaving ? 'Saving…' : 'Save to journal'}
-                  </button>
-                </div>
-              </>
+            {potdError && (
+              <p style={{
+                margin: '0 0 10px',
+                fontSize: '12px',
+                color: '#b91c1c',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '10px',
+                padding: '8px 10px',
+              }}>
+                {potdError}
+              </p>
             )}
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => { setShowUploader(false); setPotdFile(null); setPotdNote(''); setPotdError('') }}
+                disabled={potdSaving}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  border: '1.5px solid #f3f4f6',
+                  background: '#fff',
+                  color: '#6b7280',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: potdSaving ? 'not-allowed' : 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSavePhoto}
+                disabled={potdSaving || !potdFile}
+                style={{
+                  flex: 2,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: potdSaving || !potdFile
+                    ? '#c4b5fd'
+                    : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+                  color: '#fff',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: potdSaving || !potdFile ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {potdSaving ? 'Saving…' : 'Save to journal'}
+              </button>
+            </div>
           </>
+        ) : recentPhotos.length > 0 ? (
+          <>
+            {/* Featured — the most recent memory, shown large */}
+            <div style={{ borderRadius: '14px', overflow: 'hidden', marginBottom: recentPhotos[0].note ? '8px' : '12px' }}>
+              {isVideoType(recentPhotos[0].type) ? (
+                <video
+                  src={recentPhotos[0].url}
+                  controls
+                  playsInline
+                  style={{ width: '100%', display: 'block', maxHeight: '300px', objectFit: 'cover', background: '#000' }}
+                />
+              ) : (
+                <img
+                  src={recentPhotos[0].url}
+                  alt=""
+                  style={{ width: '100%', display: 'block', maxHeight: '300px', objectFit: 'cover' }}
+                />
+              )}
+            </div>
+            {recentPhotos[0].note && (
+              <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#6b7280', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                {recentPhotos[0].note}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => setShowUploader(true)}
+                style={{
+                  flex: 2,
+                  padding: '10px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+                  color: '#fff',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                }}
+              >
+                + Add photo/video
+              </button>
+              {onOpenJournal && (
+                <button
+                  onClick={onOpenJournal}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '10px',
+                    border: '1.5px solid #ede9fe',
+                    background: '#fff',
+                    color: '#7C6FF7',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                  }}
+                >
+                  View journal
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <label
+            htmlFor="potd-photo-input-empty"
+            onClick={() => setShowUploader(true)}
+            style={{
+              display: 'block',
+              border: '2px dashed #ddd6fe',
+              borderRadius: '14px',
+              padding: '28px 16px',
+              textAlign: 'center',
+              cursor: 'pointer',
+              background: '#f5f3ff',
+            }}
+          >
+            <div style={{ fontSize: '28px', marginBottom: '4px' }}>📷</div>
+            <span style={{ color: '#7C6FF7', fontSize: '13px', fontWeight: '600' }}>
+              Tap to add your first photo or video
+            </span>
+          </label>
         )}
       </div>
+
+      {/* More memories — the rest of the baby pictures (the most recent is featured above) */}
+      {recentPhotos.length > 1 && (
+        <div style={{
+          background: '#fff',
+          borderRadius: '20px',
+          padding: '18px 0 18px 18px',
+          marginTop: '12px',
+          boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+          borderLeft: '4px solid #a78bfa',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            marginBottom: '14px',
+            paddingRight: '18px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+              <span style={{ fontSize: '16px' }}>📖</span>
+              <span style={{ fontSize: '11px', fontWeight: '700', color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                More of {babyName}'s memories
+              </span>
+            </div>
+            {onOpenJournal && (
+              <button
+                onClick={onOpenJournal}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  color: '#7C6FF7',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                View all →
+              </button>
+            )}
+          </div>
+          <div style={{
+            display: 'flex',
+            gap: '10px',
+            overflowX: 'auto',
+            paddingRight: '18px',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}>
+            {recentPhotos.slice(1).map(photo => (
+              <button
+                key={String(photo.id)}
+                onClick={onOpenJournal}
+                title={photo.note || undefined}
+                style={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  width: '92px',
+                  height: '92px',
+                  padding: 0,
+                  border: '2px solid #ede9fe',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  cursor: onOpenJournal ? 'pointer' : 'default',
+                  background: '#f5f3ff',
+                  boxShadow: '0 2px 10px rgba(100,100,180,0.10)',
+                }}
+              >
+                {isVideoType(photo.type) ? (
+                  <>
+                    <video
+                      src={photo.url}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', background: '#000' }}
+                    />
+                    <span style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.45)',
+                      color: '#fff',
+                      fontSize: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingLeft: '2px',
+                      pointerEvents: 'none',
+                    }}>▶</span>
+                  </>
+                ) : (
+                  <img
+                    src={photo.url}
+                    alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Saved tips entry */}
       <button

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getEntries, addEntry, deleteEntry } from '../data/journalStore'
+import { getEntries, addEntry, deleteEntry, isVideoType } from '../data/journalStore'
 
 function formatDate(ts) {
   const d = new Date(ts)
@@ -8,6 +8,7 @@ function formatDate(ts) {
 
 function EntryCard({ entry, onDelete }) {
   const [photoUrl, setPhotoUrl] = useState(null)
+  const isVideo = isVideoType(entry.photoType)
 
   useEffect(() => {
     if (!entry.photoBlob) return
@@ -25,12 +26,22 @@ function EntryCard({ entry, onDelete }) {
       marginBottom: '14px',
     }}>
       {photoUrl && (
-        <img src={photoUrl} alt="" style={{
-          width: '100%',
-          display: 'block',
-          maxHeight: '420px',
-          objectFit: 'cover',
-        }} />
+        isVideo ? (
+          <video src={photoUrl} controls playsInline style={{
+            width: '100%',
+            display: 'block',
+            maxHeight: '420px',
+            objectFit: 'cover',
+            background: '#000',
+          }} />
+        ) : (
+          <img src={photoUrl} alt="" style={{
+            width: '100%',
+            display: 'block',
+            maxHeight: '420px',
+            objectFit: 'cover',
+          }} />
+        )
       )}
       <div style={{ padding: '14px 16px' }}>
         <p style={{ margin: 0, fontSize: '12px', color: '#888', fontWeight: 500 }}>
@@ -113,15 +124,19 @@ function AddForm({ onSave, onCancel }) {
         }}
       >
         {previewUrl ? (
-          <img src={previewUrl} alt="preview" style={{ width: '100%', display: 'block', maxHeight: '320px', objectFit: 'cover' }} />
+          isVideoType(file?.type) ? (
+            <video src={previewUrl} controls playsInline style={{ width: '100%', display: 'block', maxHeight: '320px', objectFit: 'cover', background: '#000' }} />
+          ) : (
+            <img src={previewUrl} alt="preview" style={{ width: '100%', display: 'block', maxHeight: '320px', objectFit: 'cover' }} />
+          )
         ) : (
-          <span style={{ color: '#888', fontSize: '14px' }}>Tap to add a photo</span>
+          <span style={{ color: '#888', fontSize: '14px' }}>Tap to add a photo or video</span>
         )}
       </label>
       <input
         id="journal-photo-input"
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         onChange={e => setFile(e.target.files?.[0] || null)}
         style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
       />
@@ -268,7 +283,7 @@ export default function JournalScreen() {
           <div style={{ textAlign: 'center', marginTop: '60px', padding: '0 24px' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>📷</div>
             <p style={{ fontSize: '15px', color: '#666', lineHeight: 1.5, margin: 0 }}>
-              Save a memory of your baby — a photo, a note, a tiny moment to look back on.
+              Save a memory of your baby — a photo, a video, a note, a tiny moment to look back on.
             </p>
             <button
               onClick={() => setAdding(true)}
