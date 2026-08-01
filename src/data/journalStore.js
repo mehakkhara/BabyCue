@@ -2,6 +2,13 @@ const DB_NAME = 'baby-journal'
 const STORE_NAME = 'entries'
 const DB_VERSION = 1
 
+// Entries store the media's MIME type in `photoType` (kept that name for
+// backward compatibility). Videos and photos share the same blob storage —
+// only the rendering differs.
+export function isVideoType(type) {
+  return typeof type === 'string' && type.startsWith('video/')
+}
+
 function openDb() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION)
