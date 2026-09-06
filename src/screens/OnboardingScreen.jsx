@@ -147,8 +147,10 @@ export default function OnboardingScreen({ onComplete }) {
     try {
       await onComplete(profile)
     } catch (err) {
+      // Keep the technical detail in the console; a parent setting up the app
+      // should never be shown a raw database or network message.
       console.error('Profile save failed:', err)
-      setSaveError(err?.message || 'Could not save. Please try again.')
+      setSaveError("Something went wrong saving your details. Please try again — if it keeps happening, sign out and back in.")
     } finally {
       setSaving(false)
     }
