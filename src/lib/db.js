@@ -62,6 +62,30 @@ async function currentUserId() {
   return data?.session?.user?.id ?? null
 }
 
+// getSession() reads the token out of localStorage without asking the server
+// whether that user still exists. If the account was deleted — by us, by the
+// user on another device, or because the project was reset — the token still
+// looks valid and still passes RLS (auth.uid() comes from the JWT signature,
+// not from a lookup). The insert then dies on the foreign key into auth.users.
+//
+// 23503 = foreign_key_violation. PGRST301 = JWT expired / not acceptable.
+function isDeadSession(error) {
+  return error?.code === '23503'
+    || error?.code === 'PGRST301'
+    || error?.status === 401
+}
+
+// Drop the stale token so the next render sends them to sign-in. Scope 'local'
+// clears storage without calling the server — the token is already worthless,
+// so a network round trip would just fail.
+async function abandonDeadSession() {
+  try {
+    await supabase.auth.signOut({ scope: 'local' })
+  } catch {
+    // Nothing to do — the session is going away either way.
+  }
+}
+
 export async function getProfile() {
   const userId = await currentUserId()
   if (!userId) return loadLocalProfile()
@@ -75,7 +99,8 @@ export async function getProfile() {
     .maybeSingle()
 
   if (error) {
-    console.error('getProfile error:', error.message)
+    if (isDeadSession(error)) await abandonDeadSession()
+    else console.error('getProfile error:', error.message)
     return loadLocalProfile()
   }
   return rowToProfile(data)
@@ -100,16 +125,29 @@ export async function saveProfile(profile) {
     .limit(1)
     .maybeSingle()
 
-  if (selErr) throw selErr
+  if (selErr) {
+    if (!isDeadSession(selErr)) throw selErr
+    return saveAsGuest(profile)
+  }
 
   const row = profileToRow(profile, userId)
-  if (existing?.id) {
-    const { error } = await supabase.from('profiles').update(row).eq('id', existing.id)
-    if (error) throw error
-  } else {
-    const { error } = await supabase.from('profiles').insert(row)
-    if (error) throw error
+  const { error } = existing?.id
+    ? await supabase.from('profiles').update(row).eq('id', existing.id)
+    : await supabase.from('profiles').insert(row)
+
+  if (error) {
+    if (!isDeadSession(error)) throw error
+    // The account this token belongs to is gone. Don't strand the parent on
+    // onboarding with a database error — keep their profile on the device and
+    // let them sign in again when they're ready.
+    return saveAsGuest(profile)
   }
+  return profile
+}
+
+async function saveAsGuest(profile) {
+  await abandonDeadSession()
+  saveLocalProfile(profile)
   return profile
 }
 

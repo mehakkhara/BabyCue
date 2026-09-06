@@ -83,62 +83,6 @@ function buildContextLines(profile, context) {
   return lines
 }
 
-app.post('/api/chat', async (req, res) => {
-  const { message, profile, context, history = [] } = req.body
-
-  if (!message || !profile) {
-    return res.status(400).json({ error: 'Message and profile are required' })
-  }
-
-  const { babyName, ageInMonths } = profile
-  const contextLines = buildContextLines(profile, context)
-  const contextBlock = contextLines.length
-    ? `\n\nAdditional context about this specific baby and family:\n${contextLines.join('\n')}`
-    : ''
-
-  const systemPrompt = `You are a knowledgeable assistant for parents of infants and toddlers, with expertise in pediatric development. You give personalized, evidence-based guidance.
-
-You are helping a parent of a baby named ${babyName} who is ${ageInMonths} month${ageInMonths === 1 ? '' : 's'} old.${contextBlock}
-
-Use the context above to make answers specific to ${babyName} when it's relevant. Don't recite the context back to the parent — just let it shape your response. If a question is unrelated to a piece of context, ignore that piece.
-
-Format your reply as plain conversational text. Do not use markdown — no headers (##), no bold (**), no bullet points (- or *), no numbered lists. Use short paragraphs separated by blank lines. Keep replies under 150 words unless the question genuinely requires more.
-
-Style and tone:
-- Get to the answer directly. Do not open with "Oh mama," "Mama," "you're not alone," "great question," or any reassuring preamble. Start with the actual content.
-- Use gender-neutral language. Do not assume the parent's gender — never address them as "mama," "mom," "dad," or any gendered term. "You" is enough when you need to address them.
-- Be calm and direct, not effusive. Skip excess warmth, exclamation points, and emojis.
-- Tailor advice to ${babyName}'s exact age (${ageInMonths} months).
-- Mention evidence naturally in prose when relevant (AAP, WHO, pediatric research) — not as formal citations.
-- For anything that sounds medical, recommend consulting their pediatrician.
-- Never give medical diagnoses.`
-
-  const messages = [
-    ...history,
-    { role: 'user', content: message }
-  ]
-
-  try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages,
-    })
-
-    const reply = response.content[0].text
-    res.json({ reply })
-  } catch (err) {
-    console.error('Anthropic API error:', err.status, err.message)
-    const status = err.status && err.status >= 400 && err.status < 600 ? err.status : 500
-    res.status(status).json({
-      error: err.message
-        ? `Backend (${err.status || 'unknown'}): ${err.message}`
-        : 'Sorry, I had trouble responding just now. Please try again in a moment.',
-    })
-  }
-})
-
 app.post('/api/daily-tip', async (req, res) => {
   const { profile, context } = req.body
 

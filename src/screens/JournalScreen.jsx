@@ -78,6 +78,7 @@ function AddForm({ onSave, onCancel }) {
   const [previewUrl, setPreviewUrl] = useState(null)
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     if (!file) { setPreviewUrl(null); return }
@@ -89,14 +90,20 @@ function AddForm({ onSave, onCancel }) {
   async function handleSave() {
     if (!file && !note.trim()) return
     setSaving(true)
+    setSaveError('')
     try {
       const photoBlob = file || null
       const photoType = file ? (file.type || 'image/jpeg') : null
       await addEntry({ note: note.trim(), photoBlob, photoType })
       onSave()
     } catch (err) {
+      // Raw storage errors ("QuotaExceededError: ...") mean nothing to a
+      // parent. Keep the detail in the console, say something useful here.
       console.error('Save failed', err)
-      alert(`Could not save: ${err?.message || err}`)
+      const outOfSpace = err?.name === 'QuotaExceededError'
+      setSaveError(outOfSpace
+        ? "There's no room left on this device for another memory. Try deleting an older video."
+        : 'Could not save that memory. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -165,6 +172,17 @@ function AddForm({ onSave, onCancel }) {
           marginBottom: '12px',
         }}
       />
+
+      {saveError && (
+        <p style={{
+          margin: '0 0 10px',
+          fontSize: '13px',
+          color: '#c44',
+          lineHeight: 1.45,
+        }}>
+          {saveError}
+        </p>
+      )}
 
       <div style={{ display: 'flex', gap: '8px' }}>
         <button
