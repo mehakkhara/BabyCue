@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import HomeScreen from './screens/HomeScreen'
 import OnboardingScreen from './screens/OnboardingScreen'
-import ChatScreen from './screens/ChatScreen'
+import StoriesScreen from './screens/StoriesScreen'
 import StatsScreen from './screens/StatsScreen'
 import MilestonesScreen from './screens/MilestonesScreen'
 import JournalScreen from './screens/JournalScreen'
@@ -9,7 +9,6 @@ import AuthScreen from './screens/AuthScreen'
 import { isSupabaseConfigured } from './lib/supabase'
 import { useSession, signOut } from './lib/useSession'
 import { getProfile, saveProfile, backfillLocalProfileIfNeeded } from './lib/db'
-import { backfillLocalChatIfNeeded } from './lib/chatStore'
 
 const HomeIcon = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -18,9 +17,9 @@ const HomeIcon = ({ active }) => (
   </svg>
 )
 
-const ChatIcon = ({ active }) => (
+const StoriesIcon = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+    <path d="M20.5 14.5A8.5 8.5 0 019.5 3.5a8.5 8.5 0 1011 11z"/>
   </svg>
 )
 
@@ -50,7 +49,7 @@ const MilestoneIcon = ({ active }) => (
 
 const NAV_ITEMS = [
   { id: 'home',       label: 'Today',      Icon: HomeIcon      },
-  { id: 'chat',       label: 'Ask',        Icon: ChatIcon      },
+  { id: 'stories',    label: 'Stories',    Icon: StoriesIcon   },
   { id: 'stats',      label: 'Growth',     Icon: StatsIcon     },
   { id: 'milestones', label: 'Milestones', Icon: MilestoneIcon },
   { id: 'journal',    label: 'Journal',    Icon: JournalIcon   },
@@ -79,10 +78,6 @@ export default function App() {
           : null
         const p = backfilled ?? (await getProfile())
         if (!cancelled) setProfile(p)
-        // Once the profile row exists, also push any local chat history up.
-        if (isSupabaseConfigured && session && p) {
-          await backfillLocalChatIfNeeded()
-        }
       } catch (err) {
         console.error('Profile load failed:', err)
         if (!cancelled) setProfile(null)
@@ -133,7 +128,7 @@ export default function App() {
     <div style={{ maxWidth: '480px', margin: '0 auto', position: 'relative', minHeight: '100vh' }}>
       <div style={{ paddingBottom: '72px' }}>
         {activeTab === 'home'    && <HomeScreen profile={profile} onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} onOpenJournal={() => setActiveTab('journal')} />}
-        {activeTab === 'chat'    && <ChatScreen profile={profile} />}
+        {activeTab === 'stories' && <StoriesScreen profile={profile} />}
         {activeTab === 'stats'      && <StatsScreen profile={profile} onProfileChange={handleProfileChange} />}
         {activeTab === 'milestones' && <MilestonesScreen profile={profile} />}
         {activeTab === 'journal'    && <JournalScreen />}

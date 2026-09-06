@@ -24,15 +24,11 @@ export default defineConfig({
             urlPattern: ({ url }) => url.pathname.endsWith('/api/daily-tip'),
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'babycue-daily-tip',
+              cacheName: 'numae-daily-tip',
               networkTimeoutSeconds: 8,
               expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 },
               cacheableResponse: { statuses: [0, 200] },
             },
-          },
-          {
-            urlPattern: ({ url }) => url.pathname.endsWith('/api/chat'),
-            handler: 'NetworkOnly',
           },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
