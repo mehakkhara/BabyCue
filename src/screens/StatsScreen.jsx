@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { WHO, getPercentile, ordinal, monthsBetween } from '../data/whoStandards'
+import DevelopmentChecklist from '../components/DevelopmentChecklist'
 
 const MONTHS25 = Array.from({ length: 25 }, (_, i) => i)
 
@@ -419,6 +420,9 @@ export default function StatsScreen({ profile, onProfileChange }) {
           </div>
         </>
       )}
+
+      {/* Development — what baby is doing, alongside how baby is growing */}
+      <DevelopmentChecklist profile={profile} />
     </div>
   )
 }

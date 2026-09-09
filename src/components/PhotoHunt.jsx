@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { addEntry, getEntries, compressImage, imageDimensions, isVideoType } from '../data/journalStore'
-import { ShapedMedia, KeepWhichPart, isTallerThanTile } from '../components/PhotoShape'
+import { CropFrame, TILE_RATIO } from '../components/PhotoShape'
+import { autoCropPosition } from '../lib/autoCrop'
+import KeepsakeModal from './KeepsakeModal'
+import KeepsakePicker from './KeepsakePicker'
 import { getBabyAgeInMonths } from '../data/tips'
 import { promptsForAge } from '../data/photoPrompts'
 import { loadHunt, recordCapture } from '../lib/photoHunt'
@@ -53,7 +56,7 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
   // before it lands in a square cell she chooses how it should sit there.
   const [pending, setPending] = useState(null)   // { prompt, file, url }
   const [fit, setFit] = useState('cover')         // 'cover' | 'contain'
-  const [position, setPosition] = useState('center')
+  const [position, setPosition] = useState('50% 50%')
 
   useEffect(() => {
     if (!pending) return
@@ -74,8 +77,10 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
     if (!file || !prompt) return
     setError('')
     setFit('cover')
-    setPosition('center')
+    setPosition('50% 50%')
     setPending({ prompt, file, url: URL.createObjectURL(file) })
+    // Guess where the subject is; she can drag if the guess is off.
+    autoCropPosition(file, 1).then(setPosition)
   }
 
   function cancelPending() {
@@ -101,6 +106,7 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
       })
       setCaptures({ ...recordCapture(prompt.id, entryId, { fit, position }) })
       setPending(null)
+      rememberSaved(blob, prompt.label)
       onSaved?.()
       onCheckIn?.()
     } catch (err) {
@@ -116,6 +122,20 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
   const capturedCount = prompts.filter(p => captures[p.id]).length
   const monthName = new Date().toLocaleDateString(undefined, { month: 'long' })
 
+  // Keepsakes from Home: a picker over recent journal photos, plus a nudge
+  // right after a save while the moment is fresh.
+  const [keepsake, setKeepsake] = useState(null)     // 'picker' | { url, title, ts }
+  const [justSaved, setJustSaved] = useState(null)   // { url, title, ts } of the last photo saved here
+
+  useEffect(() => {
+    if (!justSaved) return
+    return () => URL.revokeObjectURL(justSaved.url)
+  }, [justSaved])
+
+  function rememberSaved(blob, title) {
+    setJustSaved({ url: URL.createObjectURL(blob), title, ts: Date.now() })
+  }
+
   // Custom entry — for moments the hunt didn't ask for. Same journal, no prompt.
   const [customOpen, setCustomOpen] = useState(false)
   const [customFile, setCustomFile] = useState(null)
@@ -124,15 +144,14 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
   const [customSaving, setCustomSaving] = useState(false)
   const [customError, setCustomError] = useState('')
   const [customSaved, setCustomSaved] = useState(false)
-  const [customDims, setCustomDims] = useState(null)
-  const [customPosition, setCustomPosition] = useState('center')
+  const [customPosition, setCustomPosition] = useState('50% 50%')
 
   useEffect(() => {
-    if (!customFile) { setCustomPreview(null); setCustomDims(null); return }
+    if (!customFile) { setCustomPreview(null); return }
     const url = URL.createObjectURL(customFile)
     setCustomPreview(url)
-    setCustomPosition('center')
-    if (!isVideoType(customFile.type)) imageDimensions(customFile).then(setCustomDims)
+    setCustomPosition('50% 50%')
+    if (!isVideoType(customFile.type)) autoCropPosition(customFile, TILE_RATIO).then(setCustomPosition)
     return () => URL.revokeObjectURL(url)
   }, [customFile])
 
@@ -162,6 +181,7 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
       closeCustom()
       setCustomSaved(true)
       setTimeout(() => setCustomSaved(false), 2500)
+      if (blob && !isVideo) rememberSaved(blob, customNote.trim())
       onSaved?.()
       onCheckIn?.()
     } catch (err) {
@@ -223,41 +243,70 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
 
       {/* Custom entry — a photo or note that isn't one of the nine prompts */}
       {!customOpen ? (
-        <button
-          onClick={() => { setCustomOpen(true); setCustomSaved(false) }}
-          disabled={saving}
-          style={{
-            width: '100%', marginBottom: '10px', padding: '10px 12px',
-            borderRadius: '12px', border: '1.5px dashed #c4b5fd',
-            background: customSaved ? '#f0fdf4' : '#f5f3ff',
-            color: customSaved ? '#15803d' : '#6d28d9',
-            fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-            transition: 'all 0.25s ease',
-          }}
-        >
-          {customSaved ? '✓ Saved to the journal' : <><span style={{ fontSize: '15px' }}>＋</span> Add your own moment</>}
-        </button>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+          <button
+            onClick={() => { setCustomOpen(true); setCustomSaved(false) }}
+            disabled={saving}
+            style={{
+              flex: 3, padding: '10px 12px',
+              borderRadius: '12px', border: '1.5px dashed #c4b5fd',
+              background: customSaved ? '#f0fdf4' : '#f5f3ff',
+              color: customSaved ? '#15803d' : '#6d28d9',
+              fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+              transition: 'all 0.25s ease',
+            }}
+          >
+            {customSaved ? '✓ Saved to the journal' : <><span style={{ fontSize: '15px' }}>＋</span> Add your own moment</>}
+          </button>
+          <button
+            onClick={() => setKeepsake('picker')}
+            disabled={saving}
+            aria-label="Make a keepsake card"
+            style={{
+              flex: 2, padding: '10px 8px',
+              borderRadius: '12px', border: 'none',
+              background: 'linear-gradient(135deg, #7C6FF7, #a78bfa)', color: '#fff',
+              fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
+            }}
+          >
+            🎞 Keepsake
+          </button>
+        </div>
       ) : (
         <div style={{
           marginBottom: '12px', padding: '12px',
           borderRadius: '14px', border: '1.5px solid #ddd6fe', background: '#faf9ff',
         }}>
-          <label
-            htmlFor="photo-hunt-custom-input"
-            style={{
-              display: 'block', border: '1.5px dashed #c4b5fd', borderRadius: '10px',
-              padding: customPreview ? 0 : '18px 12px', textAlign: 'center',
-              cursor: 'pointer', marginBottom: '10px', overflow: 'hidden', background: '#fff',
-            }}
-          >
-            {customPreview ? (
-              // Preview exactly as the journal's month card will show it.
-              <ShapedMedia url={customPreview} type={customFile?.type} entry={{ ...customDims, position: customPosition }} />
-            ) : (
+          {customPreview ? (
+            // Outside the label so a drag doesn't reopen the file picker.
+            <div style={{ borderRadius: '10px', overflow: 'hidden', marginBottom: '6px', background: '#fff' }}>
+              {isVideoType(customFile?.type)
+                ? <video src={customPreview} controls playsInline style={{ width: '100%', maxHeight: '240px', display: 'block', background: '#000' }} />
+                // The journal's tiles are 4:5 — drag to choose what they show.
+                : <CropFrame url={customPreview} ratio={TILE_RATIO} position={customPosition} onChange={setCustomPosition} />}
+            </div>
+          ) : (
+            <label
+              htmlFor="photo-hunt-custom-input"
+              style={{
+                display: 'block', border: '1.5px dashed #c4b5fd', borderRadius: '10px',
+                padding: '18px 12px', textAlign: 'center',
+                cursor: 'pointer', marginBottom: '10px', background: '#fff',
+              }}
+            >
               <span style={{ color: '#7c3aed', fontSize: '12px', fontWeight: 600 }}>📷 Tap to add a photo or video</span>
-            )}
-          </label>
+            </label>
+          )}
+          {customPreview && (
+            <label
+              htmlFor="photo-hunt-custom-input"
+              style={{ display: 'block', marginBottom: '10px', fontSize: '11px', fontWeight: 600, color: '#7c3aed', cursor: 'pointer', textAlign: 'center' }}
+            >
+              Choose a different photo
+            </label>
+          )}
           <input
             id="photo-hunt-custom-input"
             type="file"
@@ -266,11 +315,6 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
             style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
           />
 
-          {customDims && isTallerThanTile(customDims.width, customDims.height) && (
-            <div style={{ marginBottom: '10px' }}>
-              <KeepWhichPart value={customPosition} onChange={setCustomPosition} />
-            </div>
-          )}
 
           <textarea
             value={customNote}
@@ -334,17 +378,8 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
 
           <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
             {/* Live square preview — exactly what the grid cell will show */}
-            <div style={{
-              width: '120px', height: '120px', flexShrink: 0,
-              borderRadius: '12px', overflow: 'hidden',
-              background: fit === 'contain' ? '#1a1a2e' : '#fff',
-              border: '1.5px solid #fbcfe8',
-            }}>
-              <img
-                src={pending.url}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: fit, objectPosition: position, display: 'block' }}
-              />
+            <div style={{ width: '150px', flexShrink: 0, borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #fbcfe8' }}>
+              <CropFrame url={pending.url} ratio={1} fit={fit} position={position} onChange={setPosition} />
             </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -373,7 +408,9 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
               </div>
 
               {fit === 'cover' && (
-                <KeepWhichPart value={position} onChange={setPosition} accent="#db2777" tint="#fce7f3" />
+                <p style={{ margin: 0, fontSize: '11px', color: '#9ca3af', lineHeight: 1.45 }}>
+                  We picked the busiest part of the photo. Drag it if {profile.babyName} isn't in view.
+                </p>
               )}
             </div>
           </div>
@@ -474,6 +511,60 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
         <p style={{ margin: '10px 0 0', fontSize: '12px', color: '#15803d', fontWeight: 600, textAlign: 'center' }}>
           The whole grid — {monthName} is safely in the memory book 💜
         </p>
+      )}
+
+      {/* Fresh save → offer the card while the moment is still warm */}
+      {justSaved && !keepsake && (
+        <div style={{
+          marginTop: '10px', padding: '9px 10px',
+          background: '#fdf2f8', border: '1.5px solid #fbcfe8', borderRadius: '12px',
+          display: 'flex', alignItems: 'center', gap: '10px',
+        }}>
+          <img
+            src={justSaved.url}
+            alt=""
+            style={{ width: '40px', height: '50px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }}
+          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: '#1a1a2e' }}>Saved to the journal ✓</div>
+            <div style={{ fontSize: '11px', color: '#888' }}>Make it a keepsake card?</div>
+          </div>
+          <button
+            onClick={() => setKeepsake(justSaved)}
+            style={{
+              border: 'none', background: 'none', padding: '4px 2px',
+              color: '#db2777', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Make it →
+          </button>
+          <button
+            onClick={() => setJustSaved(null)}
+            aria-label="Dismiss"
+            style={{ border: 'none', background: 'none', color: '#c4c4d4', fontSize: '15px', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {keepsake === 'picker' && (
+        <KeepsakePicker
+          profile={profile}
+          onClose={() => setKeepsake(null)}
+          onSaved={() => onSaved?.()}
+        />
+      )}
+      {keepsake && keepsake !== 'picker' && (
+        <KeepsakeModal
+          photoUrl={keepsake.url}
+          title={keepsake.title}
+          takenAt={keepsake.ts}
+          profile={profile}
+          onClose={() => { setKeepsake(null); setJustSaved(null) }}
+          onSaved={() => onSaved?.()}
+        />
       )}
     </div>
   )

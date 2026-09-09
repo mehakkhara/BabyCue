@@ -52,7 +52,14 @@ export async function getEntries() {
 //   width/height — pixel size of the stored media (images measured on save)
 //   fit          — 'cover' (default) | 'contain' (show the whole photo)
 //   position     — which part to keep when cropping: 'top' | 'center' | 'bottom'
-export async function addEntry({ note, photoBlob, photoType, width, height, fit, position }) {
+//   kind         — 'memory' (default) | 'keepsake' (a designed card she made)
+export const KEEPSAKE_KIND = 'keepsake'
+
+export function isKeepsake(entry) {
+  return entry?.kind === KEEPSAKE_KIND
+}
+
+export async function addEntry({ note, photoBlob, photoType, width, height, fit, position, kind }) {
   let photoBuffer = null
   if (photoBlob) {
     photoBuffer = await photoBlob.arrayBuffer()
@@ -62,6 +69,7 @@ export async function addEntry({ note, photoBlob, photoType, width, height, fit,
     const tx = db.transaction(STORE_NAME, 'readwrite')
     const req = tx.objectStore(STORE_NAME).add({
       note: note || '',
+      kind: kind === KEEPSAKE_KIND ? KEEPSAKE_KIND : 'memory',
       photoBuffer,
       photoType: photoType || 'image/jpeg',
       width: width || null,
