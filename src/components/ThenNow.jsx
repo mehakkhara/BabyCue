@@ -2,16 +2,14 @@ import { useState } from 'react'
 import { isVideoType, isKeepsake } from '../data/journalStore'
 import { nameAndAgeAt } from '../lib/babyAge'
 
-const WEEK_MS = 7 * 86400000
-
-// The oldest and newest photo (not video) in the journal, or null until the
-// pair spans at least a week — a comparison of two same-day photos isn't one.
+// The oldest and newest photo (not video, not keepsake card) in the journal.
+// Any two photos will do — the slider is fun even on day one, and the gap
+// grows on its own as the journal fills.
 export function pickThenNow(entries) {
   const photos = entries.filter(e => e.photoBlob && !isVideoType(e.photoType) && !isKeepsake(e))
   if (photos.length < 2) return null
   const newest = photos[0] // entries arrive newest-first
   const oldest = photos[photos.length - 1]
-  if (newest.createdAt - oldest.createdAt < WEEK_MS) return null
   return { oldest, newest }
 }
 
