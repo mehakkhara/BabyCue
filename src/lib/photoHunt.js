@@ -11,7 +11,9 @@ function storageKey(monthKey) {
   return `photoHunt:${monthKey}`
 }
 
-// { [promptId]: { entryId, ts } }
+// { [promptId]: { entryId, ts, fit?, position? } }
+//   fit:      'cover' (fill the square, default) | 'contain' (show the whole photo)
+//   position: CSS object-position for 'cover' — 'top' | 'center' | 'bottom'
 export function loadHunt(monthKey = currentMonthKey()) {
   try {
     return JSON.parse(localStorage.getItem(storageKey(monthKey)) || '{}')
@@ -20,9 +22,14 @@ export function loadHunt(monthKey = currentMonthKey()) {
   }
 }
 
-export function recordCapture(promptId, entryId, monthKey = currentMonthKey()) {
+export function recordCapture(promptId, entryId, display = {}, monthKey = currentMonthKey()) {
   const state = loadHunt(monthKey)
-  state[promptId] = { entryId, ts: Date.now() }
+  state[promptId] = {
+    entryId,
+    ts: Date.now(),
+    fit: display.fit === 'contain' ? 'contain' : 'cover',
+    position: display.position || 'center',
+  }
   try {
     localStorage.setItem(storageKey(monthKey), JSON.stringify(state))
   } catch {

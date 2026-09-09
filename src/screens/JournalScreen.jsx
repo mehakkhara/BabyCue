@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getEntries, addEntry, deleteEntry, isVideoType } from '../data/journalStore'
+import { getEntries, addEntry, deleteEntry, isVideoType, compressImage, imageDimensions } from '../data/journalStore'
 import { groupByMonth, pickHero, nameAndAgeAt } from '../lib/babyAge'
 import ThenNow, { pickThenNow } from '../components/ThenNow'
+import { ShapedMedia, KeepWhichPart, TILE_RATIO, isTallerThanTile } from '../components/PhotoShape'
 
 function shortDate(ts) {
   return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
@@ -17,13 +18,6 @@ function useObjectUrls(entries) {
     }
     return map
   }, [entries])
-}
-
-function Media({ url, type, style }) {
-  if (!url) return null
-  return isVideoType(type)
-    ? <video src={url} muted playsInline preload="metadata" style={{ objectFit: 'cover', display: 'block', background: '#000', ...style }} />
-    : <img src={url} alt="" style={{ objectFit: 'cover', display: 'block', ...style }} />
 }
 
 function PlayBadge({ size = 30 }) {
@@ -68,7 +62,10 @@ function MonthSection({ group, urls, profile, onOpen }) {
             backgroundColor: '#fff', boxShadow: '0 2px 9px rgba(0,0,0,0.1)', textAlign: 'left',
           }}
         >
-          <Media url={urls.get(hero.id)} type={hero.photoType} style={{ width: '100%', maxHeight: '260px', height: '200px' }} />
+          {urls.get(hero.id) && (
+            // The hero takes the photo's own shape — tall for a phone portrait, wide for landscape.
+            <ShapedMedia url={urls.get(hero.id)} type={hero.photoType} entry={hero} />
+          )}
           {isVideoType(hero.photoType) && urls.get(hero.id) && <PlayBadge size={38} />}
           {urls.get(hero.id) ? (
             <div style={{
@@ -112,7 +109,8 @@ function MonthSection({ group, urls, profile, onOpen }) {
             >
               {urls.get(entry.id) && (
                 <div style={{ position: 'relative' }}>
-                  <Media url={urls.get(entry.id)} type={entry.photoType} style={{ width: '100%', height: '104px' }} />
+                  {/* Tiles share one 4:5 shape so pairs line up; her Top/Middle/Bottom choice picks the crop. */}
+                  <ShapedMedia url={urls.get(entry.id)} type={entry.photoType} entry={entry} ratio={TILE_RATIO} />
                   {isVideoType(entry.photoType) && <PlayBadge size={26} />}
                 </div>
               )}
@@ -217,11 +215,17 @@ function AddForm({ onSave, onCancel }) {
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [dims, setDims] = useState(null)          // { width, height } of the chosen image
+  const [position, setPosition] = useState('center')
+
+  const isVideo = isVideoType(file?.type)
 
   useEffect(() => {
-    if (!file) { setPreviewUrl(null); return }
+    if (!file) { setPreviewUrl(null); setDims(null); return }
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
+    setPosition('center')
+    if (!isVideoType(file.type)) imageDimensions(file).then(setDims)
     return () => URL.revokeObjectURL(url)
   }, [file])
 
@@ -230,10 +234,16 @@ function AddForm({ onSave, onCancel }) {
     setSaving(true)
     setSaveError('')
     try {
+      // Images are shrunk the same way photo-hunt captures are; videos are stored as-is.
+      const blob = file ? (isVideo ? file : await compressImage(file)) : null
+      const size = blob && !isVideo ? await imageDimensions(blob) : null
       await addEntry({
         note: note.trim(),
-        photoBlob: file || null,
-        photoType: file ? (file.type || 'image/jpeg') : null,
+        photoBlob: blob,
+        photoType: file ? (isVideo ? file.type : 'image/jpeg') : null,
+        width: size?.width,
+        height: size?.height,
+        position,
       })
       onSave()
     } catch (err) {
@@ -264,7 +274,8 @@ function AddForm({ onSave, onCancel }) {
         }}
       >
         {previewUrl ? (
-          <Media url={previewUrl} type={file?.type} style={{ width: '100%', maxHeight: '320px' }} />
+          // Preview exactly as the month's hero card will show it.
+          <ShapedMedia url={previewUrl} type={file?.type} entry={{ ...dims, position }} />
         ) : (
           <span style={{ color: '#888', fontSize: '14px' }}>Tap to add a photo or video</span>
         )}
@@ -281,6 +292,13 @@ function AddForm({ onSave, onCancel }) {
         <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#888' }}>
           {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
         </p>
+      )}
+
+      {/* Very tall photos get trimmed to fit the card — let her pick what stays. */}
+      {dims && isTallerThanTile(dims.width, dims.height) && (
+        <div style={{ marginBottom: '12px' }}>
+          <KeepWhichPart value={position} onChange={setPosition} />
+        </div>
       )}
 
       <textarea
