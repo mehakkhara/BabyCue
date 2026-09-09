@@ -47,7 +47,12 @@ export async function getEntries() {
   }))
 }
 
-export async function addEntry({ note, photoBlob, photoType }) {
+// Optional display hints saved with an entry so cards can take the photo's
+// shape without decoding it first:
+//   width/height — pixel size of the stored media (images measured on save)
+//   fit          — 'cover' (default) | 'contain' (show the whole photo)
+//   position     — which part to keep when cropping: 'top' | 'center' | 'bottom'
+export async function addEntry({ note, photoBlob, photoType, width, height, fit, position }) {
   let photoBuffer = null
   if (photoBlob) {
     photoBuffer = await photoBlob.arrayBuffer()
@@ -59,6 +64,10 @@ export async function addEntry({ note, photoBlob, photoType }) {
       note: note || '',
       photoBuffer,
       photoType: photoType || 'image/jpeg',
+      width: width || null,
+      height: height || null,
+      fit: fit === 'contain' ? 'contain' : 'cover',
+      position: position || 'center',
       createdAt: Date.now(),
     })
     req.onsuccess = () => resolve(req.result)
@@ -74,6 +83,21 @@ export async function deleteEntry(id) {
     req.onsuccess = () => resolve()
     req.onerror = () => reject(req.error)
   })
+}
+
+// Pixel size of an image blob/file. Resolves null if it can't be decoded.
+export async function imageDimensions(blob) {
+  const url = URL.createObjectURL(blob)
+  try {
+    return await new Promise(resolve => {
+      const i = new Image()
+      i.onload = () => resolve({ width: i.naturalWidth, height: i.naturalHeight })
+      i.onerror = () => resolve(null)
+      i.src = url
+    })
+  } finally {
+    URL.revokeObjectURL(url)
+  }
 }
 
 export async function compressImage(file, maxDim = 1200, quality = 0.8) {
