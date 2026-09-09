@@ -1,4 +1,4 @@
-// Keepsake card composition — turns a milestone photo + text into a designed,
+// Keepsake card composition — turns a journal photo + headline into a designed,
 // shareable image. Everything happens on a canvas on the device: no uploads,
 // no image service, no cost. Output is a 1080×1350 (4:5) JPEG — the size
 // every chat app and feed handles well.
@@ -124,7 +124,7 @@ export async function composeKeepsake({ photoUrl, title, subtitle, theme = 'lave
 // Share via the native sheet where available, otherwise download the file —
 // same outcome either way: the card leaves the app.
 export async function shareKeepsake(blob, title) {
-  const file = new File([blob], 'babycue-milestone.jpg', { type: 'image/jpeg' })
+  const file = new File([blob], 'babycue-keepsake.jpg', { type: 'image/jpeg' })
   if (navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title })
@@ -137,7 +137,7 @@ export async function shareKeepsake(blob, title) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'babycue-milestone.jpg'
+  a.download = 'babycue-keepsake.jpg'
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 5000)
   return 'downloaded'

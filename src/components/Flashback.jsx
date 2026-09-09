@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getEntries, isVideoType } from '../data/journalStore'
+import { getEntries, isVideoType, isKeepsake } from '../data/journalStore'
 import { nameAndAgeAt } from '../lib/babyAge'
 
 const DAY_MS = 86400000
@@ -10,7 +10,7 @@ const WINDOW_DAYS = 3
 // "seven months ago" — and, within a window, the entry closest to the exact
 // date (ties go to one with a note). Returns { entry, monthsAgo } or null.
 export function pickFlashback(entries, now = new Date()) {
-  const withMedia = entries.filter(e => e.photoBlob)
+  const withMedia = entries.filter(e => e.photoBlob && !isKeepsake(e))
   if (withMedia.length === 0) return null
   for (let m = 1; m <= 24; m++) {
     const target = new Date(now.getFullYear(), now.getMonth() - m, now.getDate()).getTime()

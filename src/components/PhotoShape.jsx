@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { isVideoType } from '../data/journalStore'
 
 // Cards take the photo's shape. A tall phone photo makes a tall card, a wide
@@ -11,11 +11,6 @@ export const TILE_RATIO = 4 / 5
 export function clampRatio(width, height) {
   if (!width || !height) return null
   return Math.min(MAX_RATIO, Math.max(MIN_RATIO, width / height))
-}
-
-// Tall enough that a 4:5 frame would cut something off.
-export function isTallerThanTile(width, height) {
-  return Boolean(width && height) && width / height < TILE_RATIO - 0.02
 }
 
 // A photo/video in a box that matches its shape.
@@ -56,36 +51,106 @@ export function ShapedMedia({ url, type, entry = {}, ratio, style, mediaStyle })
   )
 }
 
-// "Keep which part?" — Top / Middle / Bottom for photos that will be cropped.
-export function KeepWhichPart({ value, onChange, accent = '#7C3AED', tint = '#ede9fe' }) {
-  const options = [
-    { id: 'top', label: 'Top' },
-    { id: 'center', label: 'Middle' },
-    { id: 'bottom', label: 'Bottom' },
-  ]
+// object-position as numbers. Accepts "50% 30%" and the old keywords.
+export function parsePosition(value) {
+  const named = { top: [50, 0], center: [50, 50], bottom: [50, 100], left: [0, 50], right: [100, 50] }
+  if (!value) return { x: 50, y: 50 }
+  if (named[value]) return { x: named[value][0], y: named[value][1] }
+  const m = String(value).match(/([\d.]+)%\s+([\d.]+)%/)
+  return m ? { x: Number(m[1]), y: Number(m[2]) } : { x: 50, y: 50 }
+}
+
+export function formatPosition({ x, y }) {
+  return `${Math.round(x)}% ${Math.round(y)}%`
+}
+
+// A frame of fixed shape with the photo filling it. Drag the photo to choose
+// what stays in view — the same gesture as setting a profile picture. Only the
+// overflowing axis moves; a photo that already fits can't be dragged.
+//   ratio     — width / height of the frame
+//   position  — current object-position string
+//   onChange  — receives the new object-position string while dragging
+export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', style }) {
+  const [natural, setNatural] = useState(null)   // { w, h }
+  const drag = useRef(null)                      // { startX, startY, x, y, boxW, boxH }
+  const pos = parsePosition(position)
+
+  // How many pixels of photo overflow the frame on each axis, for a given box size.
+  function overflow(boxW, boxH) {
+    if (!natural) return { x: 0, y: 0 }
+    const scale = Math.max(boxW / natural.w, boxH / natural.h)
+    return { x: natural.w * scale - boxW, y: natural.h * scale - boxH }
+  }
+
+  function onPointerDown(e) {
+    if (fit !== 'cover' || !natural) return
+    const box = e.currentTarget.getBoundingClientRect()
+    drag.current = { startX: e.clientX, startY: e.clientY, x: pos.x, y: pos.y, boxW: box.width, boxH: box.height }
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+  }
+
+  function onPointerMove(e) {
+    const d = drag.current
+    if (!d) return
+    const over = overflow(d.boxW, d.boxH)
+    // Moving the finger right reveals more of the left, so the percentage falls.
+    const nx = over.x > 0 ? d.x - ((e.clientX - d.startX) / over.x) * 100 : d.x
+    const ny = over.y > 0 ? d.y - ((e.clientY - d.startY) / over.y) * 100 : d.y
+    onChange?.(formatPosition({ x: clamp(nx), y: clamp(ny) }))
+  }
+
+  function onPointerUp(e) {
+    drag.current = null
+    e.currentTarget.releasePointerCapture?.(e.pointerId)
+  }
+
+  const canDrag = fit === 'cover' && natural && (() => {
+    // Any overflow at all on either axis?
+    const r = natural.w / natural.h
+    return Math.abs(r - ratio) > 0.01
+  })()
+
   return (
-    <div>
-      <p style={{ margin: '0 0 6px', fontSize: '11px', fontWeight: 600, color: '#6b7280' }}>
-        Keep which part?
-      </p>
-      <div style={{ display: 'flex', gap: '6px' }}>
-        {options.map(o => (
-          <button
-            key={o.id}
-            type="button"
-            onClick={() => onChange(o.id)}
-            style={{
-              flex: 1, padding: '6px 4px', borderRadius: '9px',
-              border: value === o.id ? `1.5px solid ${accent}` : '1.5px solid #e5e7eb',
-              background: value === o.id ? tint : '#fff',
-              color: value === o.id ? accent : '#555',
-              fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-            }}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
+    <div
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      style={{
+        position: 'relative', width: '100%', aspectRatio: String(ratio), overflow: 'hidden',
+        background: fit === 'contain' ? '#1a1a2e' : '#f3f4f6',
+        touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none',
+        cursor: canDrag ? 'grab' : 'default',
+        ...style,
+      }}
+    >
+      {url && (
+        <img
+          src={url}
+          alt=""
+          draggable={false}
+          onLoad={e => setNatural({ w: e.target.naturalWidth, h: e.target.naturalHeight })}
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: fit, objectPosition: position || '50% 50%', display: 'block',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      {canDrag && (
+        <span style={{
+          position: 'absolute', left: '50%', bottom: '8px', transform: 'translateX(-50%)',
+          fontSize: '10px', fontWeight: 700, color: '#fff',
+          background: 'rgba(0,0,0,0.45)', borderRadius: '999px', padding: '3px 9px',
+          pointerEvents: 'none', whiteSpace: 'nowrap',
+        }}>
+          Drag to adjust
+        </span>
+      )}
     </div>
   )
+}
+
+function clamp(n) {
+  return Math.max(0, Math.min(100, n))
 }

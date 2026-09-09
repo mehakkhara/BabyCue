@@ -1,11 +1,28 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getEntries, addEntry, deleteEntry, isVideoType, compressImage, imageDimensions } from '../data/journalStore'
+import { getEntries, addEntry, deleteEntry, isVideoType, isKeepsake, compressImage, imageDimensions } from '../data/journalStore'
 import { groupByMonth, pickHero, nameAndAgeAt } from '../lib/babyAge'
 import ThenNow, { pickThenNow } from '../components/ThenNow'
-import { ShapedMedia, KeepWhichPart, TILE_RATIO, isTallerThanTile } from '../components/PhotoShape'
+import { ShapedMedia, CropFrame, TILE_RATIO } from '../components/PhotoShape'
+import { autoCropPosition } from '../lib/autoCrop'
+import KeepsakeModal from '../components/KeepsakeModal'
+import { shareKeepsake } from '../lib/keepsakeCard'
 
 function shortDate(ts) {
   return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+}
+
+// Small tag that marks a designed card among the photos.
+function KeepsakeBadge({ light = false, style }) {
+  return (
+    <span style={{
+      display: 'inline-block', fontSize: '8.5px', fontWeight: 800, letterSpacing: '0.06em',
+      textTransform: 'uppercase', borderRadius: '999px', padding: '2px 7px',
+      background: light ? 'rgba(255,255,255,0.9)' : '#ede9fe',
+      color: '#6d28d9', ...style,
+    }}>
+      🎞 Keepsake
+    </span>
+  )
 }
 
 // One object URL per entry, revoked together when the set changes. Creating
@@ -67,7 +84,10 @@ function MonthSection({ group, urls, profile, onOpen }) {
             <ShapedMedia url={urls.get(hero.id)} type={hero.photoType} entry={hero} />
           )}
           {isVideoType(hero.photoType) && urls.get(hero.id) && <PlayBadge size={38} />}
-          {urls.get(hero.id) ? (
+          {isKeepsake(hero) && urls.get(hero.id) ? (
+            // The card already carries its own headline and date — just tag it.
+            <KeepsakeBadge light style={{ position: 'absolute', top: '10px', left: '10px' }} />
+          ) : urls.get(hero.id) ? (
             <div style={{
               position: 'absolute', left: 0, right: 0, bottom: 0,
               padding: '26px 13px 11px',
@@ -109,13 +129,14 @@ function MonthSection({ group, urls, profile, onOpen }) {
             >
               {urls.get(entry.id) && (
                 <div style={{ position: 'relative' }}>
-                  {/* Tiles share one 4:5 shape so pairs line up; her Top/Middle/Bottom choice picks the crop. */}
+                  {/* Tiles share one 4:5 shape so pairs line up; the saved position picks the crop. */}
                   <ShapedMedia url={urls.get(entry.id)} type={entry.photoType} entry={entry} ratio={TILE_RATIO} />
                   {isVideoType(entry.photoType) && <PlayBadge size={26} />}
+                  {isKeepsake(entry) && <KeepsakeBadge light style={{ position: 'absolute', top: '7px', left: '7px' }} />}
                 </div>
               )}
               <div style={{ padding: '8px 9px 9px' }}>
-                {entry.note && (
+                {entry.note && !isKeepsake(entry) && (
                   <div style={{
                     fontSize: '11.5px', color: '#1a1a2e', lineHeight: 1.35,
                     display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -123,7 +144,7 @@ function MonthSection({ group, urls, profile, onOpen }) {
                     {entry.note}
                   </div>
                 )}
-                <div style={{ fontSize: '10px', color: '#aaa', marginTop: entry.note ? '4px' : 0 }}>
+                <div style={{ fontSize: '10px', color: '#aaa', marginTop: entry.note && !isKeepsake(entry) ? '4px' : 0 }}>
                   {shortDate(entry.createdAt)}
                 </div>
               </div>
@@ -137,7 +158,10 @@ function MonthSection({ group, urls, profile, onOpen }) {
 
 /* ---------------- opened memory ---------------- */
 
-function EntrySheet({ entry, url, profile, onClose, onDelete }) {
+function EntrySheet({ entry, url, profile, onClose, onDelete, onMakeKeepsake, onShareCard }) {
+  const card = isKeepsake(entry)
+  const canMakeCard = Boolean(url) && !card && !isVideoType(entry.photoType)
+
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -176,17 +200,45 @@ function EntrySheet({ entry, url, profile, onClose, onDelete }) {
             {new Date(entry.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
             {profile?.dateOfBirth && ` · ${nameAndAgeAt(profile.babyName, profile.dateOfBirth, entry.createdAt)}`}
           </div>
+          {card && <KeepsakeBadge style={{ marginTop: '8px' }} />}
           {entry.note && (
             <p style={{ margin: '8px 0 0', fontSize: '15px', color: '#1a1a2e', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
               {entry.note}
             </p>
           )}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+
+          {/* A card is one tap from any photo; an existing card can be shared again. */}
+          {canMakeCard && (
+            <button
+              onClick={() => onMakeKeepsake(entry)}
+              style={{
+                width: '100%', marginTop: '14px', padding: '11px', borderRadius: '10px', border: 'none',
+                background: 'linear-gradient(135deg, #7C6FF7, #a78bfa)', color: '#fff',
+                fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              🎞 Make a keepsake
+            </button>
+          )}
+          {card && (
+            <button
+              onClick={() => onShareCard(entry)}
+              style={{
+                width: '100%', marginTop: '14px', padding: '11px', borderRadius: '10px', border: 'none',
+                background: 'linear-gradient(135deg, #7C6FF7, #a78bfa)', color: '#fff',
+                fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              Share this card
+            </button>
+          )}
+
+          <div style={{ display: 'flex', gap: '8px', marginTop: canMakeCard || card ? '8px' : '16px' }}>
             <button
               onClick={onClose}
               style={{
-                flex: 2, padding: '11px', borderRadius: '10px', border: 'none',
-                backgroundColor: '#7C3AED', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+                flex: 2, padding: '11px', borderRadius: '10px', border: '1.5px solid #E5E7EB',
+                backgroundColor: '#fff', color: '#555', fontSize: '14px', fontWeight: 600, cursor: 'pointer',
               }}
             >
               Close
@@ -215,17 +267,17 @@ function AddForm({ onSave, onCancel }) {
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
-  const [dims, setDims] = useState(null)          // { width, height } of the chosen image
-  const [position, setPosition] = useState('center')
+  const [position, setPosition] = useState('50% 50%')
 
   const isVideo = isVideoType(file?.type)
 
   useEffect(() => {
-    if (!file) { setPreviewUrl(null); setDims(null); return }
+    if (!file) { setPreviewUrl(null); return }
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
-    setPosition('center')
-    if (!isVideoType(file.type)) imageDimensions(file).then(setDims)
+    setPosition('50% 50%')
+    // Guess where the subject is; she can drag if the guess is off.
+    if (!isVideoType(file.type)) autoCropPosition(file, TILE_RATIO).then(setPosition)
     return () => URL.revokeObjectURL(url)
   }, [file])
 
@@ -265,21 +317,33 @@ function AddForm({ onSave, onCancel }) {
       backgroundColor: '#fff', borderRadius: '14px', padding: '16px',
       marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
     }}>
-      <label
-        htmlFor="journal-photo-input"
-        style={{
-          display: 'block', border: '2px dashed #d4d8e3', borderRadius: '12px',
-          padding: previewUrl ? 0 : '32px 16px', textAlign: 'center',
-          cursor: 'pointer', marginBottom: '12px', overflow: 'hidden',
-        }}
-      >
-        {previewUrl ? (
-          // Preview exactly as the month's hero card will show it.
-          <ShapedMedia url={previewUrl} type={file?.type} entry={{ ...dims, position }} />
-        ) : (
+      {previewUrl ? (
+        // Outside the label so a drag doesn't reopen the file picker.
+        <div style={{ borderRadius: '12px', overflow: 'hidden', marginBottom: '6px' }}>
+          {isVideo
+            ? <video src={previewUrl} controls playsInline style={{ width: '100%', maxHeight: '320px', display: 'block', background: '#000' }} />
+            // Tiles are 4:5 — drag to choose what they show.
+            : <CropFrame url={previewUrl} ratio={TILE_RATIO} position={position} onChange={setPosition} />}
+        </div>
+      ) : (
+        <label
+          htmlFor="journal-photo-input"
+          style={{
+            display: 'block', border: '2px dashed #d4d8e3', borderRadius: '12px',
+            padding: '32px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: '12px',
+          }}
+        >
           <span style={{ color: '#888', fontSize: '14px' }}>Tap to add a photo or video</span>
-        )}
-      </label>
+        </label>
+      )}
+      {previewUrl && (
+        <label
+          htmlFor="journal-photo-input"
+          style={{ display: 'block', marginBottom: '10px', fontSize: '12px', fontWeight: 600, color: '#7C3AED', cursor: 'pointer', textAlign: 'center' }}
+        >
+          Choose a different photo
+        </label>
+      )}
       <input
         id="journal-photo-input"
         type="file"
@@ -294,12 +358,6 @@ function AddForm({ onSave, onCancel }) {
         </p>
       )}
 
-      {/* Very tall photos get trimmed to fit the card — let her pick what stays. */}
-      {dims && isTallerThanTile(dims.width, dims.height) && (
-        <div style={{ marginBottom: '12px' }}>
-          <KeepWhichPart value={position} onChange={setPosition} />
-        </div>
-      )}
 
       <textarea
         value={note}
@@ -354,6 +412,7 @@ export default function JournalScreen({ profile }) {
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [opened, setOpened] = useState(null)
+  const [keepsakeFrom, setKeepsakeFrom] = useState(null)   // entry a card is being made from
 
   const urls = useObjectUrls(entries)
   useEffect(() => () => { urls.forEach(u => URL.revokeObjectURL(u)) }, [urls])
@@ -452,13 +511,26 @@ export default function JournalScreen({ profile }) {
         )}
       </div>
 
-      {opened && (
+      {opened && !keepsakeFrom && (
         <EntrySheet
           entry={opened}
           url={urls.get(opened.id)}
           profile={profile}
           onClose={() => setOpened(null)}
           onDelete={handleDelete}
+          onMakeKeepsake={setKeepsakeFrom}
+          onShareCard={e => shareKeepsake(e.photoBlob, e.note)}
+        />
+      )}
+
+      {keepsakeFrom && (
+        <KeepsakeModal
+          photoUrl={urls.get(keepsakeFrom.id)}
+          title={keepsakeFrom.note}
+          takenAt={keepsakeFrom.createdAt}
+          profile={profile}
+          onClose={() => { setKeepsakeFrom(null); setOpened(null) }}
+          onSaved={refresh}
         />
       )}
     </div>
