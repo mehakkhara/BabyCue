@@ -231,7 +231,36 @@ export default function StatsScreen({ profile, onProfileChange }) {
             </div>
           )}
 
+          {/* No measurements yet: one card, one ask. The chart appears with the first entry. */}
+          {enriched.length === 0 && !showForm && (
+            <div style={{
+              background: '#fff', borderRadius: '20px', padding: '24px 20px',
+              marginBottom: '14px', boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '34px', marginBottom: '8px' }}>📈</div>
+              <p style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '700', color: '#1e1b4b' }}>
+                Where does {babyName} sit on the curve?
+              </p>
+              <p style={{ margin: '0 0 18px', fontSize: '13px', color: '#6b7280', lineHeight: 1.6 }}>
+                Add {babyName}'s first weight or length and we'll place {sex === 'M' ? 'him' : sex === 'F' ? 'her' : 'them'} on the WHO growth chart.
+              </p>
+              <button
+                onClick={() => setShowForm(true)}
+                style={{
+                  width: '100%', padding: '14px', borderRadius: '14px', border: 'none',
+                  background: 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+                  color: '#fff', fontSize: '15px', fontWeight: '600',
+                  cursor: 'pointer', boxShadow: '0 4px 14px rgba(124,111,247,0.3)',
+                }}
+              >
+                + Add the first measurement
+              </button>
+            </div>
+          )}
+
           {/* Metric toggle */}
+          {enriched.length > 0 && (
           <div style={{
             display: 'flex', gap: '6px', background: '#f3f4f6',
             borderRadius: '12px', padding: '3px', marginBottom: '10px',
@@ -249,8 +278,10 @@ export default function StatsScreen({ profile, onProfileChange }) {
               </button>
             ))}
           </div>
+          )}
 
           {/* Chart */}
+          {enriched.length > 0 && (
           <div style={{
             background: '#fff', borderRadius: '20px', padding: '16px 12px 8px',
             marginBottom: '14px', boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
@@ -273,9 +304,10 @@ export default function StatsScreen({ profile, onProfileChange }) {
               Shaded bands show WHO 3rd–97th and 15th–85th percentile ranges
             </p>
           </div>
+          )}
 
           {/* Add entry button */}
-          {!showForm && (
+          {!showForm && enriched.length > 0 && (
             <button
               onClick={() => setShowForm(true)}
               style={{
@@ -402,12 +434,6 @@ export default function StatsScreen({ profile, onProfileChange }) {
                   >✕</button>
                 </div>
               ))}
-            </div>
-          )}
-
-          {enriched.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '24px 0', color: '#c4c4d4', fontSize: '14px' }}>
-              No measurements yet — add the first one above.
             </div>
           )}
 

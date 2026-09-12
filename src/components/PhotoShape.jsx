@@ -70,7 +70,8 @@ export function formatPosition({ x, y }) {
 //   ratio     — width / height of the frame
 //   position  — current object-position string
 //   onChange  — receives the new object-position string while dragging
-export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', style }) {
+//   hint      — show the "Drag to adjust" pill (off where the caller draws its own overlay)
+export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', style, hint = true }) {
   const [natural, setNatural] = useState(null)   // { w, h }
   const drag = useRef(null)                      // { startX, startY, x, y, boxW, boxH }
   const pos = parsePosition(position)
@@ -137,7 +138,7 @@ export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', s
           }}
         />
       )}
-      {canDrag && (
+      {canDrag && hint && (
         <span style={{
           position: 'absolute', left: '50%', bottom: '8px', transform: 'translateX(-50%)',
           fontSize: '10px', fontWeight: 700, color: '#fff',

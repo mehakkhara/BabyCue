@@ -230,6 +230,12 @@ export default function OnboardingScreen({ onComplete }) {
         />
       </label>
 
+      {/* Boy or girl — asked up front so tips and growth charts fit from day one */}
+      <div style={{ marginBottom: '20px' }}>
+        <span style={labelStyle}>Boy or girl? <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional)</span></span>
+        <ChoiceRow options={sexOptions} value={babySex} onChange={setBabySex} />
+      </div>
+
       {/* Tell us more — collapsible optional section */}
       <button
         type="button"
@@ -259,11 +265,6 @@ export default function OnboardingScreen({ onComplete }) {
           <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#888', lineHeight: 1.6 }}>
             All optional. The more we know, the more personalized your AI answers will be.
           </p>
-
-          <div style={{ marginBottom: '20px' }}>
-            <span style={labelStyle}>Baby's Sex</span>
-            <ChoiceRow options={sexOptions} value={babySex} onChange={setBabySex} />
-          </div>
 
           <div style={{ marginBottom: '20px' }}>
             <span style={labelStyle}>Feeding</span>

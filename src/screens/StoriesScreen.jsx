@@ -8,10 +8,28 @@ import { getReadIds, todayKey } from '../lib/storyProgress'
 
 const SERIF = "Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif"
 
-export default function StoriesScreen({ profile }) {
+const BEDTIME_CUE_KEY = 'storiesBedtimeCueShown'
+const BEDTIME_CUE_TIMES = 3
+
+// The app opens on Stories during wind-down hours. Say so the first few
+// times, so it reads as a choice rather than the app losing her place.
+function useBedtimeCue(openedForBedtime) {
+  const [show, setShow] = useState(() => {
+    if (!openedForBedtime) return false
+    let n = 0
+    try { n = Number(localStorage.getItem(BEDTIME_CUE_KEY) || 0) } catch { /* private mode */ }
+    if (n >= BEDTIME_CUE_TIMES) return false
+    try { localStorage.setItem(BEDTIME_CUE_KEY, String(n + 1)) } catch { /* ignore */ }
+    return true
+  })
+  return [show, () => setShow(false)]
+}
+
+export default function StoriesScreen({ profile, openedForBedtime = false, onGoHome }) {
   const [open, setOpen] = useState(null)
   // Bumped when the reader closes, so "already read" marks refresh.
   const [version, setVersion] = useState(0)
+  const [showCue, dismissCue] = useBedtimeCue(openedForBedtime)
 
   const ageInMonths = getBabyAgeInMonths(profile.dateOfBirth)
   const band = bandForAge(ageInMonths)
@@ -57,6 +75,33 @@ export default function StoriesScreen({ profile }) {
       </div>
 
       <div style={{ padding: '16px' }}>
+        {showCue && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '10px',
+            background: '#1a1a2e', color: '#fff', borderRadius: '14px',
+            padding: '10px 12px', marginBottom: '16px',
+          }}>
+            <span style={{ fontSize: '18px' }}>🌙</span>
+            <p style={{ flex: 1, margin: 0, fontSize: '12.5px', lineHeight: 1.45 }}>
+              It's bedtime, so we opened Stories.{' '}
+              {onGoHome ? (
+                <button
+                  onClick={onGoHome}
+                  style={{ background: 'none', border: 'none', padding: 0, color: '#c4b5fd', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline' }}
+                >
+                  Today is still a tap away.
+                </button>
+              ) : 'Today is still a tap away.'}
+            </p>
+            <button
+              onClick={dismissCue}
+              aria-label="Dismiss"
+              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: '16px', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}
+            >
+              ×
+            </button>
+          </div>
+        )}
         {tonight && (
           <>
             <SectionLabel>Tonight</SectionLabel>

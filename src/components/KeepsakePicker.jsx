@@ -35,6 +35,7 @@ export default function KeepsakePicker({ profile, onClose, onSaved, limit = 12 }
         photoUrl={chosen.url}
         title={chosen.entry.note}
         takenAt={chosen.entry.createdAt}
+        position={chosen.entry.position}
         profile={profile}
         onClose={onClose}
         onSaved={onSaved}

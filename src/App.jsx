@@ -54,6 +54,16 @@ export default function App() {
   // During wind-down hours the app opens on Stories — bedtime is what she's
   // here for at 8pm. Initial tab only; navigation stays entirely hers.
   const [activeTab, setActiveTab] = useState(() => (isBedtimeHour() ? 'stories' : 'home'))
+  // True only when the app itself chose Stories at launch — Stories uses it
+  // to say why, the first few times.
+  const [openedForBedtime] = useState(() => isBedtimeHour())
+
+  // Each tab opens at its top, like a native app. Tapping the tab you're
+  // already on also scrolls to the top (the iOS convention).
+  function goToTab(id) {
+    setActiveTab(id)
+    window.scrollTo({ top: 0, left: 0, behavior: id === activeTab ? 'smooth' : 'auto' })
+  }
 
   // Dusk backdrop during wind-down hours. Re-checked on resume and on a slow
   // interval — a phone app crosses 7pm while backgrounded, not while watched.
@@ -138,8 +148,8 @@ export default function App() {
   return (
     <div style={{ maxWidth: '480px', margin: '0 auto', position: 'relative', minHeight: '100vh' }}>
       <div key={activeTab} style={{ paddingBottom: '72px', animation: 'fadeIn 0.22s ease' }}>
-        {activeTab === 'home'    && <HomeScreen profile={profile} onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} onOpenJournal={() => setActiveTab('journal')} />}
-        {activeTab === 'stories' && <StoriesScreen profile={profile} />}
+        {activeTab === 'home'    && <HomeScreen profile={profile} onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} onOpenJournal={() => goToTab('journal')} />}
+        {activeTab === 'stories' && <StoriesScreen profile={profile} openedForBedtime={openedForBedtime} onGoHome={() => goToTab('home')} />}
         {activeTab === 'stats'      && <StatsScreen profile={profile} onProfileChange={handleProfileChange} />}
         {activeTab === 'journal'    && <JournalScreen profile={profile} />}
       </div>
@@ -162,10 +172,11 @@ export default function App() {
       }}>
         {NAV_ITEMS.map(({ id, label, Icon }) => {
           const isActive = activeTab === id
+          const bedtimeMark = id === 'stories' && openedForBedtime
           return (
             <button
               key={id}
-              onClick={() => setActiveTab(id)}
+              onClick={() => goToTab(id)}
               style={{
                 flex: 1,
                 padding: '12px 0 14px',
@@ -178,7 +189,13 @@ export default function App() {
                 gap: '4px',
               }}
             >
-              <Icon active={isActive} />
+              <span style={{ position: 'relative', display: 'inline-flex' }}>
+                <Icon active={isActive} />
+                {/* A tiny moon during wind-down hours: opening on Stories was on purpose. */}
+                {bedtimeMark && (
+                  <span aria-hidden="true" style={{ position: 'absolute', top: '-6px', right: '-9px', fontSize: '10px', lineHeight: 1 }}>🌙</span>
+                )}
+              </span>
               <span style={{
                 fontSize: '11px',
                 fontWeight: '600',

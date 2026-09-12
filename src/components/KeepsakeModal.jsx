@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { nameAndAgeAt } from '../lib/babyAge'
 import { composeKeepsake, shareKeepsake, KEEPSAKE_THEMES } from '../lib/keepsakeCard'
 import { addEntry, KEEPSAKE_KIND } from '../data/journalStore'
+import { CropFrame } from './PhotoShape'
 
 // Preview + share sheet for a keepsake card. Works from any journal photo:
 // the headline starts as the entry's note and can be edited. Every card she
@@ -10,14 +11,26 @@ import { addEntry, KEEPSAKE_KIND } from '../data/journalStore'
 //   photoUrl  — object URL of the source photo
 //   title     — starting headline (entry note, prompt label…)
 //   takenAt   — timestamp of the moment, for "{Name}, {age}" (defaults to now)
+//   position  — the crop she chose for the entry; she can drag it again here
 //   onSaved   — called with the new journal entry id after the card is stored
-export default function KeepsakeModal({ photoUrl, title: initialTitle = '', takenAt, profile, onClose, onSaved }) {
+const CARD_RATIO = 4 / 5
+
+// The preview is the live photo in a drag frame with the card's text drawn
+// over it in CSS; the real 1080×1350 JPEG is composed only when she shares or
+// saves, from the same position.
+const PREVIEW_THEMES = {
+  lavender: { overlay: '30,27,75',  accent: '#dcd6ff', badge: '#7C6FF7' },
+  sunset:   { overlay: '157,23,77', accent: '#fde68a', badge: '#db2777' },
+  midnight: { overlay: '4,6,20',    accent: '#e8b13d', badge: '#1e1b4b' },
+}
+
+export default function KeepsakeModal({ photoUrl, title: initialTitle = '', takenAt, position: initialPosition, profile, onClose, onSaved }) {
   const [theme, setTheme] = useState('lavender')
-  const [title, setTitle] = useState(cleanTitle(initialTitle))
-  const [preview, setPreview] = useState(null) // { url, blob }
+  const [title, setTitle] = useState(String(initialTitle || '').trim())
+  const [position, setPosition] = useState(initialPosition || '50% 50%')
   const [error, setError] = useState('')
   const [outcome, setOutcome] = useState('')
-  const [savedId, setSavedId] = useState(null)
+  const [saved, setSaved] = useState(null)   // { id, key } — key is what was saved, so an edit makes a new card
   const [busy, setBusy] = useState(false)
 
   const when = takenAt || Date.now()
@@ -27,76 +40,73 @@ export default function KeepsakeModal({ photoUrl, title: initialTitle = '', take
     : dateLabel
 
   const headline = title.trim() || 'A little moment'
+  const cardKey = `${headline}|${subtitle}|${theme}|${position}`
+  const alreadySaved = saved?.key === cardKey
+  const look = PREVIEW_THEMES[theme] || PREVIEW_THEMES.lavender
 
-  // Recompose on every change; the canvas work is near-instant at this size.
-  useEffect(() => {
-    let cancelled = false
-    let url = null
-    setError('')
-    setSavedId(null)   // an edited card is a new card
-    setOutcome('')
-    const t = setTimeout(() => {
-      composeKeepsake({ photoUrl, title: headline, subtitle, theme })
-        .then(blob => {
-          if (cancelled) return
-          url = URL.createObjectURL(blob)
-          setPreview({ url, blob })
-        })
-        .catch(() => { if (!cancelled) setError('Could not build the card from this photo.') })
-    }, 150)
-    return () => {
-      cancelled = true
-      clearTimeout(t)
-      if (url) URL.revokeObjectURL(url)
-    }
-  }, [photoUrl, headline, subtitle, theme])
+  async function compose() {
+    return composeKeepsake({ photoUrl, title: headline, subtitle, theme, position })
+  }
 
-  async function saveToJournal() {
-    if (savedId) return savedId
+  async function saveToJournal(blob) {
+    if (alreadySaved) return saved.id
     const id = await addEntry({
       note: headline,
       kind: KEEPSAKE_KIND,
-      photoBlob: preview.blob,
+      photoBlob: blob,
       photoType: 'image/jpeg',
       width: 1080,
       height: 1350,
+      createdAt: when,
     })
-    setSavedId(id)
+    setSaved({ id, key: cardKey })
     onSaved?.(id)
     return id
   }
 
+  function failed(err) {
+    console.error('Keepsake save failed', err)
+    setError(err?.name === 'QuotaExceededError'
+      ? "There's no room left on this device to save the card."
+      : 'Could not build or save the card. Please try again.')
+  }
+
   async function handleShare() {
-    if (!preview || busy) return
+    if (busy) return
     setBusy(true)
+    setError('')
     try {
-      await saveToJournal()
-      const result = await shareKeepsake(preview.blob, headline)
+      const blob = await compose()
+      await saveToJournal(blob)
+      const result = await shareKeepsake(blob, headline)
       if (result === 'shared') setOutcome('Shared, and saved to the journal 💜')
       if (result === 'downloaded') setOutcome('Saved to the journal and your downloads 💜')
       if (result === 'cancelled') setOutcome('Saved to the journal 💜')
     } catch (err) {
-      console.error('Keepsake save failed', err)
-      setError(err?.name === 'QuotaExceededError'
-        ? "There's no room left on this device to save the card."
-        : 'Could not save the card. Please try again.')
+      failed(err)
     } finally {
       setBusy(false)
     }
   }
 
   async function handleSaveOnly() {
-    if (!preview || busy) return
+    if (busy || alreadySaved) return
     setBusy(true)
+    setError('')
     try {
-      await saveToJournal()
+      const blob = await compose()
+      await saveToJournal(blob)
       setOutcome('Saved to the journal 💜')
     } catch (err) {
-      console.error('Keepsake save failed', err)
-      setError('Could not save the card. Please try again.')
+      failed(err)
     } finally {
       setBusy(false)
     }
+  }
+
+  const btn = {
+    flex: 1, padding: '13px 10px', borderRadius: '12px', border: 'none',
+    fontSize: '14px', fontWeight: '600', fontFamily: 'inherit', cursor: busy ? 'wait' : 'pointer',
   }
 
   return (
@@ -112,12 +122,12 @@ export default function KeepsakeModal({ photoUrl, title: initialTitle = '', take
         style={{
           width: '100%', maxWidth: '480px', maxHeight: '92vh',
           background: '#faf9ff', borderRadius: '24px 24px 0 0',
-          padding: '20px 18px calc(20px + env(safe-area-inset-bottom))',
+          padding: '18px 18px calc(16px + env(safe-area-inset-bottom))',
           overflowY: 'auto', boxShadow: '0 -8px 40px rgba(100,100,180,0.25)',
           animation: 'fadeIn 0.2s ease',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
           <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#1e1b4b' }}>
             🎞 Keepsake card
           </h2>
@@ -134,21 +144,7 @@ export default function KeepsakeModal({ photoUrl, title: initialTitle = '', take
           </button>
         </div>
 
-        {error ? (
-          <p style={{
-            fontSize: '13px', color: '#b91c1c', background: '#fef2f2',
-            border: '1px solid #fecaca', borderRadius: '10px', padding: '10px 12px',
-          }}>
-            {error}
-          </p>
-        ) : (
-          <div style={{ borderRadius: '16px', overflow: 'hidden', marginBottom: '12px', background: '#e8e5f5', aspectRatio: '4 / 5' }}>
-            {preview && (
-              <img src={preview.url} alt="Keepsake card preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            )}
-          </div>
-        )}
-
+        {/* Headline first, so the card preview is the last thing before the buttons. */}
         <input
           value={title}
           onChange={e => setTitle(e.target.value)}
@@ -159,61 +155,109 @@ export default function KeepsakeModal({ photoUrl, title: initialTitle = '', take
             width: '100%', padding: '11px 12px', borderRadius: '10px',
             border: '1.5px solid #ddd6fe', background: '#fff', fontSize: '14px',
             fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
-            color: '#1e1b4b', marginBottom: '12px',
+            color: '#1e1b4b', marginBottom: '10px',
           }}
         />
 
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '14px' }}>
-          {KEEPSAKE_THEMES.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTheme(t.id)}
-              aria-label={`${t.label} theme`}
-              style={{
-                width: '32px', height: '32px', borderRadius: '50%',
-                border: theme === t.id ? '2.5px solid #1e1b4b' : '2.5px solid transparent',
-                background: t.swatch, cursor: 'pointer', padding: 0,
-              }}
-            />
-          ))}
+        {/* Theme, by name */}
+        <div style={{ display: 'flex', gap: '6px', background: '#ece9f6', borderRadius: '12px', padding: '3px', marginBottom: '10px' }}>
+          {KEEPSAKE_THEMES.map(t => {
+            const on = theme === t.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTheme(t.id)}
+                aria-pressed={on}
+                style={{
+                  flex: 1, padding: '7px 6px', borderRadius: '9px', border: 'none',
+                  background: on ? '#fff' : 'transparent',
+                  boxShadow: on ? '0 2px 8px rgba(100,100,180,0.12)' : 'none',
+                  color: on ? '#1e1b4b' : '#6b7280', fontSize: '12.5px', fontWeight: 600,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                }}
+              >
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: t.swatch, flexShrink: 0 }} />
+                {t.label}
+              </button>
+            )
+          })}
         </div>
 
-        <button
-          onClick={handleShare}
-          disabled={!preview || busy}
-          style={{
-            width: '100%', padding: '13px', borderRadius: '12px', border: 'none',
-            background: preview && !busy ? 'linear-gradient(135deg, #7C6FF7, #a78bfa)' : '#c4b5fd',
-            color: '#fff', fontSize: '14px', fontWeight: '600',
-            cursor: preview && !busy ? 'pointer' : 'wait', fontFamily: 'inherit',
-          }}
-        >
-          {busy ? 'One moment…' : 'Share the moment'}
-        </button>
-        <button
-          onClick={handleSaveOnly}
-          disabled={!preview || busy || Boolean(savedId)}
-          style={{
-            width: '100%', marginTop: '8px', padding: '10px', borderRadius: '12px',
-            border: 'none', background: 'none',
-            color: savedId ? '#15803d' : '#7C6FF7', fontSize: '13px', fontWeight: '600',
-            cursor: savedId ? 'default' : 'pointer', fontFamily: 'inherit',
-          }}
-        >
-          {savedId ? '✓ In the journal' : 'Just save to the journal'}
-        </button>
+        {/* Card preview: drag the photo to choose what the card shows. */}
+        <div style={{ borderRadius: '16px', overflow: 'hidden', marginBottom: '12px', background: '#e8e5f5', position: 'relative' }}>
+          <CropFrame url={photoUrl} ratio={CARD_RATIO} position={position} onChange={setPosition} hint={false} />
+          <span style={{
+            position: 'absolute', top: '10px', left: '10px', pointerEvents: 'none',
+            fontSize: '10px', fontWeight: 700, color: '#fff',
+            background: 'rgba(0,0,0,0.45)', borderRadius: '999px', padding: '3px 9px',
+          }}>
+            Drag to adjust
+          </span>
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: `linear-gradient(to bottom, rgba(${look.overlay},0) 38%, rgba(${look.overlay},0.92) 100%)`,
+          }} />
+          <span style={{
+            position: 'absolute', top: '10px', right: '10px', pointerEvents: 'none',
+            background: 'rgba(255,255,255,0.88)', color: look.badge,
+            fontSize: '9.5px', fontWeight: 700, borderRadius: '999px', padding: '4px 9px',
+          }}>
+            ✦ BabyCue
+          </span>
+          <div style={{ position: 'absolute', left: '16px', right: '16px', bottom: '16px', pointerEvents: 'none' }}>
+            <div style={{
+              fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 700, color: '#fff',
+              fontSize: '20px', lineHeight: 1.2,
+              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+            }}>
+              {headline}
+            </div>
+            <div style={{ marginTop: '6px', fontSize: '10.5px', fontWeight: 500, color: look.accent }}>{subtitle}</div>
+          </div>
+        </div>
+
+        {error && (
+          <p style={{
+            margin: '0 0 10px', fontSize: '13px', color: '#b91c1c', background: '#fef2f2',
+            border: '1px solid #fecaca', borderRadius: '10px', padding: '10px 12px',
+          }}>
+            {error}
+          </p>
+        )}
+
+        {/* Both actions in view, side by side. */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={handleSaveOnly}
+            disabled={busy || alreadySaved}
+            style={{
+              ...btn, flex: 1,
+              background: '#fff', border: '1.5px solid #ddd6fe',
+              color: alreadySaved ? '#15803d' : '#6d28d9',
+              cursor: alreadySaved ? 'default' : btn.cursor,
+            }}
+          >
+            {alreadySaved ? '✓ In the journal' : 'Save to journal'}
+          </button>
+          <button
+            onClick={handleShare}
+            disabled={busy}
+            style={{
+              ...btn, flex: 1.4,
+              background: busy ? '#c4b5fd' : 'linear-gradient(135deg, #7C6FF7, #a78bfa)',
+              color: '#fff',
+            }}
+          >
+            {busy ? 'One moment…' : 'Share the moment'}
+          </button>
+        </div>
         {outcome && (
-          <p style={{ margin: '6px 0 0', fontSize: '12.5px', color: '#15803d', fontWeight: 600, textAlign: 'center' }}>
+          <p style={{ margin: '8px 0 0', fontSize: '12.5px', color: '#15803d', fontWeight: 600, textAlign: 'center' }}>
             {outcome}
           </p>
         )}
       </div>
     </div>
   )
-}
-
-// Journal notes carry small prefixes ("📸 Photo hunt: …") that don't belong
-// on a card.
-function cleanTitle(text) {
-  return String(text || '').replace(/^📸\s*Photo hunt:\s*/i, '').trim()
 }

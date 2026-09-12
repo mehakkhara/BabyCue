@@ -42,9 +42,19 @@ export async function getEntries() {
     req.onerror = () => reject(req.error)
   })
   return raw.map(e => ({
-    ...e,
+    ...normalizeLegacy(e),
     photoBlob: e.photoBuffer ? new Blob([e.photoBuffer], { type: e.photoType || 'image/jpeg' }) : null,
   }))
+}
+
+// Older photo-hunt entries stored "📸 Photo hunt: Standing up" as the note.
+// The caption should be hers; the app's part is a `source` tag instead.
+const LEGACY_HUNT_PREFIX = /^📸\s*Photo hunt:\s*/i
+function normalizeLegacy(e) {
+  if (!e.source && LEGACY_HUNT_PREFIX.test(e.note || '')) {
+    return { ...e, note: e.note.replace(LEGACY_HUNT_PREFIX, '').trim(), source: PHOTO_HUNT_SOURCE }
+  }
+  return e
 }
 
 // Optional display hints saved with an entry so cards can take the photo's
@@ -53,13 +63,20 @@ export async function getEntries() {
 //   fit          — 'cover' (default) | 'contain' (show the whole photo)
 //   position     — which part to keep when cropping: 'top' | 'center' | 'bottom'
 //   kind         — 'memory' (default) | 'keepsake' (a designed card she made)
+//   source       — undefined (she added it) | 'photoHunt' (a hunt cell capture)
+//   createdAt    — when the moment happened (editable), not when it was saved
 export const KEEPSAKE_KIND = 'keepsake'
+export const PHOTO_HUNT_SOURCE = 'photoHunt'
 
 export function isKeepsake(entry) {
   return entry?.kind === KEEPSAKE_KIND
 }
 
-export async function addEntry({ note, photoBlob, photoType, width, height, fit, position, kind }) {
+export function isPhotoHunt(entry) {
+  return entry?.source === PHOTO_HUNT_SOURCE
+}
+
+export async function addEntry({ note, photoBlob, photoType, width, height, fit, position, kind, source, createdAt }) {
   let photoBuffer = null
   if (photoBlob) {
     photoBuffer = await photoBlob.arrayBuffer()
@@ -70,16 +87,42 @@ export async function addEntry({ note, photoBlob, photoType, width, height, fit,
     const req = tx.objectStore(STORE_NAME).add({
       note: note || '',
       kind: kind === KEEPSAKE_KIND ? KEEPSAKE_KIND : 'memory',
+      source: source === PHOTO_HUNT_SOURCE ? PHOTO_HUNT_SOURCE : undefined,
       photoBuffer,
       photoType: photoType || 'image/jpeg',
       width: width || null,
       height: height || null,
       fit: fit === 'contain' ? 'contain' : 'cover',
       position: position || 'center',
-      createdAt: Date.now(),
+      createdAt: Number.isFinite(createdAt) && createdAt > 0 ? createdAt : Date.now(),
     })
     req.onsuccess = () => resolve(req.result)
     req.onerror = () => reject(req.error)
+  })
+}
+
+// Change the note, the date, or the crop of an existing entry in place.
+// Only the fields passed are touched; the photo itself never changes.
+export async function updateEntry(id, patch) {
+  const db = await openDb()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    const store = tx.objectStore(STORE_NAME)
+    const get = store.get(id)
+    get.onsuccess = () => {
+      const current = get.result
+      if (!current) { reject(new Error('Entry not found')); return }
+      const next = { ...current }
+      if (patch.note != null) next.note = String(patch.note)
+      if (Number.isFinite(patch.createdAt) && patch.createdAt > 0) next.createdAt = patch.createdAt
+      if (patch.position) next.position = patch.position
+      if (patch.fit) next.fit = patch.fit === 'contain' ? 'contain' : 'cover'
+      if (patch.source !== undefined) next.source = patch.source || undefined
+      const put = store.put(next)
+      put.onsuccess = () => resolve(next)
+      put.onerror = () => reject(put.error)
+    }
+    get.onerror = () => reject(get.error)
   })
 }
 
