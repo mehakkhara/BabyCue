@@ -61,6 +61,40 @@ After Phases 1 + 2, the still-thin months (likely 5, 7, 11, 19-23 — older todd
 
 ---
 
+## Up Next — 2026-09-12
+
+Left over after the photo-hunt camera work (`feat/photo-hunt-camera`) and the September dogfood pass (`feat/dogfood-sept-2026`, all 10 findings in `dogfood-output/2026-09-08.html` built). Mockup of the camera options: `public/photo-hunt-camera-mockup.html` (A and B built, C below).
+
+### Open the two PRs (first)
+
+`gh` isn't signed in on this Mac, so both branches are pushed but have no PR. Open `feat/photo-hunt-camera` first, then `feat/dogfood-sept-2026` (it stacks on the first). Links: `github.com/mehakkhara/BabyCue/pull/new/<branch>`.
+
+### Instagram-style in-app camera (concept C)
+
+- [ ] Full-screen viewfinder inside the app (`getUserMedia`), shutter, flip camera, prompt label at the top, library button bottom-left. Captured frame drops into the existing crop step.
+- [ ] Needs HTTPS for phone testing (`vite --host` over plain http can't use the camera) — a local cert or a tunnel.
+- [ ] The "recents" strip and any auto-scanning of the camera roll are **native-only**. Belongs with the Capacitor / App Store wrap (`pwa-scope.md`). In the wrap, request photo-library permission and classify on-device (Apple Vision) rather than uploading photos.
+- [ ] Web-only fallback if the wrap is far off: "assisted sorting" — she multi-selects a batch, Claude vision matches each photo to a hunt prompt, she confirms. Needs a clear consent step because photos leave the phone; ~$0.10 per 30-photo batch on Sonnet 5.
+
+### Photo-hunt polish
+
+- [ ] Camera back-out detection relies on the file input's `cancel` event (Safari 16.4+, Chrome 113+). Add a focus-based fallback if an older phone never shows the "From library" card.
+- [ ] Photo dates: `lib/photoDate.js` reads EXIF from JPEGs only. HEIC (iPhone default) falls back to the file's modified time — either parse HEIC metadata or nudge her to check the date on library picks.
+- [ ] Dragging the crop inside the keepsake modal doesn't write the new position back to the journal entry. Decide whether it should.
+- [ ] Hunt cells default to `capture="environment"` (rear camera). Consider remembering the last-used camera.
+
+### Server (left untouched on purpose)
+
+- [ ] `server/index.js` still calls `claude-sonnet-4-6` with the Anthropic SDK pinned at 0.39.0. When next touching it: upgrade the SDK (latest is 0.125.x), move to structured outputs so the tip JSON is schema-enforced, check `stop_reason` before reading content, and pass the baby's pronoun into the prompt (the client-side tips now do this via `lib/pronouns.js`).
+- [ ] `server/package-lock.json` still says `baby-app-server` while `package.json` says `babycue-server`; the next `npm install` will rewrite it. Commit that when it happens.
+
+### Housekeeping
+
+- [ ] `src/components/Flashback 2.jsx` and `vite.config 2.js` are stray untracked duplicates — delete.
+- [ ] `public/*.html` mockups are untracked; decide whether to commit them as design history.
+
+---
+
 ## Up Next — 2026-05-25
 
 Three forward-looking changes captured at end-of-day 2026-05-24. Each touches multiple files / external services, so each gets its own focused PR.
