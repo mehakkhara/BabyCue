@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getEntries, addEntry, deleteEntry, isVideoType, isKeepsake, compressImage, imageDimensions } from '../data/journalStore'
+import { getEntries, addEntry, deleteEntry, isVideoType, isKeepsake } from '../data/journalStore'
 import { groupByMonth, pickHero, nameAndAgeAt } from '../lib/babyAge'
 import ThenNow, { pickThenNow } from '../components/ThenNow'
 import { ShapedMedia, CropFrame, TILE_RATIO } from '../components/PhotoShape'
 import { autoCropPosition } from '../lib/autoCrop'
+import { saveMediaEntries } from '../lib/journalSave'
+import MediaStrip from '../components/MediaStrip'
 import KeepsakeModal from '../components/KeepsakeModal'
 import { shareKeepsake } from '../lib/keepsakeCard'
 
@@ -262,7 +264,8 @@ function EntrySheet({ entry, url, profile, onClose, onDelete, onMakeKeepsake, on
 /* ---------------- add form ---------------- */
 
 function AddForm({ onSave, onCancel }) {
-  const [file, setFile] = useState(null)
+  const [files, setFiles] = useState([])   // one or many; each saves as its own entry
+  const file = files.length === 1 ? files[0] : null   // single-pick gets the crop step
   const [previewUrl, setPreviewUrl] = useState(null)
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
@@ -282,21 +285,16 @@ function AddForm({ onSave, onCancel }) {
   }, [file])
 
   async function handleSave() {
-    if (!file && !note.trim()) return
+    if (files.length === 0 && !note.trim()) return
     setSaving(true)
     setSaveError('')
     try {
-      // Images are shrunk the same way photo-hunt captures are; videos are stored as-is.
-      const blob = file ? (isVideo ? file : await compressImage(file)) : null
-      const size = blob && !isVideo ? await imageDimensions(blob) : null
-      await addEntry({
-        note: note.trim(),
-        photoBlob: blob,
-        photoType: file ? (isVideo ? file.type : 'image/jpeg') : null,
-        width: size?.width,
-        height: size?.height,
-        position,
-      })
+      if (files.length === 0) {
+        await addEntry({ note: note.trim(), photoBlob: null, photoType: null })
+      } else {
+        // A single pick keeps the position she dragged; a batch is auto-cropped.
+        await saveMediaEntries(files, note.trim(), file ? { 0: position } : {})
+      }
       onSave()
     } catch (err) {
       // Raw storage errors ("QuotaExceededError: ...") mean nothing to a
@@ -310,14 +308,18 @@ function AddForm({ onSave, onCancel }) {
     }
   }
 
-  const canSave = Boolean(file || note.trim())
+  const canSave = Boolean(files.length || note.trim())
 
   return (
     <div style={{
       backgroundColor: '#fff', borderRadius: '14px', padding: '16px',
       marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
     }}>
-      {previewUrl ? (
+      {files.length > 1 ? (
+        <div style={{ marginBottom: '6px' }}>
+          <MediaStrip files={files} />
+        </div>
+      ) : previewUrl ? (
         // Outside the label so a drag doesn't reopen the file picker.
         <div style={{ borderRadius: '12px', overflow: 'hidden', marginBottom: '6px' }}>
           {isVideo
@@ -333,28 +335,34 @@ function AddForm({ onSave, onCancel }) {
             padding: '32px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: '12px',
           }}
         >
-          <span style={{ color: '#888', fontSize: '14px' }}>Tap to add a photo or video</span>
+          <span style={{ color: '#888', fontSize: '14px' }}>Tap to add photos or a video</span>
         </label>
       )}
-      {previewUrl && (
+      {files.length > 0 && (
         <label
           htmlFor="journal-photo-input"
           style={{ display: 'block', marginBottom: '10px', fontSize: '12px', fontWeight: 600, color: '#7C3AED', cursor: 'pointer', textAlign: 'center' }}
         >
-          Choose a different photo
+          {files.length > 1 ? 'Choose different photos' : 'Choose a different photo'}
         </label>
       )}
       <input
         id="journal-photo-input"
         type="file"
         accept="image/*,video/*"
-        onChange={e => setFile(e.target.files?.[0] || null)}
+        multiple
+        onChange={e => setFiles(Array.from(e.target.files || []))}
         style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
       />
 
       {file && (
         <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#888' }}>
           {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
+        </p>
+      )}
+      {files.length > 1 && (
+        <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#888' }}>
+          {files.length} photos — each saves as its own memory with this note.
         </p>
       )}
 

@@ -4,6 +4,8 @@ import { CropFrame, TILE_RATIO } from '../components/PhotoShape'
 import { autoCropPosition } from '../lib/autoCrop'
 import KeepsakeModal from './KeepsakeModal'
 import KeepsakePicker from './KeepsakePicker'
+import MediaStrip from './MediaStrip'
+import { saveMediaEntries } from '../lib/journalSave'
 import { getBabyAgeInMonths } from '../data/tips'
 import { promptsForAge } from '../data/photoPrompts'
 import { loadHunt, recordCapture } from '../lib/photoHunt'
@@ -20,7 +22,22 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const pendingPrompt = useRef(null)
-  const inputRef = useRef(null)
+  const cameraInputRef = useRef(null)    // capture="environment" → straight to the camera
+  const libraryInputRef = useRef(null)   // plain picker → photo library, multi-select
+  const [offerLibrary, setOfferLibrary] = useState(null)   // prompt whose camera she backed out of
+  const [batchNote, setBatchNote] = useState('')           // "Saved 3 moments" after a multi-pick
+
+  // Backing out of the camera fires `cancel` on the input (Safari 16.4+,
+  // Chrome 113+). That's the moment to offer the library instead.
+  useEffect(() => {
+    const el = cameraInputRef.current
+    if (!el) return
+    const onCancel = () => {
+      if (pendingPrompt.current) setOfferLibrary(pendingPrompt.current)
+    }
+    el.addEventListener('cancel', onCancel)
+    return () => el.removeEventListener('cancel', onCancel)
+  }, [])
 
   // Resolve captured entries to thumbnails; revoke the batch on change.
   useEffect(() => {
@@ -63,19 +80,42 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
     return () => URL.revokeObjectURL(pending.url)
   }, [pending])
 
+  // Tapping a cell goes straight to the camera. The click must happen inside
+  // the tap handler — browsers only open the camera from a user gesture.
   function pickFor(prompt) {
     if (captures[prompt.id] || saving || pending) return
+    setOfferLibrary(null)
+    setBatchNote('')
     pendingPrompt.current = prompt
-    inputRef.current?.click()
+    cameraInputRef.current?.click()
+  }
+
+  function openLibrary() {
+    pendingPrompt.current = offerLibrary
+    setOfferLibrary(null)
+    libraryInputRef.current?.click()
+  }
+
+  // The always-visible library button: no cell chosen, so photos go to the
+  // first empty cell(s) in grid order.
+  const firstOpen = prompts.find(p => !captures[p.id]) || null
+  function openLibraryForNext() {
+    if (!firstOpen || saving || pending) return
+    setOfferLibrary(null)
+    setBatchNote('')
+    pendingPrompt.current = firstOpen
+    libraryInputRef.current?.click()
   }
 
   function handleChosen(e) {
-    const file = e.target.files?.[0]
+    const files = Array.from(e.target.files || [])
     const prompt = pendingPrompt.current
     e.target.value = ''
     pendingPrompt.current = null
-    if (!file || !prompt) return
+    if (files.length === 0 || !prompt) return
     setError('')
+    if (files.length > 1) { saveBatch(prompt, files); return }
+    const file = files[0]
     setFit('cover')
     setPosition('50% 50%')
     setPending({ prompt, file, url: URL.createObjectURL(file) })
@@ -87,34 +127,79 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
     setPending(null)
   }
 
+  function saveFailed(err) {
+    console.error('Photo hunt save failed', err)
+    setError(err?.name === 'QuotaExceededError'
+      ? "There's no room left on this device for another photo."
+      : 'Could not save that photo. Please try again.')
+  }
+
+  // Compress, write the journal entry, and link it to the grid cell.
+  async function saveCapture(prompt, file, display) {
+    const blob = await compressImage(file)
+    const size = await imageDimensions(blob)
+    const entryId = await addEntry({
+      note: `📸 Photo hunt: ${prompt.label}`,
+      photoBlob: blob,
+      photoType: 'image/jpeg',
+      width: size?.width,
+      height: size?.height,
+      fit: display.fit,
+      position: display.position,
+    })
+    return { blob, state: recordCapture(prompt.id, entryId, display) }
+  }
+
   async function savePending() {
     if (!pending || saving) return
     const { prompt, file } = pending
     setSaving(true)
     setError('')
     try {
-      const blob = await compressImage(file)
-      const size = await imageDimensions(blob)
-      const entryId = await addEntry({
-        note: `📸 Photo hunt: ${prompt.label}`,
-        photoBlob: blob,
-        photoType: 'image/jpeg',
-        width: size?.width,
-        height: size?.height,
-        fit,
-        position,
-      })
-      setCaptures({ ...recordCapture(prompt.id, entryId, { fit, position }) })
+      const { blob, state } = await saveCapture(prompt, file, { fit, position })
+      setCaptures({ ...state })
       setPending(null)
       rememberSaved(blob, prompt.label)
       onSaved?.()
       onCheckIn?.()
     } catch (err) {
-      console.error('Photo hunt save failed', err)
-      setError(err?.name === 'QuotaExceededError'
-        ? "There's no room left on this device for another photo."
-        : 'Could not save that photo. Please try again.')
+      saveFailed(err)
     } finally {
+      setSaving(false)
+    }
+  }
+
+  // Several library photos at once: the tapped cell takes the first, the
+  // next empty cells take the rest in grid order. No crop step — each gets
+  // the auto-crop guess, and she can re-tap a cell later if one sits badly.
+  async function saveBatch(prompt, files) {
+    const open = prompts.filter(p => p.id === prompt.id || !captures[p.id])
+    const targets = [prompt, ...open.filter(p => p.id !== prompt.id)].slice(0, files.length)
+    setSaving(true)
+    setError('')
+    let state = captures
+    let firstBlob = null
+    let count = 0
+    try {
+      for (let i = 0; i < targets.length; i++) {
+        const position = await autoCropPosition(files[i], 1)
+        const saved = await saveCapture(targets[i], files[i], { fit: 'cover', position })
+        state = saved.state
+        firstBlob = firstBlob || saved.blob
+        count++
+      }
+      if (files.length > targets.length) {
+        setBatchNote(`Saved ${count} — the grid was full, so ${files.length - targets.length} weren't added.`)
+      } else {
+        setBatchNote(`Saved ${count} moment${count === 1 ? '' : 's'} to the grid.`)
+      }
+      if (firstBlob) rememberSaved(firstBlob, targets[0].label)
+      onSaved?.()
+      onCheckIn?.()
+    } catch (err) {
+      saveFailed(err)
+    } finally {
+      setCaptures({ ...state })
       setSaving(false)
     }
   }
@@ -138,7 +223,8 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
 
   // Custom entry — for moments the hunt didn't ask for. Same journal, no prompt.
   const [customOpen, setCustomOpen] = useState(false)
-  const [customFile, setCustomFile] = useState(null)
+  const [customFiles, setCustomFiles] = useState([])   // one or many; each saves as its own entry
+  const customFile = customFiles.length === 1 ? customFiles[0] : null   // single-pick gets the crop step
   const [customPreview, setCustomPreview] = useState(null)
   const [customNote, setCustomNote] = useState('')
   const [customSaving, setCustomSaving] = useState(false)
@@ -157,31 +243,29 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
 
   function closeCustom() {
     setCustomOpen(false)
-    setCustomFile(null)
+    setCustomFiles([])
     setCustomNote('')
     setCustomError('')
   }
 
   async function saveCustom() {
-    if (!customFile && !customNote.trim()) return
+    if (customFiles.length === 0 && !customNote.trim()) return
     setCustomSaving(true)
     setCustomError('')
     try {
-      const isVideo = isVideoType(customFile?.type)
-      const blob = customFile ? (isVideo ? customFile : await compressImage(customFile)) : null
-      const size = blob && !isVideo ? await imageDimensions(blob) : null
-      await addEntry({
-        note: customNote.trim(),
-        photoBlob: blob,
-        photoType: customFile ? (isVideo ? customFile.type : 'image/jpeg') : null,
-        width: size?.width,
-        height: size?.height,
-        position: customPosition,
-      })
+      const note = customNote.trim()
+      let firstPhoto = null
+      if (customFiles.length === 0) {
+        await addEntry({ note, photoBlob: null, photoType: null })
+      } else {
+        // A single pick keeps the position she dragged; a batch is auto-cropped.
+        const saved = await saveMediaEntries(customFiles, note, customFile ? { 0: customPosition } : {})
+        firstPhoto = saved.find(s => !s.isVideo)?.blob ?? null
+      }
       closeCustom()
       setCustomSaved(true)
       setTimeout(() => setCustomSaved(false), 2500)
-      if (blob && !isVideo) rememberSaved(blob, customNote.trim())
+      if (firstPhoto) rememberSaved(firstPhoto, note)
       onSaved?.()
       onCheckIn?.()
     } catch (err) {
@@ -194,7 +278,7 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
     }
   }
 
-  const canSaveCustom = Boolean(customFile || customNote.trim()) && !customSaving
+  const canSaveCustom = Boolean(customFiles.length || customNote.trim()) && !customSaving
 
   return (
     <div style={{
@@ -205,10 +289,22 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
       boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
       borderLeft: '4px solid #f472b6',
     }}>
+      {/* Two hidden inputs for the hunt cells: capture="environment" opens the
+          rear camera directly on phones (desktop ignores it); the second is the
+          plain picker for the photo library. */}
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
+        capture="environment"
+        onChange={handleChosen}
+        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+      />
+      <input
+        ref={libraryInputRef}
+        type="file"
+        accept="image/*"
+        multiple
         onChange={handleChosen}
         style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
       />
@@ -238,7 +334,7 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
         </div>
       </div>
       <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#9ca3af', lineHeight: 1.5 }}>
-        Nine little moments to catch this month — each one saves to {profile.babyName}'s journal.
+        Nine little moments to catch this month — tap a cell to shoot it, or 🖼 to pull some in from your photos. Each saves to {profile.babyName}'s journal.
       </p>
 
       {/* Custom entry — a photo or note that isn't one of the nine prompts */}
@@ -273,13 +369,36 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
           >
             🎞 Keepsake
           </button>
+          <button
+            onClick={openLibraryForNext}
+            disabled={saving || Boolean(pending) || !firstOpen}
+            aria-label="Add hunt photos from your library"
+            title="From your photos"
+            style={{
+              flex: '0 0 auto', padding: '10px 11px',
+              borderRadius: '12px', border: '1.5px solid #fbcfe8',
+              background: '#fff', color: '#db2777',
+              fontSize: '15px', cursor: firstOpen ? 'pointer' : 'default', fontFamily: 'inherit',
+              opacity: firstOpen ? 1 : 0.4,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            🖼
+          </button>
         </div>
       ) : (
         <div style={{
           marginBottom: '12px', padding: '12px',
           borderRadius: '14px', border: '1.5px solid #ddd6fe', background: '#faf9ff',
         }}>
-          {customPreview ? (
+          {customFiles.length > 1 ? (
+            <div style={{ marginBottom: '6px' }}>
+              <MediaStrip files={customFiles} />
+              <p style={{ margin: '4px 0 0', fontSize: '11px', color: '#9ca3af' }}>
+                {customFiles.length} photos — each saves as its own memory with this note.
+              </p>
+            </div>
+          ) : customPreview ? (
             // Outside the label so a drag doesn't reopen the file picker.
             <div style={{ borderRadius: '10px', overflow: 'hidden', marginBottom: '6px', background: '#fff' }}>
               {isVideoType(customFile?.type)
@@ -296,22 +415,23 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
                 cursor: 'pointer', marginBottom: '10px', background: '#fff',
               }}
             >
-              <span style={{ color: '#7c3aed', fontSize: '12px', fontWeight: 600 }}>📷 Tap to add a photo or video</span>
+              <span style={{ color: '#7c3aed', fontSize: '12px', fontWeight: 600 }}>📷 Tap to add photos or a video</span>
             </label>
           )}
-          {customPreview && (
+          {customFiles.length > 0 && (
             <label
               htmlFor="photo-hunt-custom-input"
               style={{ display: 'block', marginBottom: '10px', fontSize: '11px', fontWeight: 600, color: '#7c3aed', cursor: 'pointer', textAlign: 'center' }}
             >
-              Choose a different photo
+              {customFiles.length > 1 ? 'Choose different photos' : 'Choose a different photo'}
             </label>
           )}
           <input
             id="photo-hunt-custom-input"
             type="file"
             accept="image/*,video/*"
-            onChange={e => setCustomFile(e.target.files?.[0] || null)}
+            multiple
+            onChange={e => setCustomFiles(Array.from(e.target.files || []))}
             style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
           />
 
@@ -363,6 +483,41 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
               {customSaving ? 'Saving…' : 'Save to journal'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* She backed out of the camera — offer the library (multi-select) instead. */}
+      {offerLibrary && !pending && (
+        <div style={{
+          marginBottom: '12px', padding: '10px 12px',
+          borderRadius: '14px', border: '1.5px solid #fbcfe8', background: '#fdf2f8',
+          display: 'flex', alignItems: 'center', gap: '10px',
+        }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: '#db2777' }}>
+              {offerLibrary.emoji} {offerLibrary.label}
+            </div>
+            <div style={{ fontSize: '11px', color: '#9ca3af' }}>
+              Already have this one? Pick it from your photos — or several at once.
+            </div>
+          </div>
+          <button
+            onClick={openLibrary}
+            style={{
+              padding: '9px 12px', borderRadius: '10px', border: 'none',
+              background: '#db2777', color: '#fff', fontSize: '12px', fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+            }}
+          >
+            🖼 From library
+          </button>
+          <button
+            onClick={() => setOfferLibrary(null)}
+            aria-label="Dismiss"
+            style={{ border: 'none', background: 'none', color: '#c4c4d4', fontSize: '15px', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -505,6 +660,11 @@ export default function PhotoHunt({ profile, onSaved, onCheckIn, onOpenJournal }
           borderRadius: '10px', padding: '8px 10px',
         }}>
           {error}
+        </p>
+      )}
+      {batchNote && capturedCount < prompts.length && (
+        <p style={{ margin: '10px 0 0', fontSize: '12px', color: '#15803d', fontWeight: 600, textAlign: 'center' }}>
+          {batchNote}
         </p>
       )}
       {capturedCount === prompts.length && (
