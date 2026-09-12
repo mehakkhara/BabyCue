@@ -54,7 +54,17 @@ function wrapText(ctx, text, maxWidth, maxLines) {
   return lines
 }
 
-export async function composeKeepsake({ photoUrl, title, subtitle, theme = 'lavender' }) {
+// object-position ("50% 30%" or a keyword) → { x, y } percentages.
+function parsePos(value) {
+  const named = { top: [50, 0], center: [50, 50], bottom: [50, 100], left: [0, 50], right: [100, 50] }
+  if (!value) return { x: 50, y: 50 }
+  if (named[value]) return { x: named[value][0], y: named[value][1] }
+  const m = String(value).match(/([\d.]+)%\s+([\d.]+)%/)
+  return m ? { x: Number(m[1]), y: Number(m[2]) } : { x: 50, y: 50 }
+}
+
+//   position — the crop she chose (object-position string); defaults to centre
+export async function composeKeepsake({ photoUrl, title, subtitle, theme = 'lavender', position }) {
   const style = THEME_STYLES[theme] || THEME_STYLES.lavender
   const img = await loadImage(photoUrl)
 
@@ -63,11 +73,12 @@ export async function composeKeepsake({ photoUrl, title, subtitle, theme = 'lave
   canvas.height = H
   const ctx = canvas.getContext('2d')
 
-  // Photo, cover-fit and centered.
+  // Photo, cover-fit, offset to the same spot CSS object-position would show.
   const scale = Math.max(W / img.width, H / img.height)
   const dw = img.width * scale
   const dh = img.height * scale
-  ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh)
+  const pos = parsePos(position)
+  ctx.drawImage(img, (W - dw) * (pos.x / 100), (H - dh) * (pos.y / 100), dw, dh)
 
   // Dusk gradient so the text always reads, whatever the photo.
   const grad = ctx.createLinearGradient(0, H * 0.38, 0, H)

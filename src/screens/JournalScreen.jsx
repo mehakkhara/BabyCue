@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getEntries, addEntry, deleteEntry, isVideoType, isKeepsake } from '../data/journalStore'
+import { getEntries, deleteEntry, updateEntry, isVideoType, isKeepsake, isPhotoHunt } from '../data/journalStore'
 import { groupByMonth, pickHero, nameAndAgeAt } from '../lib/babyAge'
-import ThenNow, { pickThenNow } from '../components/ThenNow'
-import { ShapedMedia, CropFrame, TILE_RATIO } from '../components/PhotoShape'
-import { autoCropPosition } from '../lib/autoCrop'
-import { saveMediaEntries } from '../lib/journalSave'
-import MediaStrip from '../components/MediaStrip'
+import ThenNow, { pickThenNow, thenNowPhotos, rememberThenNow } from '../components/ThenNow'
+import { ShapedMedia, TILE_RATIO } from '../components/PhotoShape'
+import { toDateInput, fromDateInput } from '../lib/photoDate'
+import MemoryForm from '../components/MemoryForm'
+import KeepsakeNudge from '../components/KeepsakeNudge'
 import KeepsakeModal from '../components/KeepsakeModal'
 import { shareKeepsake } from '../lib/keepsakeCard'
 
@@ -23,6 +23,20 @@ function KeepsakeBadge({ light = false, style }) {
       color: '#6d28d9', ...style,
     }}>
       🎞 Keepsake
+    </span>
+  )
+}
+
+// A photo-hunt capture: the caption is hers, this is the app's part.
+function PhotoHuntBadge({ light = false, style }) {
+  return (
+    <span style={{
+      display: 'inline-block', fontSize: '8.5px', fontWeight: 800, letterSpacing: '0.06em',
+      textTransform: 'uppercase', borderRadius: '999px', padding: '2px 7px',
+      background: light ? 'rgba(255,255,255,0.9)' : '#fce7f3',
+      color: '#db2777', ...style,
+    }}>
+      📷 Photo hunt
     </span>
   )
 }
@@ -86,6 +100,9 @@ function MonthSection({ group, urls, profile, onOpen }) {
             <ShapedMedia url={urls.get(hero.id)} type={hero.photoType} entry={hero} />
           )}
           {isVideoType(hero.photoType) && urls.get(hero.id) && <PlayBadge size={38} />}
+          {isPhotoHunt(hero) && urls.get(hero.id) && (
+            <PhotoHuntBadge light style={{ position: 'absolute', top: '10px', left: '10px' }} />
+          )}
           {isKeepsake(hero) && urls.get(hero.id) ? (
             // The card already carries its own headline and date — just tag it.
             <KeepsakeBadge light style={{ position: 'absolute', top: '10px', left: '10px' }} />
@@ -135,6 +152,7 @@ function MonthSection({ group, urls, profile, onOpen }) {
                   <ShapedMedia url={urls.get(entry.id)} type={entry.photoType} entry={entry} ratio={TILE_RATIO} />
                   {isVideoType(entry.photoType) && <PlayBadge size={26} />}
                   {isKeepsake(entry) && <KeepsakeBadge light style={{ position: 'absolute', top: '7px', left: '7px' }} />}
+                  {isPhotoHunt(entry) && <PhotoHuntBadge light style={{ position: 'absolute', top: '7px', left: '7px' }} />}
                 </div>
               )}
               <div style={{ padding: '8px 9px 9px' }}>
@@ -160,9 +178,37 @@ function MonthSection({ group, urls, profile, onOpen }) {
 
 /* ---------------- opened memory ---------------- */
 
-function EntrySheet({ entry, url, profile, onClose, onDelete, onMakeKeepsake, onShareCard }) {
+function EntrySheet({ entry, url, profile, onClose, onDelete, onUpdate, onMakeKeepsake, onShareCard }) {
   const card = isKeepsake(entry)
   const canMakeCard = Boolean(url) && !card && !isVideoType(entry.photoType)
+
+  // Edit in place: the date and the note become fields; Save writes them back.
+  const [editing, setEditing] = useState(false)
+  const [draftNote, setDraftNote] = useState(entry.note || '')
+  const [draftDate, setDraftDate] = useState(toDateInput(entry.createdAt))
+  const [savingEdit, setSavingEdit] = useState(false)
+
+  function startEdit() {
+    setDraftNote(entry.note || '')
+    setDraftDate(toDateInput(entry.createdAt))
+    setEditing(true)
+  }
+
+  async function saveEdit() {
+    if (savingEdit) return
+    setSavingEdit(true)
+    try {
+      await onUpdate(entry.id, { note: draftNote.trim(), createdAt: fromDateInput(draftDate, entry.createdAt) })
+      setEditing(false)
+    } finally {
+      setSavingEdit(false)
+    }
+  }
+
+  const field = {
+    width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1.5px solid #ddd6fe',
+    fontSize: '14px', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1a1a2e',
+  }
 
   useEffect(() => {
     const prev = document.body.style.overflow
@@ -198,19 +244,76 @@ function EntrySheet({ entry, url, profile, onClose, onDelete, onMakeKeepsake, on
             : <img src={url} alt="" style={{ width: '100%', display: 'block', maxHeight: '60vh', objectFit: 'contain', background: '#111' }} />
         )}
         <div style={{ padding: '15px 17px 17px' }}>
-          <div style={{ fontSize: '11.5px', color: '#999', fontWeight: 500 }}>
-            {new Date(entry.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
-            {profile?.dateOfBirth && ` · ${nameAndAgeAt(profile.babyName, profile.dateOfBirth, entry.createdAt)}`}
-          </div>
-          {card && <KeepsakeBadge style={{ marginTop: '8px' }} />}
-          {entry.note && (
-            <p style={{ margin: '8px 0 0', fontSize: '15px', color: '#1a1a2e', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
-              {entry.note}
-            </p>
+          {editing ? (
+            <>
+              <label style={{ display: 'block', marginBottom: '10px' }}>
+                <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>When was this?</span>
+                <input type="date" value={draftDate} max={toDateInput(Date.now())} onChange={e => setDraftDate(e.target.value)} style={field} />
+              </label>
+              <textarea
+                value={draftNote}
+                onChange={e => setDraftNote(e.target.value)}
+                placeholder="What happened?"
+                rows={3}
+                autoFocus
+                style={{ ...field, resize: 'vertical' }}
+              />
+              <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                <button
+                  onClick={() => setEditing(false)}
+                  disabled={savingEdit}
+                  style={{ flex: 1, padding: '11px', borderRadius: '10px', border: '1.5px solid #E5E7EB', backgroundColor: '#fff', color: '#555', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveEdit}
+                  disabled={savingEdit}
+                  style={{ flex: 2, padding: '11px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #7C6FF7, #a78bfa)', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  {savingEdit ? 'Saving…' : 'Save changes'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Tap the date or the note to edit them. */}
+              <button
+                onClick={card ? undefined : startEdit}
+                style={{
+                  display: 'block', width: '100%', padding: 0, border: 'none', background: 'none',
+                  textAlign: 'left', cursor: card ? 'default' : 'text', fontFamily: 'inherit',
+                }}
+              >
+                <div style={{ fontSize: '11.5px', color: '#999', fontWeight: 500 }}>
+                  {new Date(entry.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                  {profile?.dateOfBirth && ` · ${nameAndAgeAt(profile.babyName, profile.dateOfBirth, entry.createdAt)}`}
+                </div>
+                {card && <KeepsakeBadge style={{ marginTop: '8px' }} />}
+                {isPhotoHunt(entry) && <PhotoHuntBadge style={{ marginTop: '8px' }} />}
+                {entry.note ? (
+                  <p style={{ margin: '8px 0 0', fontSize: '15px', color: '#1a1a2e', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
+                    {entry.note}
+                  </p>
+                ) : !card && (
+                  <p style={{ margin: '8px 0 0', fontSize: '13px', color: '#c4c4d4', fontStyle: 'italic' }}>
+                    Add a note…
+                  </p>
+                )}
+              </button>
+              {!card && (
+                <button
+                  onClick={startEdit}
+                  style={{ marginTop: '10px', padding: 0, border: 'none', background: 'none', color: '#7C3AED', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  ✎ Edit date or note
+                </button>
+              )}
+            </>
           )}
 
           {/* A card is one tap from any photo; an existing card can be shared again. */}
-          {canMakeCard && (
+          {canMakeCard && !editing && (
             <button
               onClick={() => onMakeKeepsake(entry)}
               style={{
@@ -222,7 +325,7 @@ function EntrySheet({ entry, url, profile, onClose, onDelete, onMakeKeepsake, on
               🎞 Make a keepsake
             </button>
           )}
-          {card && (
+          {card && !editing && (
             <button
               onClick={() => onShareCard(entry)}
               style={{
@@ -235,6 +338,7 @@ function EntrySheet({ entry, url, profile, onClose, onDelete, onMakeKeepsake, on
             </button>
           )}
 
+          {!editing && (
           <div style={{ display: 'flex', gap: '8px', marginTop: canMakeCard || card ? '8px' : '16px' }}>
             <button
               onClick={onClose}
@@ -255,159 +359,8 @@ function EntrySheet({ entry, url, profile, onClose, onDelete, onMakeKeepsake, on
               Delete
             </button>
           </div>
+          )}
         </div>
-      </div>
-    </div>
-  )
-}
-
-/* ---------------- add form ---------------- */
-
-function AddForm({ onSave, onCancel }) {
-  const [files, setFiles] = useState([])   // one or many; each saves as its own entry
-  const file = files.length === 1 ? files[0] : null   // single-pick gets the crop step
-  const [previewUrl, setPreviewUrl] = useState(null)
-  const [note, setNote] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState('')
-  const [position, setPosition] = useState('50% 50%')
-
-  const isVideo = isVideoType(file?.type)
-
-  useEffect(() => {
-    if (!file) { setPreviewUrl(null); return }
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-    setPosition('50% 50%')
-    // Guess where the subject is; she can drag if the guess is off.
-    if (!isVideoType(file.type)) autoCropPosition(file, TILE_RATIO).then(setPosition)
-    return () => URL.revokeObjectURL(url)
-  }, [file])
-
-  async function handleSave() {
-    if (files.length === 0 && !note.trim()) return
-    setSaving(true)
-    setSaveError('')
-    try {
-      if (files.length === 0) {
-        await addEntry({ note: note.trim(), photoBlob: null, photoType: null })
-      } else {
-        // A single pick keeps the position she dragged; a batch is auto-cropped.
-        await saveMediaEntries(files, note.trim(), file ? { 0: position } : {})
-      }
-      onSave()
-    } catch (err) {
-      // Raw storage errors ("QuotaExceededError: ...") mean nothing to a
-      // parent. Keep the detail in the console, say something useful here.
-      console.error('Save failed', err)
-      setSaveError(err?.name === 'QuotaExceededError'
-        ? "There's no room left on this device for another memory. Try deleting an older video."
-        : 'Could not save that memory. Please try again.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const canSave = Boolean(files.length || note.trim())
-
-  return (
-    <div style={{
-      backgroundColor: '#fff', borderRadius: '14px', padding: '16px',
-      marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
-    }}>
-      {files.length > 1 ? (
-        <div style={{ marginBottom: '6px' }}>
-          <MediaStrip files={files} />
-        </div>
-      ) : previewUrl ? (
-        // Outside the label so a drag doesn't reopen the file picker.
-        <div style={{ borderRadius: '12px', overflow: 'hidden', marginBottom: '6px' }}>
-          {isVideo
-            ? <video src={previewUrl} controls playsInline style={{ width: '100%', maxHeight: '320px', display: 'block', background: '#000' }} />
-            // Tiles are 4:5 — drag to choose what they show.
-            : <CropFrame url={previewUrl} ratio={TILE_RATIO} position={position} onChange={setPosition} />}
-        </div>
-      ) : (
-        <label
-          htmlFor="journal-photo-input"
-          style={{
-            display: 'block', border: '2px dashed #d4d8e3', borderRadius: '12px',
-            padding: '32px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: '12px',
-          }}
-        >
-          <span style={{ color: '#888', fontSize: '14px' }}>Tap to add photos or a video</span>
-        </label>
-      )}
-      {files.length > 0 && (
-        <label
-          htmlFor="journal-photo-input"
-          style={{ display: 'block', marginBottom: '10px', fontSize: '12px', fontWeight: 600, color: '#7C3AED', cursor: 'pointer', textAlign: 'center' }}
-        >
-          {files.length > 1 ? 'Choose different photos' : 'Choose a different photo'}
-        </label>
-      )}
-      <input
-        id="journal-photo-input"
-        type="file"
-        accept="image/*,video/*"
-        multiple
-        onChange={e => setFiles(Array.from(e.target.files || []))}
-        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
-      />
-
-      {file && (
-        <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#888' }}>
-          {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
-        </p>
-      )}
-      {files.length > 1 && (
-        <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#888' }}>
-          {files.length} photos — each saves as its own memory with this note.
-        </p>
-      )}
-
-
-      <textarea
-        value={note}
-        onChange={e => setNote(e.target.value)}
-        placeholder="What happened? (optional)"
-        rows={3}
-        style={{
-          width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #E5E7EB',
-          fontSize: '14px', resize: 'vertical', fontFamily: 'inherit', outline: 'none',
-          boxSizing: 'border-box', marginBottom: '12px',
-        }}
-      />
-
-      {saveError && (
-        <p style={{ margin: '0 0 10px', fontSize: '13px', color: '#c44', lineHeight: 1.45 }}>
-          {saveError}
-        </p>
-      )}
-
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button
-          onClick={onCancel}
-          disabled={saving}
-          style={{
-            flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid #E5E7EB',
-            backgroundColor: '#fff', color: '#555', fontSize: '14px', fontWeight: 600, cursor: 'pointer',
-          }}
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={saving || !canSave}
-          style={{
-            flex: 2, padding: '12px', borderRadius: '10px', border: 'none',
-            backgroundColor: canSave && !saving ? '#7C3AED' : '#E5E7EB',
-            color: '#fff', fontSize: '14px', fontWeight: 600,
-            cursor: canSave && !saving ? 'pointer' : 'not-allowed',
-          }}
-        >
-          {saving ? 'Saving...' : 'Save memory'}
-        </button>
       </div>
     </div>
   )
@@ -421,16 +374,24 @@ export default function JournalScreen({ profile }) {
   const [adding, setAdding] = useState(false)
   const [opened, setOpened] = useState(null)
   const [keepsakeFrom, setKeepsakeFrom] = useState(null)   // entry a card is being made from
+  const [justSaved, setJustSaved] = useState(null)         // { url, title, ts, position } after a save here
+  const [pickVersion, setPickVersion] = useState(0)        // bumps when she swaps a Then↔Now side
 
   const urls = useObjectUrls(entries)
   useEffect(() => () => { urls.forEach(u => URL.revokeObjectURL(u)) }, [urls])
+
+  useEffect(() => {
+    if (!justSaved) return
+    return () => URL.revokeObjectURL(justSaved.url)
+  }, [justSaved])
 
   const months = useMemo(
     () => groupByMonth(entries, profile?.dateOfBirth),
     [entries, profile?.dateOfBirth],
   )
 
-  const thenNowPair = useMemo(() => pickThenNow(entries), [entries])
+  const thenNowPair = useMemo(() => pickThenNow(entries), [entries, pickVersion]) // eslint-disable-line react-hooks/exhaustive-deps
+  const photoCount = useMemo(() => thenNowPhotos(entries).length, [entries])
 
   async function refresh() {
     setEntries(await getEntries())
@@ -443,6 +404,24 @@ export default function JournalScreen({ profile }) {
     await deleteEntry(id)
     setOpened(null)
     refresh()
+  }
+
+  // Date/note edits: write, then refresh so age labels and month groups follow.
+  async function handleUpdate(id, patch) {
+    const next = await updateEntry(id, patch)
+    await refresh()
+    setOpened(o => (o && o.id === id ? { ...o, ...next, photoBlob: o.photoBlob } : o))
+  }
+
+  function handleMemorySaved(first) {
+    setAdding(false)
+    if (first) setJustSaved({ url: URL.createObjectURL(first.blob), title: first.title, ts: first.ts, position: first.position })
+    refresh()
+  }
+
+  function handleSwap(side, id) {
+    rememberThenNow(side, id)
+    setPickVersion(v => v + 1)
   }
 
   return (
@@ -479,8 +458,13 @@ export default function JournalScreen({ profile }) {
       </div>
 
       <div style={{ padding: '16px' }}>
-        {adding && (
-          <AddForm onSave={() => { setAdding(false); refresh() }} onCancel={() => setAdding(false)} />
+        {justSaved && !keepsakeFrom && (
+          <KeepsakeNudge
+            url={justSaved.url}
+            onMake={() => setKeepsakeFrom({ fromNudge: true, ...justSaved })}
+            onDismiss={() => setJustSaved(null)}
+            style={{ marginBottom: '16px' }}
+          />
         )}
 
         {loading ? (
@@ -505,7 +489,14 @@ export default function JournalScreen({ profile }) {
           </div>
         ) : (
           <>
-            {thenNowPair && <ThenNow pair={thenNowPair} urls={urls} profile={profile} />}
+            {thenNowPair ? (
+              <ThenNow pair={thenNowPair} urls={urls} profile={profile} photos={thenNowPhotos(entries)} onSwap={handleSwap} />
+            ) : (
+              // Never let the section seem missing — say what unlocks it.
+              <p style={{ margin: '0 2px 18px', fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
+                Then ↔ now appears once there are two photos{photoCount === 1 ? ' — one more to go' : ''}.
+              </p>
+            )}
             {months.map(group => (
               <MonthSection
                 key={group.key}
@@ -526,6 +517,7 @@ export default function JournalScreen({ profile }) {
           profile={profile}
           onClose={() => setOpened(null)}
           onDelete={handleDelete}
+          onUpdate={handleUpdate}
           onMakeKeepsake={setKeepsakeFrom}
           onShareCard={e => shareKeepsake(e.photoBlob, e.note)}
         />
@@ -533,12 +525,21 @@ export default function JournalScreen({ profile }) {
 
       {keepsakeFrom && (
         <KeepsakeModal
-          photoUrl={urls.get(keepsakeFrom.id)}
-          title={keepsakeFrom.note}
-          takenAt={keepsakeFrom.createdAt}
+          photoUrl={keepsakeFrom.fromNudge ? keepsakeFrom.url : urls.get(keepsakeFrom.id)}
+          title={keepsakeFrom.fromNudge ? keepsakeFrom.title : keepsakeFrom.note}
+          takenAt={keepsakeFrom.fromNudge ? keepsakeFrom.ts : keepsakeFrom.createdAt}
+          position={keepsakeFrom.position}
           profile={profile}
-          onClose={() => { setKeepsakeFrom(null); setOpened(null) }}
+          onClose={() => { setKeepsakeFrom(null); setOpened(null); if (keepsakeFrom.fromNudge) setJustSaved(null) }}
           onSaved={refresh}
+        />
+      )}
+
+      {adding && (
+        <MemoryForm
+          profile={profile}
+          onClose={() => setAdding(false)}
+          onSaved={handleMemorySaved}
         />
       )}
     </div>

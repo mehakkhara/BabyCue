@@ -13,8 +13,21 @@ import StreakRow from '../components/StreakRow'
 import PhotoHunt from '../components/PhotoHunt'
 import Flashback from '../components/Flashback'
 import { greetingForHour } from '../lib/timeOfDay'
+import { personalize } from '../lib/pronouns'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001'
+
+// One style for every section heading that sits on the lavender gradient.
+// Deep ink at 70% reads on the purple where the old grey vanished.
+const SECTION_LABEL = {
+  margin: '0 0 10px',
+  fontSize: '11px',
+  fontWeight: '700',
+  color: 'rgba(30,27,75,0.7)',
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  paddingLeft: '2px',
+}
 
 function todayKey() {
   return new Date().toISOString().split('T')[0]
@@ -578,7 +591,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'flex-start' }}>
                     <p style={{ margin: '0 0 6px', fontSize: '14px', fontWeight: '600', color: '#1e1b4b', lineHeight: 1.4 }}>
-                      {t.title}
+                      {personalize(t.title, profile)}
                     </p>
                     <button
                       onClick={() => unsaveTip(t.id)}
@@ -598,7 +611,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                     </button>
                   </div>
                   <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: '#6b7280' }}>
-                    {t.body}
+                    {personalize(t.body, profile)}
                   </p>
                   {t.source && (
                     <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#c4b5fd' }}>
@@ -690,14 +703,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
       </div>
 
       {/* Stats banner */}
-      <p style={{
-        margin: '0 4px 6px',
-        fontSize: '11px',
-        fontWeight: '700',
-        color: '#9ca3af',
-        textTransform: 'uppercase',
-        letterSpacing: '0.08em',
-      }}>
+      <p style={{ ...SECTION_LABEL, margin: '0 4px 6px' }}>
         Typical for month {browseMonth}
       </p>
       <div style={{ display: 'flex', gap: '10px', marginBottom: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
@@ -751,8 +757,8 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
                 when the curated pool has nothing to show for this filter. */}
             {(() => {
               const useAi = !tipOfDay && showAiTip && aiTip && !aiTipLoading
-              const heroTitle = useAi ? aiTip.title : tipOfDay.title
-              const heroBody = useAi ? aiTip.body : tipOfDay.body
+              const heroTitle = useAi ? aiTip.title : personalize(tipOfDay.title, profile)
+              const heroBody = useAi ? aiTip.body : personalize(tipOfDay.body, profile)
               const heroSource = useAi ? aiTip.source : tipOfDay.source
               const heroId = useAi ? `ai:${todayKey()}` : tipOfDay.id
               const heroTopic = useAi ? (aiTip.topic ?? selectedTopic ?? null) : tipOfDay.topic
@@ -891,7 +897,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
 
       {/* Topic chips — primary inline + Other expands the rest */}
       <div style={{ marginBottom: '14px' }}>
-        <p style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
+        <p style={SECTION_LABEL}>
           Explore by Topic
         </p>
         <div style={{
@@ -940,7 +946,7 @@ export default function HomeScreen({ profile, onResetProfile, onSignOut, onOpenJ
 
       {/* How's baby feeling today? — chips styled like Explore by Topic */}
       <div style={{ marginTop: '24px', marginBottom: '14px' }}>
-        <p style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: '2px' }}>
+        <p style={SECTION_LABEL}>
           How's {babyName} feeling today?
         </p>
         <div style={{
