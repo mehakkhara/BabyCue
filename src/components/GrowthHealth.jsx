@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { WHO, getPercentile, ordinal, monthsBetween } from '../data/whoStandards'
-import DevelopmentChecklist from '../components/DevelopmentChecklist'
 
 const MONTHS25 = Array.from({ length: 25 }, (_, i) => i)
 
@@ -101,7 +100,9 @@ function loadEntries() {
   try { return JSON.parse(localStorage.getItem('growthEntries') || '[]') } catch { return [] }
 }
 
-export default function StatsScreen({ profile, onProfileChange }) {
+// Health segment of the Growth screen: WHO percentiles, the chart, and the
+// measurement log. Lifted out of the old StatsScreen unchanged.
+export default function GrowthHealth({ profile, onProfileChange }) {
   const [entries, setEntries] = useState(loadEntries)
   const [metric, setMetric] = useState('weight')
   const [showForm, setShowForm] = useState(false)
@@ -153,18 +154,7 @@ export default function StatsScreen({ profile, onProfileChange }) {
   }
 
   return (
-    <div style={{ maxWidth: '480px', margin: '0 auto', padding: '28px 16px 16px', minHeight: '100vh' }}>
-
-      {/* Header */}
-      <div style={{
-        background: '#fff', borderRadius: '24px', padding: '22px 20px',
-        marginBottom: '14px', boxShadow: '0 4px 24px rgba(100,100,180,0.08)',
-      }}>
-        <p style={{ margin: '0 0 4px', fontSize: '14px', color: '#9ca3af', fontWeight: '500' }}>Growth</p>
-        <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '700', color: '#1e1b4b' }}>
-          {babyName}'s Stats
-        </h1>
-      </div>
+    <div>
 
       {/* Sex picker — shown once */}
       {!sex && (
@@ -447,8 +437,6 @@ export default function StatsScreen({ profile, onProfileChange }) {
         </>
       )}
 
-      {/* Development — what baby is doing, alongside how baby is growing */}
-      <DevelopmentChecklist profile={profile} />
     </div>
   )
 }

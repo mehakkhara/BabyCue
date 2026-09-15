@@ -1,4 +1,9 @@
-export const tips = [
+import enrichment from './tipEnrichment.json' with { type: 'json' }
+
+// Curated, source-cited tips. Structured extras (tryToday, whyItMatters,
+// minutes) come from tipEnrichment.json, generated from each tip's own
+// source by scripts/enrich-tips.mjs and reviewed by hand.
+const RAW_TIPS = [
   // Month 1
   { id: 1, month: 1, style: 'gentle', topic: 'development', title: 'Skin-to-Skin Contact', body: 'Hold your newborn skin-to-skin as much as possible. It regulates their temperature, heart rate, and supports bonding and breastfeeding.', source: 'AAP' },
   { id: 2, month: 1, style: 'gentle', topic: 'development', title: 'Respond to Every Cry', body: 'You cannot spoil a newborn. Responding promptly to cries builds trust and a secure attachment foundation.', source: 'AAP' },
@@ -653,6 +658,8 @@ export const tips = [
   { id: 692, month: 12, topic: "motor", title: "Skip the baby walker", body: "Give {them} open floor space and sturdy furniture to pull up on and cruise along instead of a seated walker. Walkers don't actually help babies learn to walk and can tip over near stairs, while free-standing practice builds the balance and leg strength {baby} needs. Stay close as {baby} explores.", source: "AAP" },
   { id: 693, month: 12, topic: "activity", title: "Build a cushion obstacle course", body: "Line up pillows, sofa cushions, and a soft box on the floor and invite {them} to crawl over, around, and through them toward you. This playful climbing strengthens {their} large muscles and coordination while turning practice into a giggly game. Cheer {them} on and stay within arm's reach.", source: "Zero to Three" },
 ]
+
+export const tips = RAW_TIPS.map(t => (enrichment[t.id] ? { ...t, ...enrichment[t.id] } : t))
 
 export const funActivities = [
   { id: 'f1', month: 1, topic: 'play', title: 'Dance Party for Two', body: 'Put on your favorite song and sway with your baby. They love the motion and rhythm — and it counts as a workout for you. Bonus: it almost always stops the fussing.' },

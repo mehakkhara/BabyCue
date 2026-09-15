@@ -2,29 +2,43 @@ import { useEffect, useState } from 'react'
 import HomeScreen from './screens/HomeScreen'
 import OnboardingScreen from './screens/OnboardingScreen'
 import StoriesScreen from './screens/StoriesScreen'
-import StatsScreen from './screens/StatsScreen'
+import GrowthScreen from './screens/GrowthScreen'
 import JournalScreen from './screens/JournalScreen'
 import AuthScreen from './screens/AuthScreen'
+import TipDetail from './screens/TipDetail'
+import MoodScreen from './screens/MoodScreen'
+import ProfileScreen from './screens/ProfileScreen'
+import SavedTipsScreen from './screens/SavedTipsScreen'
+import StoryReader from './screens/StoryReader'
+import PhotoHunt from './components/PhotoHunt'
+import { Screen } from './components/ui'
+import { markCheckIn } from './lib/streak'
 import { isSupabaseConfigured } from './lib/supabase'
 import { useSession, signOut } from './lib/useSession'
 import { getProfile, saveProfile, backfillLocalProfileIfNeeded } from './lib/db'
 import { isBedtimeHour } from './lib/timeOfDay'
+import { useViewStack } from './lib/viewStack'
+import { color } from './theme'
+
+const ICON_ON = color.primary
+const ICON_OFF = '#a7a4c0'
 
 const HomeIcon = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? ICON_ON : 'none'} stroke={active ? ICON_ON : ICON_OFF} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/>
-    <path d="M9 21V12h6v9"/>
+    <path d="M9 21V13h6v8" stroke={active ? '#fff' : ICON_OFF} fill="none"/>
   </svg>
 )
 
 const StoriesIcon = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.5 14.5A8.5 8.5 0 019.5 3.5a8.5 8.5 0 1011 11z"/>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? ICON_ON : 'none'} stroke={active ? ICON_ON : ICON_OFF} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 4h6a4 4 0 014 4v13a3 3 0 00-3-3H2z"/>
+    <path d="M22 4h-6a4 4 0 00-4 4v13a3 3 0 013-3h7z"/>
   </svg>
 )
 
 const StatsIcon = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={active ? ICON_ON : ICON_OFF} strokeWidth={active ? 2.8 : 2} strokeLinecap="round" strokeLinejoin="round">
     <line x1="18" y1="20" x2="18" y2="10"/>
     <line x1="12" y1="20" x2="12" y2="4"/>
     <line x1="6"  y1="20" x2="6"  y2="14"/>
@@ -33,18 +47,18 @@ const StatsIcon = ({ active }) => (
 )
 
 const JournalIcon = ({ active }) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#7C6FF7' : '#aab'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-    <circle cx="8.5" cy="8.5" r="1.5"/>
-    <polyline points="21 15 16 10 5 21"/>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? ICON_ON : 'none'} stroke={active ? ICON_ON : ICON_OFF} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
+    <circle cx="8.5" cy="8.5" r="1.5" fill={active ? '#fff' : 'none'} stroke={active ? '#fff' : ICON_OFF}/>
+    <polyline points="21 15 16 10 5 21" stroke={active ? '#fff' : ICON_OFF} fill="none"/>
   </svg>
 )
 
 const NAV_ITEMS = [
-  { id: 'home',       label: 'Today',      Icon: HomeIcon      },
-  { id: 'stories',    label: 'Stories',    Icon: StoriesIcon   },
-  { id: 'stats',      label: 'Growth',     Icon: StatsIcon     },
-  { id: 'journal',    label: 'Journal',    Icon: JournalIcon   },
+  { id: 'home',    label: 'Today',   Icon: HomeIcon    },
+  { id: 'stories', label: 'Stories', Icon: StoriesIcon },
+  { id: 'stats',   label: 'Growth',  Icon: StatsIcon   },
+  { id: 'journal', label: 'Journal', Icon: JournalIcon },
 ]
 
 export default function App() {
@@ -57,6 +71,9 @@ export default function App() {
   // True only when the app itself chose Stories at launch — Stories uses it
   // to say why, the first few times.
   const [openedForBedtime] = useState(() => isBedtimeHour())
+  // Detail pages (tip, activity, mood, profile, story) sit on top of the tabs.
+  const { view, push, pop, replace } = useViewStack()
+  const [photoVersion, setPhotoVersion] = useState(0)
 
   // Each tab opens at its top, like a native app. Tapping the tab you're
   // already on also scrolls to the top (the iOS convention).
@@ -117,14 +134,7 @@ export default function App() {
   // refresh for already-signed-in users.
   if (status === 'loading' || profile === undefined) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#9ca3af',
-        fontSize: '14px',
-      }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: '14px' }}>
         Loading…
       </div>
     )
@@ -145,13 +155,46 @@ export default function App() {
     setProfile(null)
   }
 
+  // Detail pages hide the tab bar; the back arrow (or the phone's back
+  // gesture) returns to the tab underneath.
+  if (view) {
+    const { name, params, key } = view
+    const openTip = (tip, kind = 'related') => replace('tip', { tip, kind })
+    let page = null
+    if (name === 'tip') page = <TipDetail tip={params.tip} kind={params.kind} profile={profile} onBack={pop} onOpenTip={openTip} />
+    else if (name === 'mood') page = <MoodScreen profile={profile} onBack={pop} />
+    else if (name === 'profile') page = (
+      <ProfileScreen
+        profile={profile}
+        onBack={pop}
+        onEditProfile={() => push('editProfile')}
+        onSavedTips={() => push('savedTips')}
+        onSignOut={isSupabaseConfigured ? handleSignOut : null}
+        onPhotoChange={() => setPhotoVersion(v => v + 1)}
+      />
+    )
+    else if (name === 'savedTips') page = <SavedTipsScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'saved' })} />
+    else if (name === 'editProfile') page = <OnboardingScreen onComplete={async p => { await handleProfileChange(p); pop() }} />
+    else if (name === 'story') page = <StoryReader story={params.story} profile={profile} onClose={pop} />
+    else if (name === 'photoHunt') page = (
+      <Screen onBack={pop} detail>
+        <PhotoHunt profile={profile} onCheckIn={() => markCheckIn('photo')} />
+      </Screen>
+    )
+    return (
+      <div key={key} style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', animation: 'fadeIn 0.18s ease' }}>
+        {page}
+      </div>
+    )
+  }
+
   return (
     <div style={{ maxWidth: '480px', margin: '0 auto', position: 'relative', minHeight: '100vh' }}>
       <div key={activeTab} style={{ paddingBottom: '72px', animation: 'fadeIn 0.22s ease' }}>
-        {activeTab === 'home'    && <HomeScreen profile={profile} onResetProfile={() => setProfile(null)} onSignOut={isSupabaseConfigured ? handleSignOut : null} onOpenJournal={() => goToTab('journal')} />}
+        {activeTab === 'home'    && <HomeScreen profile={profile} onOpen={push} onOpenJournal={() => goToTab('journal')} photoVersion={photoVersion} />}
         {activeTab === 'stories' && <StoriesScreen profile={profile} openedForBedtime={openedForBedtime} onGoHome={() => goToTab('home')} />}
-        {activeTab === 'stats'      && <StatsScreen profile={profile} onProfileChange={handleProfileChange} />}
-        {activeTab === 'journal'    && <JournalScreen profile={profile} />}
+        {activeTab === 'stats'   && <GrowthScreen profile={profile} onProfileChange={handleProfileChange} onOpen={push} />}
+        {activeTab === 'journal' && <JournalScreen profile={profile} onOpen={push} />}
       </div>
 
       {/* Bottom nav */}
@@ -162,10 +205,10 @@ export default function App() {
         transform: 'translateX(-50%)',
         width: '100%',
         maxWidth: '480px',
-        background: 'rgba(255,255,255,0.85)',
+        background: 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderTop: '1px solid rgba(255,255,255,0.6)',
+        borderTop: '1px solid rgba(124,111,247,0.08)',
         display: 'flex',
         zIndex: 100,
         paddingBottom: 'env(safe-area-inset-bottom)',
@@ -179,14 +222,15 @@ export default function App() {
               onClick={() => goToTab(id)}
               style={{
                 flex: 1,
-                padding: '12px 0 14px',
+                padding: '10px 0 12px',
                 border: 'none',
                 backgroundColor: 'transparent',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '3px',
+                fontFamily: 'inherit',
               }}
             >
               <span style={{ position: 'relative', display: 'inline-flex' }}>
@@ -196,23 +240,9 @@ export default function App() {
                   <span aria-hidden="true" style={{ position: 'absolute', top: '-6px', right: '-9px', fontSize: '10px', lineHeight: 1 }}>🌙</span>
                 )}
               </span>
-              <span style={{
-                fontSize: '11px',
-                fontWeight: '600',
-                color: isActive ? '#7C6FF7' : '#aab',
-                letterSpacing: '0.02em',
-              }}>
+              <span style={{ fontSize: '11px', fontWeight: isActive ? 700 : 600, color: isActive ? ICON_ON : ICON_OFF, letterSpacing: '0.01em' }}>
                 {label}
               </span>
-              {isActive && (
-                <div style={{
-                  width: '20px',
-                  height: '3px',
-                  borderRadius: '2px',
-                  backgroundColor: '#7C6FF7',
-                  marginTop: '1px',
-                }} />
-              )}
             </button>
           )
         })}

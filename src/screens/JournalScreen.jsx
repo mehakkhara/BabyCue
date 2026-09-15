@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getEntries, deleteEntry, updateEntry, isVideoType, isKeepsake, isPhotoHunt } from '../data/journalStore'
+import { useRef } from 'react'
+import { getEntries, deleteEntry, updateEntry, isVideoType, isAudioType, isKeepsake, isPhotoHunt } from '../data/journalStore'
 import { groupByMonth, pickHero, nameAndAgeAt } from '../lib/babyAge'
 import ThenNow, { pickThenNow, thenNowPhotos, rememberThenNow } from '../components/ThenNow'
 import { ShapedMedia, TILE_RATIO } from '../components/PhotoShape'
@@ -8,6 +9,13 @@ import MemoryForm from '../components/MemoryForm'
 import KeepsakeNudge from '../components/KeepsakeNudge'
 import KeepsakeModal from '../components/KeepsakeModal'
 import { shareKeepsake } from '../lib/keepsakeCard'
+import PhotoHuntCard from '../components/PhotoHuntCard'
+import DateStrip from '../components/DateStrip'
+import VoiceMemo from '../components/VoiceMemo'
+import AudioPlayer from '../components/AudioPlayer'
+import { markCheckIn, dayKey } from '../lib/streak'
+import { Screen, Card, IconButton, IconTile } from '../components/ui'
+import { color, type } from '../theme'
 
 function shortDate(ts) {
   return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
@@ -146,7 +154,12 @@ function MonthSection({ group, urls, profile, onOpen }) {
                 boxShadow: '0 1px 4px rgba(0,0,0,0.07)', textAlign: 'left',
               }}
             >
-              {urls.get(entry.id) && (
+              {urls.get(entry.id) && isAudioType(entry.photoType) ? (
+                <div style={{ padding: '12px 10px 4px', background: '#faf9ff' }}>
+                  <div style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#7C6FF7', marginBottom: '8px' }}>🎙️ Recorded</div>
+                  <AudioPlayer url={urls.get(entry.id)} compact />
+                </div>
+              ) : urls.get(entry.id) && (
                 <div style={{ position: 'relative' }}>
                   {/* Tiles share one 4:5 shape so pairs line up; the saved position picks the crop. */}
                   <ShapedMedia url={urls.get(entry.id)} type={entry.photoType} entry={entry} ratio={TILE_RATIO} />
@@ -180,7 +193,7 @@ function MonthSection({ group, urls, profile, onOpen }) {
 
 function EntrySheet({ entry, url, profile, onClose, onDelete, onUpdate, onMakeKeepsake, onShareCard }) {
   const card = isKeepsake(entry)
-  const canMakeCard = Boolean(url) && !card && !isVideoType(entry.photoType)
+  const canMakeCard = Boolean(url) && !card && !isVideoType(entry.photoType) && !isAudioType(entry.photoType)
 
   // Edit in place: the date and the note become fields; Save writes them back.
   const [editing, setEditing] = useState(false)
@@ -239,9 +252,11 @@ function EntrySheet({ entry, url, profile, onClose, onDelete, onUpdate, onMakeKe
         }}
       >
         {url && (
-          isVideoType(entry.photoType)
-            ? <video src={url} controls playsInline autoPlay style={{ width: '100%', display: 'block', maxHeight: '60vh', background: '#000' }} />
-            : <img src={url} alt="" style={{ width: '100%', display: 'block', maxHeight: '60vh', objectFit: 'contain', background: '#111' }} />
+          isAudioType(entry.photoType)
+            ? <div style={{ padding: '22px 18px 6px', background: '#faf9ff' }}><AudioPlayer url={url} /></div>
+            : isVideoType(entry.photoType)
+              ? <video src={url} controls playsInline autoPlay style={{ width: '100%', display: 'block', maxHeight: '60vh', background: '#000' }} />
+              : <img src={url} alt="" style={{ width: '100%', display: 'block', maxHeight: '60vh', objectFit: 'contain', background: '#111' }} />
         )}
         <div style={{ padding: '15px 17px 17px' }}>
           {editing ? (
@@ -368,8 +383,17 @@ function EntrySheet({ entry, url, profile, onClose, onDelete, onUpdate, onMakeKe
 
 /* ---------------- screen ---------------- */
 
-export default function JournalScreen({ profile }) {
+export default function JournalScreen({ profile, onOpen }) {
   const [entries, setEntries] = useState([])
+  const [anchor, setAnchor] = useState(() => new Date())
+  const [selectedDay, setSelectedDay] = useState(null)      // 'YYYY-MM-DD' from the date strip
+  const [showSearch, setShowSearch] = useState(false)
+  const [query, setQuery] = useState('')
+  const [recording, setRecording] = useState(false)
+  const [formFiles, setFormFiles] = useState([])            // photos picked from the prompt card
+  const [formNote, setFormNote] = useState(false)           // "Write a note" opens with the note focused
+  const [huntVersion, setHuntVersion] = useState(0)
+  const photoInputRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [opened, setOpened] = useState(null)
@@ -392,6 +416,14 @@ export default function JournalScreen({ profile }) {
 
   const thenNowPair = useMemo(() => pickThenNow(entries), [entries, pickVersion]) // eslint-disable-line react-hooks/exhaustive-deps
   const photoCount = useMemo(() => thenNowPhotos(entries).length, [entries])
+  const entryDays = useMemo(() => new Set(entries.map(e => dayKey(new Date(e.createdAt)))), [entries])
+  const q = query.trim().toLowerCase()
+  const filtered = useMemo(() => {
+    if (selectedDay) return entries.filter(e => dayKey(new Date(e.createdAt)) === selectedDay)
+    if (q) return entries.filter(e => (e.note || '').toLowerCase().includes(q))
+    return null
+  }, [entries, selectedDay, q])
+  const babyName = (profile?.babyName || '').trim() || 'your baby'
 
   async function refresh() {
     setEntries(await getEntries())
@@ -413,8 +445,30 @@ export default function JournalScreen({ profile }) {
     setOpened(o => (o && o.id === id ? { ...o, ...next, photoBlob: o.photoBlob } : o))
   }
 
-  function handleMemorySaved(first) {
+  function pickPhotos(e) {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (files.length === 0) return
+    setFormFiles(files)
+    setFormNote(false)
+    setAdding(true)
+  }
+
+  function openNote() {
+    setFormFiles([])
+    setFormNote(true)
+    setAdding(true)
+  }
+
+  function closeForm() {
     setAdding(false)
+    setFormFiles([])
+    setFormNote(false)
+  }
+
+  function handleMemorySaved(first) {
+    closeForm()
+    markCheckIn('photo')
     if (first) setJustSaved({ url: URL.createObjectURL(first.blob), title: first.title, ts: first.ts, position: first.position })
     refresh()
   }
@@ -425,39 +479,57 @@ export default function JournalScreen({ profile }) {
   }
 
   return (
-    <div style={{
-      maxWidth: '480px', margin: '0 auto',
-      fontFamily: "'Segoe UI', system-ui, sans-serif",
-      minHeight: '100vh', backgroundColor: '#FAFAFA',
-    }}>
-      <div style={{
-        padding: '20px 20px 16px', backgroundColor: '#fff',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <div>
-          <h1 style={{ margin: '0 0 2px', fontSize: '20px', fontWeight: 700, color: '#1a1a2e' }}>
-            Journal
-          </h1>
-          <p style={{ margin: 0, fontSize: '13px', color: '#888' }}>
-            {entries.length} {entries.length === 1 ? 'memory' : 'memories'}
-          </p>
+    <Screen>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ ...type.h1, fontSize: '24px' }}>Journal</h1>
+          <p style={{ ...type.body, marginTop: '4px' }}>Little moments. A big story.</p>
         </div>
-        {!adding && (
-          <button
-            onClick={() => setAdding(true)}
-            style={{
-              padding: '8px 14px', borderRadius: '20px', border: 'none',
-              backgroundColor: '#7C3AED', color: '#fff', fontSize: '13px',
-              fontWeight: 600, cursor: 'pointer',
-            }}
-          >
-            + Add
-          </button>
-        )}
+        <IconButton label="Search" active={showSearch} onClick={() => { setShowSearch(v => !v); setQuery(''); setSelectedDay(null) }}>🔍</IconButton>
       </div>
 
-      <div style={{ padding: '16px' }}>
+      {showSearch && (
+        <input
+          autoFocus
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search your notes"
+          style={{ width: '100%', padding: '12px 14px', borderRadius: '14px', border: '1.5px solid #ddd6fe', fontSize: '14px', fontFamily: 'inherit', outline: 'none', marginBottom: '12px', background: '#fff', color: color.ink }}
+        />
+      )}
+
+      <DateStrip anchor={anchor} onAnchor={setAnchor} selected={selectedDay} onSelect={d => { setSelectedDay(d); setQuery('') }} entryDays={entryDays} />
+
+      {/* The prompt: three ways in, all landing in the same journal */}
+      <Card padding="16px 18px" style={{ marginTop: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <IconTile emoji="❤️" hue="rose" size={30} />
+          <p style={type.bodyStrong}>What made you smile today?</p>
+        </div>
+        <p style={{ ...type.small, marginTop: '6px' }}>Add a photo, write a note, or just a few words. It all counts.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '12px' }}>
+          {[
+            { emoji: '📷', label: 'Add a photo', onClick: () => photoInputRef.current?.click() },
+            { emoji: '🎙️', label: 'Record a moment', onClick: () => setRecording(true) },
+            { emoji: '✏️', label: 'Write a note', onClick: openNote },
+          ].map(a => (
+            <button key={a.label} onClick={a.onClick} style={{
+              border: 'none', borderRadius: '14px', background: color.tintLight, padding: '12px 6px', cursor: 'pointer', fontFamily: 'inherit',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+            }}>
+              <span style={{ fontSize: '20px', lineHeight: 1 }}>{a.emoji}</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: color.ink, textAlign: 'center', lineHeight: 1.2 }}>{a.label}</span>
+            </button>
+          ))}
+        </div>
+        <input ref={photoInputRef} type="file" accept="image/*,video/*" multiple onChange={pickPhotos} style={{ display: 'none' }} />
+      </Card>
+
+      <div style={{ marginTop: '14px' }}>
+        <PhotoHuntCard profile={profile} version={huntVersion} onOpen={() => onOpen?.('photoHunt')} />
+      </div>
+
+      <div style={{ paddingTop: '18px' }}>
         {justSaved && !keepsakeFrom && (
           <KeepsakeNudge
             url={justSaved.url}
@@ -478,10 +550,10 @@ export default function JournalScreen({ profile }) {
               Save a memory of your baby — a photo, a video, a note, a tiny moment to look back on.
             </p>
             <button
-              onClick={() => setAdding(true)}
+              onClick={openNote}
               style={{
                 marginTop: '20px', padding: '12px 24px', borderRadius: '24px', border: 'none',
-                backgroundColor: '#7C3AED', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+                backgroundColor: '#7C6FF7', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
               }}
             >
               Add your first memory
@@ -489,6 +561,37 @@ export default function JournalScreen({ profile }) {
           </div>
         ) : (
           <>
+            {filtered ? (
+              filtered.length === 0 ? (
+                <p style={{ margin: '10px 2px 24px', fontSize: '13px', color: '#aaa', textAlign: 'center' }}>
+                  {selectedDay ? 'No moments on this day yet.' : 'Nothing matches that yet.'}
+                </p>
+              ) : (
+                <MonthSection
+                  group={{
+                    key: 'filtered',
+                    ageLabel: selectedDay
+                      ? new Date(selectedDay + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+                      : `${filtered.length} ${filtered.length === 1 ? 'match' : 'matches'}`,
+                    monthLabel: '',
+                    entries: filtered,
+                  }}
+                  urls={urls}
+                  profile={profile}
+                  onOpen={setOpened}
+                />
+              )
+            ) : (
+              months.map(group => (
+                <MonthSection
+                  key={group.key}
+                  group={group}
+                  urls={urls}
+                  profile={profile}
+                  onOpen={setOpened}
+                />
+              ))
+            )}
             {thenNowPair ? (
               <ThenNow pair={thenNowPair} urls={urls} profile={profile} photos={thenNowPhotos(entries)} onSwap={handleSwap} />
             ) : (
@@ -497,15 +600,6 @@ export default function JournalScreen({ profile }) {
                 Then ↔ now appears once there are two photos{photoCount === 1 ? ' — one more to go' : ''}.
               </p>
             )}
-            {months.map(group => (
-              <MonthSection
-                key={group.key}
-                group={group}
-                urls={urls}
-                profile={profile}
-                onOpen={setOpened}
-              />
-            ))}
           </>
         )}
       </div>
@@ -536,12 +630,13 @@ export default function JournalScreen({ profile }) {
       )}
 
       {adding && (
-        <MemoryForm
-          profile={profile}
-          onClose={() => setAdding(false)}
-          onSaved={handleMemorySaved}
-        />
+        <MemoryForm profile={profile} onClose={closeForm} onSaved={handleMemorySaved} initialFiles={formFiles} autoFocusNote={formNote} />
       )}
-    </div>
+
+      {recording && (
+        <VoiceMemo profile={profile} onClose={() => setRecording(false)} onSaved={() => { setRecording(false); markCheckIn('photo'); refresh() }} />
+      )}
+
+    </Screen>
   )
 }

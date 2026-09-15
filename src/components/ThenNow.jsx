@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { isVideoType, isKeepsake } from '../data/journalStore'
+import { isVideoType, isAudioType, isKeepsake } from '../data/journalStore'
 import { nameAndAgeAt } from '../lib/babyAge'
 
 const PICK_KEY = 'thenNowPick'
 
 export function thenNowPhotos(entries) {
-  return entries.filter(e => e.photoBlob && !isVideoType(e.photoType) && !isKeepsake(e))
+  return entries.filter(e => e.photoBlob && !isVideoType(e.photoType) && !isAudioType(e.photoType) && !isKeepsake(e))
 }
 
 function loadPick() {

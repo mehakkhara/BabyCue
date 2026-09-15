@@ -439,3 +439,35 @@ export function pickTonight(ageInMonths, { seed = '', readIds = [] } = {}) {
   const candidates = unread.length ? unread : pool
   return candidates[hash(seed) % candidates.length]
 }
+
+// Shelf extras, kept apart from the prose: a one-line blurb for the Tonight
+// card and a "try this while reading" prompt for the reader — a small,
+// concrete thing to do with the baby, not advice. Reading time comes from
+// the word count at a read-aloud pace.
+export const STORY_EXTRAS = {
+  A1: { blurb: 'A river, a star, and the quiet of night.', prompt: 'Whisper "goodnight" to the star and let {name} hear the hush.' },
+  A2: { blurb: 'Pink blossoms against a soft blue sky.', prompt: 'Look up together and say "up". Pause and watch {name}\'s eyes.' },
+  A3: { blurb: 'Sunflowers, wheat, and everything yellow.', prompt: 'Find something yellow in the room and hold it near the page.' },
+  A4: { blurb: 'The little boats come home for the night.', prompt: 'Rock {name} gently like a boat as you read.' },
+  A5: { blurb: 'Soft petals, soft words, soft sleep.', prompt: 'Stroke {name}\'s hand slowly each time you read "soft".' },
+  B1: { blurb: 'A small bird finds its way home across the field.', prompt: 'Point to the bird and say "bird". Pause and let {name} respond.' },
+  B2: { blurb: 'Late at night, who is still awake in the café?', prompt: 'Ask "who is awake?" and wait. Then whisper "you are".' },
+  B3: { blurb: 'Everything is white and quiet after the snow.', prompt: 'Blow a soft breath on {name}\'s cheek when the snow falls.' },
+  B4: { blurb: 'Two white butterflies dance over the grass.', prompt: 'Flutter your fingers like wings and let {name} chase them.' },
+  B5: { blurb: 'A story about curiosity, growing, and all the big things ahead.', prompt: 'Point to the tree and say "tree". Pause and let {name} respond.' },
+  C1: { blurb: 'A field bird sets off to see the sea.', prompt: 'Ask "where is the bird going?" and let {name} point.' },
+  C2: { blurb: 'Fourteen sunflowers, and the last one to bloom.', prompt: 'Count the sunflowers together on your fingers.' },
+  C3: { blurb: 'A very big day, and the long way home.', prompt: 'Ask {name} what was big about today. Any answer counts.' },
+  C4: { blurb: 'A man, a field, and a handful of seeds.', prompt: 'Pretend to scatter seeds with your hand and let {name} copy you.' },
+  C5: { blurb: 'Some nights the sky is just the sky. Some nights it spins.', prompt: 'Trace a slow circle in the air and say "round and round".' },
+}
+
+export function storyExtras(id) {
+  return STORY_EXTRAS[id] || { blurb: '', prompt: '' }
+}
+
+// Minutes to read aloud, with pauses for looking at the painting.
+export function readingMinutes(story) {
+  const words = story.pages.flatMap(p => p.text).join(' ').split(/\s+/).filter(Boolean).length
+  return Math.max(2, Math.round(words / 90 + story.pages.length * 0.5))
+}

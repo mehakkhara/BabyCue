@@ -4,13 +4,16 @@
 // a gentle, concrete way to encourage it, shown when a parent taps "Not yet".
 
 export const DOMAINS = {
-  social:   { label: 'Social',   color: '#7C6FF7' },
-  language: { label: 'Talking',  color: '#4F7CF7' },
-  motor:    { label: 'Moving',   color: '#059669' },
-  thinking: { label: 'Thinking', color: '#D97706' },
+  language: { label: 'Communication',      short: 'Communication', emoji: '💬', hue: 'sky',      color: '#4F7CF7' },
+  motor:    { label: 'Movement',           short: 'Movement',      emoji: '🏃', hue: 'mint',     color: '#059669' },
+  social:   { label: 'Social & Emotional', short: 'Social',        emoji: '❤️', hue: 'rose',     color: '#7C6FF7' },
+  thinking: { label: 'Thinking',           short: 'Thinking',      emoji: '⭐', hue: 'amber',    color: '#D97706' },
   // Milestones the parent added themselves — see lib/customMilestones.js.
-  custom:   { label: 'Yours',    color: '#DB2777' },
+  custom:   { label: 'Yours',              short: 'Yours',         emoji: '✏️', hue: 'lavender', color: '#DB2777' },
 }
+
+// The four curated domains, in display order.
+export const DOMAIN_KEYS = ['language', 'motor', 'social', 'thinking']
 
 export const CHECKPOINTS = [2, 4, 6, 9, 12, 15, 18, 24]
 
