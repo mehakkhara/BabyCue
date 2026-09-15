@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import PaintingCanvas from '../components/PaintingCanvas'
 import { PAINTINGS } from '../data/paintings'
 import { renderSegments } from '../lib/storyText'
-import { markRead } from '../lib/storyProgress'
+import { markRead, isFavourite, toggleFavourite } from '../lib/storyProgress'
+import { storyExtras } from '../data/stories'
+import { renderLine } from '../lib/storyText'
 
 const SERIF = "Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif"
 
@@ -15,6 +17,8 @@ const GOLD = '#e8b13d'
 export default function StoryReader({ story, profile, onClose }) {
   const [page, setPage] = useState(0)
   const [hint, setHint] = useState(true)
+  const [fav, setFav] = useState(() => isFavourite(story.id))
+  const prompt = storyExtras(story.id).prompt
   const textRef = useRef(null)
   const touchX = useRef(0)
 
@@ -103,6 +107,15 @@ export default function StoryReader({ story, profile, onClose }) {
             background: `linear-gradient(to bottom, rgba(16,19,31,.22) 0%, rgba(16,19,31,0) 34%, ${NIGHT} 100%)`,
             pointerEvents: 'none',
           }} />
+          {/* Back and favourite sit above the tap zones. */}
+          <div style={{ position: 'absolute', top: 'calc(14px + env(safe-area-inset-top))', left: '14px', right: '14px', display: 'flex', justifyContent: 'space-between', zIndex: 2 }}>
+            <button onClick={onClose} aria-label="Back to the shelf" style={roundBtn}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+            </button>
+            <button onClick={() => { toggleFavourite(story.id); setFav(f => !f) }} aria-label={fav ? 'Remove from favourites' : 'Add to favourites'} style={{ ...roundBtn, color: fav ? '#c4b5fd' : '#f3e6c8' }}>
+              {fav ? '♥' : '♡'}
+            </button>
+          </div>
           {/* Museum wall label */}
           <div style={{
             position: 'absolute',
@@ -147,6 +160,19 @@ export default function StoryReader({ story, profile, onClose }) {
               ))}
             </p>
           ))}
+          {page === 0 && prompt && (
+            <div style={{
+              marginTop: '22px', display: 'flex', gap: '10px', alignItems: 'flex-start',
+              background: 'rgba(243,230,200,0.08)', border: '1px solid rgba(243,230,200,0.14)',
+              borderRadius: '14px', padding: '11px 13px', fontFamily: 'Inter, system-ui, sans-serif',
+            }}>
+              <span style={{ fontSize: '16px', lineHeight: 1 }}>💡</span>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: GOLD, marginBottom: '3px' }}>Try this while reading</div>
+                <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'rgba(243,230,200,0.85)' }}>{renderLine(prompt, profile)}</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Controls */}
@@ -216,7 +242,7 @@ export default function StoryReader({ story, profile, onClose }) {
       {hint && (
         <div style={{
           position: 'absolute',
-          left: 0, right: 0, bottom: '84px',
+          left: 0, right: 0, top: 'calc(46dvh + 8px)',
           textAlign: 'center',
           fontSize: '11px',
           letterSpacing: '0.09em',
@@ -229,6 +255,13 @@ export default function StoryReader({ story, profile, onClose }) {
       )}
     </div>
   )
+}
+
+const roundBtn = {
+  width: '36px', height: '36px', borderRadius: '12px', border: 'none',
+  background: 'rgba(16,19,31,0.55)', color: '#f3e6c8', fontSize: '18px', lineHeight: 1,
+  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', fontFamily: 'inherit',
 }
 
 function tapZone(flex) {
