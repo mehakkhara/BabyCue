@@ -101,6 +101,10 @@ function loadEntries() {
   try { return JSON.parse(localStorage.getItem('growthEntries') || '[]') } catch { return [] }
 }
 
+import { statItemsFor, AGE_STATS_SOURCE } from '../data/ageStats'
+import { StatTile } from '../components/ui'
+import { getBabyAgeInMonths } from '../data/tips'
+
 export default function StatsScreen({ profile, onProfileChange }) {
   const [entries, setEntries] = useState(loadEntries)
   const [metric, setMetric] = useState('weight')
@@ -165,6 +169,24 @@ export default function StatsScreen({ profile, onProfileChange }) {
           {babyName}'s Stats
         </h1>
       </div>
+
+      {/* Typical at this age — reference numbers, never something to log */}
+      {(() => {
+        const m = Math.max(0, Math.min(24, getBabyAgeInMonths(dateOfBirth)))
+        return (
+          <div style={{ marginBottom: '14px' }}>
+            <p style={{ margin: '0 4px 8px', fontSize: '11px', fontWeight: 700, color: 'rgba(30,27,75,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Typical at {m} months
+            </p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {statItemsFor(m).map(s => <StatTile key={s.label} emoji={s.emoji} value={s.value} label={s.label} />)}
+            </div>
+            <p style={{ margin: '8px 4px 0', fontSize: '10px', color: '#c4c4d4', textAlign: 'center', lineHeight: 1.5 }}>
+              Ranges, not targets — based on {AGE_STATS_SOURCE} guidance
+            </p>
+          </div>
+        )
+      })()}
 
       {/* Sex picker — shown once */}
       {!sex && (

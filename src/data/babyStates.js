@@ -5,13 +5,18 @@
 // Evidence-informed (AAP/WHO framing); NOT medical advice — concern states
 // carry a red-flag line pointing to the pediatrician.
 
+// Order matches the "How is baby today?" grid. `unwell` is reached from a
+// link under the grid rather than a tile — it's the red-flag route.
 export const BABY_STATES = [
-  { key: 'fussy',   emoji: '😣', tone: 'concern',  label: 'Fussy',       ask: name => `Why might ${name} be fussy?` },
-  { key: 'clingy',  emoji: '😢', tone: 'concern',  label: 'Clingy',      ask: name => `Why is ${name} extra clingy?` },
-  { key: 'sleep',   emoji: '🌙', tone: 'concern',  label: "Won't settle", ask: name => `Why won't ${name} settle?` },
-  { key: 'feeding', emoji: '🍼', tone: 'concern',  label: "Won't eat",    ask: name => `Why might ${name} be fighting feeds?` },
-  { key: 'unwell',  emoji: '🤒', tone: 'concern',  label: 'Unwell',      ask: name => `${name} seems unwell — what to know` },
-  { key: 'happy',   emoji: '😊', tone: 'positive', label: 'Happy',       ask: name => `What's blooming for ${name}? 💛` },
+  { key: 'happy',   emoji: '😊', tone: 'positive', label: 'Happy',           ask: name => `What's blooming for ${name}? 💛` },
+  { key: 'fussy',   emoji: '😣', tone: 'concern',  label: 'Fussy',           ask: name => `Why might ${name} be fussy?` },
+  { key: 'clingy',  emoji: '😢', tone: 'concern',  label: 'Clingy',          ask: name => `Why is ${name} extra clingy?` },
+  { key: 'sleep',   emoji: '🌙', tone: 'concern',  label: "Won't settle",    ask: name => `Why won't ${name} settle?` },
+  { key: 'feeding', emoji: '🍽️', tone: 'concern',  label: 'Not eating well', ask: name => `Why might ${name} be fighting feeds?` },
+  { key: 'tummy',   emoji: '💩', tone: 'concern',  label: 'Tummy issues',    ask: name => `What's going on with ${name}'s tummy?` },
+  { key: 'sleepy',  emoji: '😴', tone: 'concern',  label: 'Sleepy',          ask: name => `Why is ${name} extra sleepy?` },
+  { key: 'great',   emoji: '✨', tone: 'positive', label: 'Great day!',      ask: name => `What's blooming for ${name}? ✨` },
+  { key: 'unwell',  emoji: '🤒', tone: 'concern',  label: 'Unwell',          ask: name => `${name} seems unwell — what to know`, hidden: true },
 ]
 
 const BAND_LABEL = {
@@ -189,11 +194,68 @@ const REASONS = {
   },
 }
 
+// Added 2026-09-14 with the mood check-in redesign. Same framing: common,
+// age-typical causes with one thing to try; red flags point to the doctor.
+// Sources: AAP HealthyChildren.org (gas, spit-up, constipation, juice limits,
+// sleep needs), CDC growth-spurt guidance.
+REASONS.tummy = {
+  '0-3': [
+    { cause: 'Gas', action: 'Burp mid-feed and after; bicycle {their} legs and try tummy time to help gas move.' },
+    { cause: 'Spit-up', action: 'Spitting up is normal when {baby} is gaining and content. Keep {them} upright 20–30 min after feeds.' },
+    { cause: 'Straining with soft stools', action: 'Grunting and going red while passing a soft stool is normal at this age — not constipation.' },
+    { cause: 'Feed too fast or too much', action: 'Try paced bottle feeding or shorter, more frequent feeds.' },
+  ],
+  '4-6': [
+    { cause: 'Reflux peaking', action: 'Spit-up often peaks around 4 months and eases by 12. Smaller feeds, upright afterwards.' },
+    { cause: 'First solids', action: 'Around 6 months new foods can firm stools. Offer pears, prunes or peaches, and a few sips of water with meals.' },
+    { cause: 'Gas from new foods', action: 'Introduce one new food at a time, a few days apart, so you can spot what bothers {them}.' },
+  ],
+  '7-12': [
+    { cause: 'Constipation with solids', action: 'Add fibre fruits (prunes, pears, peaches) and offer water in a cup with meals. Go easy on rice cereal and banana.' },
+    { cause: 'New foods', action: 'One new food at a time. A little looser or firmer stool with a new food is common.' },
+    { cause: 'Stomach bug', action: 'Keep offering breast milk or formula in small amounts, often. Watch wet diapers.' },
+  ],
+  '13-24': [
+    { cause: 'Too much cow’s milk', action: 'More than 16–24 oz a day can cause constipation. Offer water and whole foods alongside.' },
+    { cause: 'Too much juice', action: 'The AAP suggests no more than 4 oz of juice a day for toddlers — more can cause loose stools.' },
+    { cause: 'Holding it in', action: 'Toddlers sometimes withhold. Fibre fruits, water, and no pressure around the potty.' },
+    { cause: 'Stomach bug', action: 'Small sips of fluid every few minutes beat big drinks. Regular food as soon as {they} want it.' },
+  ],
+}
+
+REASONS.sleepy = {
+  '0-3': [
+    { cause: 'Newborn sleep', action: '14–17 hours a day is typical. In the first weeks, wake {them} to feed if it has been 3–4 hours.' },
+    { cause: 'Growth spurt', action: 'Around 2–3 weeks, 6 weeks and 3 months babies sleep and feed more for a few days.' },
+    { cause: 'After vaccines', action: 'Mild sleepiness for a day after shots is common. Keep offering feeds as usual.' },
+  ],
+  '4-6': [
+    { cause: 'Growth spurt', action: 'A few extra-sleepy days with bigger feeds usually means a spurt.' },
+    { cause: 'Big developmental leap', action: 'Learning to roll, grab and babble is tiring. An extra nap is fine.' },
+    { cause: 'After vaccines', action: 'A sleepier day after the 4- or 6-month shots is expected.' },
+  ],
+  '7-12': [
+    { cause: 'A cold brewing', action: 'Extra sleep often comes the day before a cold shows. Watch for a fever or a runny nose.' },
+    { cause: 'Nap transition', action: 'Dropping to two naps can leave {them} extra tired for a week. An earlier bedtime helps.' },
+    { cause: 'Growth spurt', action: 'Around 9 months many babies eat and sleep more for a few days.' },
+  ],
+  '13-24': [
+    { cause: 'Dropped a nap', action: 'Moving to one nap is tiring for a couple of weeks. Bring bedtime earlier for now.' },
+    { cause: 'Fighting a bug', action: 'Toddlers often sleep more a day or two before and during a cold.' },
+    { cause: 'Busy days', action: 'Toddlers still need 11–14 hours a day including the nap. A big day may need an early night.' },
+  ],
+}
+
+// "Great day!" celebrates the same things as "Happy".
+REASONS.great = REASONS.happy
+
 const RED_FLAGS = {
   fussy: 'Call your pediatrician for a fever of 100.4°F (38°C)+, crying that can’t be soothed for hours, a weak or high-pitched cry, or if something just feels wrong.',
   clingy: 'Sudden, extreme clinginess alongside fever, poor feeding, or lethargy is worth a call to your pediatrician.',
   sleep: 'Call your pediatrician if sleep changes come with fever, breathing trouble, or unusual lethargy.',
   feeding: 'Call your pediatrician for fewer than 6 wet diapers a day, no weight gain, forceful vomiting, or refusing several feeds in a row.',
+  tummy: 'Call your pediatrician for green or bloody vomit, blood in the stool, a hard swollen belly, no wet diaper in 6–8 hours, or vomiting that will not stop. Forceful (projectile) vomiting in a young baby needs a same-day call.',
+  sleepy: 'Call your pediatrician if {baby} is hard to wake, too sleepy to feed, has fewer wet diapers, or seems limp or floppy. Under 3 months, a fever of 100.4°F (38°C) or higher is an emergency.',
   unwell: 'Trust your instincts. Call your pediatrician for a high or persistent fever, trouble breathing, dehydration (few wet diapers, no tears), a rash that doesn’t fade when pressed, or if your baby just isn’t themselves. Under 3 months, ANY fever is an emergency.',
 }
 

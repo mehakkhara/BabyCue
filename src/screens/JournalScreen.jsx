@@ -8,6 +8,8 @@ import MemoryForm from '../components/MemoryForm'
 import KeepsakeNudge from '../components/KeepsakeNudge'
 import KeepsakeModal from '../components/KeepsakeModal'
 import { shareKeepsake } from '../lib/keepsakeCard'
+import PhotoHunt from '../components/PhotoHunt'
+import { markCheckIn } from '../lib/streak'
 
 function shortDate(ts) {
   return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
@@ -465,6 +467,18 @@ export default function JournalScreen({ profile }) {
             onDismiss={() => setJustSaved(null)}
             style={{ marginBottom: '16px' }}
           />
+        )}
+
+        {/* This month's photo hunt moved here from Today: the journal is the
+            one place photos live. Captures save straight into the entries. */}
+        {!loading && (
+          <div style={{ marginBottom: '16px' }}>
+            <PhotoHunt
+              profile={profile}
+              onSaved={refresh}
+              onCheckIn={() => markCheckIn('photo')}
+            />
+          </div>
         )}
 
         {loading ? (
