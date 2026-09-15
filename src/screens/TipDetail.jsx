@@ -66,18 +66,6 @@ export default function TipDetail({ tip, kind = 'tip', profile, onBack, onOpenTi
       <h1 style={{ ...type.h1, fontSize: '28px', marginBottom: '10px' }}>{title}</h1>
       <p style={{ ...type.body, fontSize: '15px', color: color.text, marginBottom: '18px' }}>{body}</p>
 
-      {tip.tryToday && (
-        <Card style={{ background: color.tintLight, boxShadow: 'none', marginBottom: '14px' }} padding="14px 16px">
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-            <IconTile emoji="💬" size={30} />
-            <div>
-              <p style={{ ...type.bodyStrong, fontSize: '13px', color: color.primary }}>Try it today</p>
-              <p style={{ ...type.body, fontSize: '14px', color: color.ink, marginTop: '2px' }}>“{personalize(tip.tryToday, profile)}”</p>
-            </div>
-          </div>
-        </Card>
-      )}
-
       {isActivity && Array.isArray(tip.steps) && tip.steps.length > 0 && (
         <div style={{ marginBottom: '14px' }}>
           <p style={{ ...type.bodyStrong, marginBottom: '8px' }}>How to do it</p>
@@ -90,8 +78,25 @@ export default function TipDetail({ tip, kind = 'tip', profile, onBack, onOpenTi
         </div>
       )}
 
+      {/* Order: the reason first, then the concrete thing to do with its time right under it. */}
+      {tip.whyItMatters && (
+        <div style={{ marginBottom: '6px' }}>
+          <InfoRow emoji="🧠" hue="sky" title="Why it matters" text={personalize(tip.whyItMatters, profile)} />
+        </div>
+      )}
+      {tip.tryToday && (
+        <Card style={{ background: color.tintLight, boxShadow: 'none', marginBottom: '14px' }} padding="14px 16px">
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+            <IconTile emoji="💬" size={30} />
+            <div>
+              <p style={{ ...type.bodyStrong, fontSize: '13px', color: color.primary }}>Try it today</p>
+              <p style={{ ...type.body, fontSize: '14px', color: color.ink, marginTop: '2px' }}>“{personalize(tip.tryToday, profile)}”</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <div style={{ marginBottom: '18px' }}>
-        {tip.whyItMatters && <InfoRow emoji="🧠" hue="sky" title="Why it matters" text={personalize(tip.whyItMatters, profile)} />}
         {tip.builds && <InfoRow emoji="🧠" hue="sky" text={`Builds ${tip.builds}`} />}
         {tip.minutes && <InfoRow emoji="⏱️" hue="amber" text={`Takes about ${tip.minutes} minutes`} />}
         {tip.materials && <InfoRow emoji="🧺" hue="mint" text={tip.materials} />}
