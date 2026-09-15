@@ -10,6 +10,9 @@ import MoodScreen from './screens/MoodScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import SavedTipsScreen from './screens/SavedTipsScreen'
 import StoryReader from './screens/StoryReader'
+import PhotoHunt from './components/PhotoHunt'
+import { Screen } from './components/ui'
+import { markCheckIn } from './lib/streak'
 import { isSupabaseConfigured } from './lib/supabase'
 import { useSession, signOut } from './lib/useSession'
 import { getProfile, saveProfile, backfillLocalProfileIfNeeded } from './lib/db'
@@ -173,6 +176,11 @@ export default function App() {
     else if (name === 'savedTips') page = <SavedTipsScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'saved' })} />
     else if (name === 'editProfile') page = <OnboardingScreen onComplete={async p => { await handleProfileChange(p); pop() }} />
     else if (name === 'story') page = <StoryReader story={params.story} profile={profile} onClose={pop} />
+    else if (name === 'photoHunt') page = (
+      <Screen onBack={pop} detail>
+        <PhotoHunt profile={profile} onCheckIn={() => markCheckIn('photo')} />
+      </Screen>
+    )
     return (
       <div key={key} style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', animation: 'fadeIn 0.18s ease' }}>
         {page}
@@ -186,7 +194,7 @@ export default function App() {
         {activeTab === 'home'    && <HomeScreen profile={profile} onOpen={push} onOpenJournal={() => goToTab('journal')} photoVersion={photoVersion} />}
         {activeTab === 'stories' && <StoriesScreen profile={profile} openedForBedtime={openedForBedtime} onGoHome={() => goToTab('home')} />}
         {activeTab === 'stats'   && <GrowthScreen profile={profile} onProfileChange={handleProfileChange} onOpen={push} />}
-        {activeTab === 'journal' && <JournalScreen profile={profile} />}
+        {activeTab === 'journal' && <JournalScreen profile={profile} onOpen={push} />}
       </div>
 
       {/* Bottom nav */}

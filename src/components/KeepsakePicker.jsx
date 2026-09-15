@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getEntries, isVideoType, isKeepsake } from '../data/journalStore'
+import { getEntries, isVideoType, isAudioType, isKeepsake } from '../data/journalStore'
 import KeepsakeModal from './KeepsakeModal'
 
 // "Make a keepsake" from anywhere: pick one of the recent journal photos,
@@ -14,7 +14,7 @@ export default function KeepsakePicker({ profile, onClose, onSaved, limit = 12 }
     getEntries().then(entries => {
       if (cancelled) return
       const usable = entries
-        .filter(e => e.photoBlob && !isVideoType(e.photoType) && !isKeepsake(e))
+        .filter(e => e.photoBlob && !isVideoType(e.photoType) && !isAudioType(e.photoType) && !isKeepsake(e))
         .slice(0, limit)
       const list = usable.map(entry => {
         const url = URL.createObjectURL(entry.photoBlob)

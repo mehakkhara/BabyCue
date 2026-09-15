@@ -96,5 +96,8 @@ export function groupByMonth(entries, dateOfBirth) {
  */
 export function pickHero(entries) {
   if (!entries.length) return null
-  return entries.find(e => e.note && e.note.trim()) || entries[0]
+  // Voice memos have nothing to enlarge; they stay in the grid.
+  const visual = entries.filter(e => !(typeof e.photoType === 'string' && e.photoType.startsWith('audio/')))
+  const pool = visual.length ? visual : entries
+  return pool.find(e => e.note && e.note.trim()) || pool[0]
 }

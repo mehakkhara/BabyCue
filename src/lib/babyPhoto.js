@@ -1,7 +1,7 @@
 // The baby's profile photo for the Today hero. One small JPEG data URL in
 // localStorage (≈60–100 KB at 800 px). Falls back to the newest journal
 // photo so the hero is never empty once she has added any memory.
-import { compressImage, getEntries, isKeepsake, isVideoType } from '../data/journalStore'
+import { compressImage, getEntries, isKeepsake, isVideoType, isAudioType } from '../data/journalStore'
 
 const KEY = 'babyPhoto'
 
@@ -29,7 +29,7 @@ export function clearBabyPhoto() {
 export async function latestJournalPhotoUrl() {
   try {
     const entries = await getEntries()
-    const e = entries.find(x => x.photoBlob && !isKeepsake(x) && !isVideoType(x.photoType))
+    const e = entries.find(x => x.photoBlob && !isKeepsake(x) && !isVideoType(x.photoType) && !isAudioType(x.photoType))
     return e ? URL.createObjectURL(e.photoBlob) : null
   } catch {
     return null

@@ -11,8 +11,11 @@ import MediaStrip from './MediaStrip'
 // and a note. Several photos save as several entries sharing the note.
 //   onSaved — called with { blob, title, ts, position } of the first photo
 //             (null if the memory was a note only) once everything is stored
-export default function MemoryForm({ profile, onClose, onSaved }) {
-  const [files, setFiles] = useState([])
+// `initialFiles` lets a caller open the picker itself (inside the tap, as
+// browsers require) and hand the files over; `autoFocusNote` opens straight
+// into writing.
+export default function MemoryForm({ profile, onClose, onSaved, initialFiles = [], autoFocusNote = false }) {
+  const [files, setFiles] = useState(initialFiles)
   const file = files.length === 1 ? files[0] : null   // single pick gets the crop step
   const [previewUrl, setPreviewUrl] = useState(null)
   const [position, setPosition] = useState('50% 50%')
@@ -201,6 +204,7 @@ export default function MemoryForm({ profile, onClose, onSaved }) {
           onChange={e => setNote(e.target.value)}
           placeholder={`What happened with ${babyName}?`}
           rows={3}
+          autoFocus={autoFocusNote}
           style={{ ...field, resize: 'vertical', marginBottom: '12px' }}
         />
 

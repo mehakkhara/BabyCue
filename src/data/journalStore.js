@@ -9,6 +9,11 @@ export function isVideoType(type) {
   return typeof type === 'string' && type.startsWith('video/')
 }
 
+// Voice memos share the same blob slot; only the rendering differs.
+export function isAudioType(type) {
+  return typeof type === 'string' && type.startsWith('audio/')
+}
+
 function openDb() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION)
