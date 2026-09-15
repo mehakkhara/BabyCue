@@ -52,6 +52,7 @@ export default function StoriesScreen({ profile, openedForBedtime = false, onGoH
 
   const forAge = storiesForAge(ageInMonths)
   const others = STORIES.filter(s => !forAge.includes(s))
+  const animalStories = STORIES.filter(s => ['A6', 'B6', 'C6'].includes(s.id))
   const q = query.trim().toLowerCase()
   const matches = q
     ? STORIES.filter(s => s.title.toLowerCase().includes(q) || PAINTINGS[s.pages[0].art].title.toLowerCase().includes(q))
@@ -133,12 +134,16 @@ export default function StoriesScreen({ profile, openedForBedtime = false, onGoH
             </p>
           )}
 
+          <SectionHeader title="Animal discovery" />
+          <p style={{ ...type.small, margin: '-4px 2px 10px', color: color.inkSoft }}>Original stories for learning through looking, listening, and play.</p>
+          <List stories={animalStories} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+
           <SectionHeader
             title={`More stories for ${babyName}`}
             action={others.length > 0 ? (showAll ? 'Just this age' : 'See all') : null}
             onAction={() => setShowAll(v => !v)}
           />
-          <List stories={forAge.filter(s => s !== tonight)} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+          <List stories={forAge.filter(s => s !== tonight && !animalStories.includes(s))} readIds={readIds} favourites={favourites} onOpen={setOpen} />
 
           {showAll && others.length > 0 && (
             <>
