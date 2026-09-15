@@ -403,6 +403,32 @@ export const STORIES = [
       ] },
     ],
   },
+  // Original animal-discovery stories. Each offers one concrete fact and a
+  // simple looking or movement prompt appropriate to its age band.
+  {
+    id: 'A6', band: 'A', title: 'Robin Says Hello',
+    pages: [
+      { art: 'robinMeadow', text: ['Hello, little robin.', 'The robin sits on a branch. It has feathers. Its chest is orange.', 'Can you see the bird?'] },
+      { art: 'robinMeadow', text: ['The robin looks this way. Then that way.', 'Its small feet hold tight to the branch.', 'Bird. Feet. Branch.'] },
+      { art: 'robinMeadow', text: ['The robin gives a tiny chirp, then flutters its wings.', 'Bye-bye, robin.', 'Can you wave hello and bye-bye?'] },
+    ],
+  },
+  {
+    id: 'B6', band: 'B', title: 'Ollie Otter and the Smooth Pebble',
+    pages: [
+      { art: 'otterStream', text: ['Ollie the otter floats in a stream.', 'Look — Ollie is holding a smooth pebble with two little paws.', 'Can you point to Ollie’s paws?'] },
+      { art: 'otterStream', text: ['Otters can swim. Ollie’s feet help it paddle through the water.', 'Paddle, paddle. The water makes small circles.', 'Can you make a swimming motion with your hands?'] },
+      { art: 'otterStream', text: ['Ollie puts the pebble down and swims toward the reeds.', 'Splash, splash — off Ollie goes.', 'Can you wave goodbye to the little swimmer?'] },
+    ],
+  },
+  {
+    id: 'C6', band: 'C', title: 'Rory Rabbit Listens',
+    pages: [
+      { art: 'rabbitBurrow', text: ['Rory Rabbit sits outside a burrow in the meadow.', 'A burrow is a tunnel under the ground. It is a safe place for a rabbit to rest.', 'Can you find the dark burrow behind Rory?'] },
+      { art: 'rabbitBurrow', text: ['Rory’s long ears stand tall. They help Rory hear small sounds: a leaf rustling, a bee buzzing, the grass moving in the breeze.', 'Hold your hands beside your ears. What can you hear?'] },
+      { art: 'rabbitBurrow', text: ['Rory twitches its ears, then hops into the burrow for a rest.', 'The meadow is still there to explore another day.', 'What sound would you like to listen for next?'] },
+    ],
+  },
 ]
 
 export function bandForAge(ageInMonths) {
@@ -450,20 +476,23 @@ export const STORY_EXTRAS = {
   A3: { blurb: 'Sunflowers, wheat, and everything yellow.', prompt: 'Find something yellow in the room and hold it near the page.' },
   A4: { blurb: 'The little boats come home for the night.', prompt: 'Rock {name} gently like a boat as you read.' },
   A5: { blurb: 'Soft petals, soft words, soft sleep.', prompt: 'Stroke {name}\'s hand slowly each time you read "soft".' },
+  A6: { blurb: 'Meet a robin, its feathers, and its bright orange chest.', prompt: 'Point to the robin and say “bird.” Pause so {name} can look.', learn: 'A robin is a bird. Birds have feathers and feet.' },
   B1: { blurb: 'A small bird finds its way home across the field.', prompt: 'Point to the bird and say "bird". Pause and let {name} respond.' },
   B2: { blurb: 'Late at night, who is still awake in the café?', prompt: 'Ask "who is awake?" and wait. Then whisper "you are".' },
   B3: { blurb: 'Everything is white and quiet after the snow.', prompt: 'Blow a soft breath on {name}\'s cheek when the snow falls.' },
   B4: { blurb: 'Two white butterflies dance over the grass.', prompt: 'Flutter your fingers like wings and let {name} chase them.' },
   B5: { blurb: 'A story about curiosity, growing, and all the big things ahead.', prompt: 'Point to the tree and say "tree". Pause and let {name} respond.' },
+  B6: { blurb: 'An otter floats, paddles, and holds a smooth pebble.', prompt: 'Show a gentle swimming motion with your hands and invite {name} to copy.', learn: 'Otters swim. Their feet help them paddle in water.' },
   C1: { blurb: 'A field bird sets off to see the sea.', prompt: 'Ask "where is the bird going?" and let {name} point.' },
   C2: { blurb: 'Fourteen sunflowers, and the last one to bloom.', prompt: 'Count the sunflowers together on your fingers.' },
   C3: { blurb: 'A very big day, and the long way home.', prompt: 'Ask {name} what was big about today. Any answer counts.' },
   C4: { blurb: 'A man, a field, and a handful of seeds.', prompt: 'Pretend to scatter seeds with your hand and let {name} copy you.' },
   C5: { blurb: 'Some nights the sky is just the sky. Some nights it spins.', prompt: 'Trace a slow circle in the air and say "round and round".' },
+  C6: { blurb: 'A rabbit’s ears listen for the sounds of the meadow.', prompt: 'Cup your hands behind your ears and take turns listening for a sound.', learn: 'A burrow is a tunnel under the ground. Rabbits use their ears to hear.' },
 }
 
 export function storyExtras(id) {
-  return STORY_EXTRAS[id] || { blurb: '', prompt: '' }
+  return STORY_EXTRAS[id] || { blurb: '', prompt: '', learn: '' }
 }
 
 // Minutes to read aloud, with pauses for looking at the painting.

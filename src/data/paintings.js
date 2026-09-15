@@ -11,6 +11,26 @@
 // PaintingCanvas will render the image instead — nothing else has to change.
 
 export const PAINTINGS = {
+  // Original app illustrations. These remain separate from the public-domain
+  // museum works below so their provenance stays clear in the reader.
+  robinMeadow: {
+    title: 'Robin in the Meadow', year: 2026,
+    collection: 'BabyCue original illustration', motif: 'animal',
+    file: '/BabyCue/story-art/robin-in-the-meadow.jpg',
+    palette: ['#f6c457', '#9cc7ea', '#7e9c50', '#df7c34', '#fff9e8'],
+  },
+  otterStream: {
+    title: 'Otter and the Pebble', year: 2026,
+    collection: 'BabyCue original illustration', motif: 'animal',
+    file: '/BabyCue/story-art/otter-and-the-pebble.jpg',
+    palette: ['#9ed6d4', '#708b4b', '#8a603e', '#f5eac9', '#d4b15b'],
+  },
+  rabbitBurrow: {
+    title: 'Rabbit by the Burrow', year: 2026,
+    collection: 'BabyCue original illustration', motif: 'animal',
+    file: '/BabyCue/story-art/rabbit-by-the-burrow.jpg',
+    palette: ['#dfb45e', '#8fa367', '#9b673e', '#fff0c7', '#e9b7a6'],
+  },
   bedroom: {
     title: 'The Bedroom', year: 1888,
     collection: 'Van Gogh Museum, Amsterdam',
