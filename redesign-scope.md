@@ -24,7 +24,7 @@ Sizes: **S** ≈ a couple of hours · **M** ≈ a day · **L** ≈ 2–3 days. C
 
 ## Phase 0 — Foundation (one PR, **L**)
 
-**Status 2026-09-14: built on branch `feat/redesign-foundation` (uncommitted, awaiting her review) together with Screen 1 (Today), Screen 2 (Tip detail, optional fields), Screen 3 (Activity detail using the activity-topic tips until `activities.js` exists), Screen 8 (Mood), Profile, the photo-hunt move to Journal, and the typical-numbers tiles on Growth.**
+**Status 2026-09-14 (evening): all eight screens built and committed on `feat/redesign-foundation` — Growth (three segments), Journal (date strip, prompt card, voice memos, compact hunt, search) and Stories (Tonight card, chips, search, reader back/heart/prompt) followed in the same day. Remaining from this doc: real painting images (19 WebP), an `activities.js` with numbered steps, Supabase sync. Originally built first: Screen 1 (Today), Screen 2 (Tip detail, optional fields), Screen 3 (Activity detail using the activity-topic tips until `activities.js` exists), Screen 8 (Mood), Profile, the photo-hunt move to Journal, and the typical-numbers tiles on Growth.**
 
 Nothing below is worth building on the current ad-hoc styling and sheet-only navigation.
 
