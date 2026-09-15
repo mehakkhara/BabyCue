@@ -1,0 +1,4862 @@
+{
+  "1": {
+    "tryToday": "After the next feed, undress {baby} to the diaper and rest {them} on your bare chest.",
+    "whyItMatters": "Bare-chest holding steadies {baby}'s warmth and heart rate while deepening your bond and supporting feeding.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "2": {
+    "tryToday": "When {baby} cries mid-chore, set the task down and go to {them} straight away.",
+    "whyItMatters": "Quick answers show {baby} you are reliable, laying the groundwork for secure attachment — and no, that isn't spoiling.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "3": {
+    "tryToday": "After the morning feed, play on the mat, then settle {baby} down for a nap.",
+    "whyItMatters": "A loose eat-play-sleep order brings predictability to the day without a rigid schedule.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "4": {
+    "tryToday": "Keep a notepad by the changing table and mark each wet or dirty diaper.",
+    "whyItMatters": "A simple log shows whether intake is enough; expect 6–8 wet diapers across the day.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "5": {
+    "tryToday": "Narrate the diaper change aloud: \"Clean one now, then we snap the buttons.\"",
+    "whyItMatters": "Everyday words, books and songs feed the brain connections behind {baby}'s fast-growing language skills.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "6": {
+    "tryToday": "When {baby} smiles at you, smile back and widen your eyes the same way.",
+    "whyItMatters": "Smiles at this age are genuine responses to you, and mirroring them nudges social development along.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "7": {
+    "tryToday": "An hour after {baby} wakes, watch for yawns or eye rubbing, then start naptime.",
+    "whyItMatters": "Catching sleepy signals inside that 60–90 minute window helps you time naps well.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "8": {
+    "tryToday": "Three ten-minute stretches on a blanket, one after each daytime diaper change.",
+    "whyItMatters": "Time on {their} front, spread across the day, strengthens neck, shoulder and core muscles.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "9": {
+    "tryToday": "If {baby} turns away from the rattle, pause quietly until {they} look back at you.",
+    "whyItMatters": "A newly alert, curious baby signals through cues what {they} want and when {they}'ve had enough.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "10": {
+    "tryToday": "Put {baby} down for every nap today in the same safe sleep space.",
+    "whyItMatters": "Repeating one setting links that place with sleep, so naps get easier as weeks pass.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "11": {
+    "tryToday": "Tonight, sit beside the crib, planning to move your chair further away over coming nights.",
+    "whyItMatters": "The four-month regression is genuine; fading your presence gradually avoids leaving {baby} to cry alone.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "12": {
+    "tryToday": "When {baby} says \"ah-goo,\" say \"ah-goo\" back and wait for {their} next turn.",
+    "whyItMatters": "These back-and-forth serve and return exchanges are where language and emotional development are built.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "13": {
+    "tryToday": "Tonight: bath, feed, one song, into the crib — same four steps, same order.",
+    "whyItMatters": "Repeating the same short sequence starts building {baby}'s association between it and falling asleep.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "14": {
+    "tryToday": "Note when {baby} woke, then aim for the next nap about 1.5–2 hours later.",
+    "whyItMatters": "Enough daytime naps keep {baby} from getting overtired, which otherwise makes nights tougher.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "15": {
+    "tryToday": "If {baby} rolls both ways, tuck a small soft lovey into your bedtime cuddle.",
+    "whyItMatters": "Once rolling both ways is established, a small safe comfort object can anchor soothing at sleep.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "16": {
+    "tryToday": "Prop {baby} upright with cushions and set a rattle just within reach.",
+    "whyItMatters": "Playing upright strengthens the core and builds a sense of space before sitting alone arrives.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "17": {
+    "tryToday": "At the next visit, ask: \"How will we know {baby} is ready for solids?\"",
+    "whyItMatters": "",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "18": {
+    "tryToday": "Lay a soft ripe banana spear on the tray and let {baby} grab it.",
+    "whyItMatters": "Feeding {themself} builds motor skills and a healthy relationship with food.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "19": {
+    "tryToday": "Stay within sight when a visitor arrives, and say, \"I'm right here.\"",
+    "whyItMatters": "This wariness shows healthy attachment, and it fades with time and your steady reassurance.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "20": {
+    "tryToday": "Count roughly two hours from waking, then start settling {baby} for the next nap.",
+    "whyItMatters": "Naps that come at predictable times tend to support stronger sleep at night.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "21": {
+    "tryToday": "Notice today whether {baby} is drooling more or chewing on hands and toys.",
+    "whyItMatters": "Extra drool, mouthing and fussiness can begin well before any tooth appears.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "22": {
+    "tryToday": "Keep a soft cloth handy and pat {baby}'s chin dry rather than rubbing it.",
+    "whyItMatters": "Constant wetness irritates chin skin; patting dry plus a thin barrier keeps it protected.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "23": {
+    "tryToday": "Chill a firm silicone teether in the fridge, not the freezer, before offering it.",
+    "whyItMatters": "Firm silicone or rubber, cooled rather than frozen, eases sore gums without added risk.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "24": {
+    "tryToday": "If a high fever or diarrhea shows up alongside fussiness, call your pediatrician.",
+    "whyItMatters": "Teething explains mild grumpiness and drool, not high fever or diarrhea — those suggest illness instead.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "25": {
+    "tryToday": "Wash your hands and rub {baby}'s gums for a slow count to sixty.",
+    "whyItMatters": "Steady counter-pressure eases sore gums, and many babies find the touch settling.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "26": {
+    "tryToday": "Add \"is infant acetaminophen okay for {baby}?\" to your list for the pediatrician.",
+    "whyItMatters": "Teething that disrupts feeding or sleep is worth raising, and benzocaine gels are unsafe for infants.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "27": {
+    "tryToday": "Squeeze a rice-grain dab of fluoride toothpaste onto a soft infant brush tonight.",
+    "whyItMatters": "Starting at the first tooth works best when it feels playful rather than like a struggle.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "28": {
+    "tryToday": "Call the dental office today and book {baby}'s first visit.",
+    "whyItMatters": "The window closes at six months after the first tooth or the first birthday, whichever comes sooner.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "29": {
+    "tryToday": "At the first eye rub near the 2.5-hour mark, head to the nursery.",
+    "whyItMatters": "Settling {baby} before {they} tip into overtired makes falling asleep much smoother.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "30": {
+    "tryToday": "Wake {baby} by the same morning time each day, even after a rough night.",
+    "whyItMatters": "A steady morning wake time anchors the rest of the day's nap schedule.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "31": {
+    "tryToday": "Stir iron-fortified cereal with breast milk and offer a few spoonfuls at lunch.",
+    "whyItMatters": "The iron {baby} stored from breast milk starts running low around six to seven months.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "32": {
+    "tryToday": "Add a small second meal: a few spoonfuls after the afternoon milk feed.",
+    "whyItMatters": "Keep servings small, since milk still supplies most of {baby}'s nutrition at seven months.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "33": {
+    "tryToday": "Hide a soft toy under a cloth and ask, \"Where did it go?\"",
+    "whyItMatters": "Hiding games suit {them} perfectly now that {baby} knows things still exist unseen.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "34": {
+    "tryToday": "Say, \"Bath, then pyjamas, then a story,\" as you move through bedtime.",
+    "whyItMatters": "Knowing what comes next eases fussiness and helps {baby} feel secure.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "35": {
+    "tryToday": "Ring {baby} with cushions and hold a toy slightly off to one side.",
+    "whyItMatters": "Tipping over safely while reaching is how balance and core strength get built.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "36": {
+    "tryToday": "Clear a rug, skip the bouncer, and put {baby} down after breakfast.",
+    "whyItMatters": "Reaching, rolling and early crawling develop best on the floor rather than in seats.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "37": {
+    "tryToday": "Add one more song at bedtime and say, \"I'm right outside, {baby}.\"",
+    "whyItMatters": "Separation anxiety peaks now and can unsettle sleep, so extra bedtime comfort is fitting and short-lived.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "38": {
+    "tryToday": "If {baby} woke at 7, start the morning nap routine around 9:30.",
+    "whyItMatters": "The first nap sets up the whole day, and a too-long one pushes bedtime later.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "39": {
+    "tryToday": "Set three pieces of ripe banana on the tray and sit close while {baby} picks them up.",
+    "whyItMatters": "Grasping small soft pieces develops the pincer grasp and confidence in self-feeding.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "40": {
+    "tryToday": "Offer a few sips of water from a small open cup at dinner.",
+    "whyItMatters": "Practicing now makes the move from bottle to cup at twelve months much easier.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "41": {
+    "tryToday": "Set out two stacking cups at floor time and let {baby} knock them down.",
+    "whyItMatters": "Toys that react to {their} actions show {baby} their actions cause results, and keep {them} interested longer than passive toys.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "42": {
+    "tryToday": "Read the same animal board book again, even if it is the third time today.",
+    "whyItMatters": "Repeating a favourite book is not dull for {baby} — it is exactly how learning happens.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "43": {
+    "tryToday": "Notice how {baby} crosses the room today, scooting or rolling, without comparing {them} to others.",
+    "whyItMatters": "What counts is that {baby} is moving and exploring; crawling or skipping it are both normal.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "44": {
+    "tryToday": "Put a rolling ball an arm's length away during floor time.",
+    "whyItMatters": "Reaching to move builds the arm strength and coordination crawling and pulling up will need.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "45": {
+    "tryToday": "When {baby} wakes tonight, settle {them} quietly and skip the urge to change anything.",
+    "whyItMatters": "A single night waking at nine months falls within the normal biological range and may need no changes.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "46": {
+    "tryToday": "If {baby} fights the third nap again, try a three-hour stretch between the two.",
+    "whyItMatters": "Consistently refusing that last nap can signal readiness for a two-nap day with longer wake windows.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "47": {
+    "tryToday": "Fork-mash the cooked carrot today instead of blending it smooth.",
+    "whyItMatters": "Meeting varied textures now makes fussy, selective eating less likely later on.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "48": {
+    "tryToday": "Serve lunch around noon and a small snack mid-afternoon, at the same times daily.",
+    "whyItMatters": "A steady schedule helps {baby}'s hunger signals settle into a reliable pattern.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "49": {
+    "tryToday": "While unpacking groceries, name each item aloud and answer {their} babbles back.",
+    "whyItMatters": "Understanding arrives before speech, so your naming and responding land even when {baby} cannot say the words yet.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "50": {
+    "tryToday": "On your walk, point and name: \"bus,\" \"dog,\" \"tree.\"",
+    "whyItMatters": "Naming what you point at turns any ordinary outing into language practice for {baby}.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "51": {
+    "tryToday": "Drop the crib mattress to its lowest setting before tonight's bedtime.",
+    "whyItMatters": "Pulling upright on furniture is valuable weight-bearing practice, so the sleep space needs to stay safe for it.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "52": {
+    "tryToday": "Gate one room, clear hazards, and let {baby} roam without redirecting {them}.",
+    "whyItMatters": "Exploring without interruption grows motor confidence and problem-solving skills.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "53": {
+    "tryToday": "Keep bath, book, bed in the same order tonight, even if {baby} protests.",
+    "whyItMatters": "Disruption at this stage links to developmental leaps and usually settles within two to four weeks.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "54": {
+    "tryToday": "Set a bedtime alarm for yourself so the routine starts at the same hour.",
+    "whyItMatters": "An early, steady bedtime safeguards the overnight and daytime hours {baby} still needs.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "55": {
+    "tryToday": "Lay a towel under the high chair and let {them} squish avocado.",
+    "whyItMatters": "Hands in the food is how sensory tolerance and fine motor skills develop.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "56": {
+    "tryToday": "Set a mid-morning snack time instead of leaving crackers out all morning.",
+    "whyItMatters": "Snacks at set times help {baby} regulate hunger and arrive at meals ready to eat.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "57": {
+    "tryToday": "When {baby} claps, clap straight back and say, \"You're clapping.\"",
+    "whyItMatters": "Mirroring each gesture you see encourages {baby} to keep making them.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "58": {
+    "tryToday": "Hold out your hand during play and say, \"Give me the ball.\"",
+    "whyItMatters": "One-step requests grow {baby}'s understanding and prepare {their} brain to follow directions later.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "59": {
+    "tryToday": "Move a sturdy chair near the couch so {baby} can side-step from one to the other.",
+    "whyItMatters": "Side-stepping along furniture is how babies get ready for walking.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "60": {
+    "tryToday": "Set a sturdy push toy in the hallway and walk alongside as {baby} pushes it.",
+    "whyItMatters": "Pushing something solid lets {baby} practice being upright with support while leg strength grows.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "61": {
+    "tryToday": "Start the nap routine at the usual time today, even if {baby} protests.",
+    "whyItMatters": "Babies this age often resist naps they still need, and the pushback usually fades with steady timing.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "62": {
+    "tryToday": "Wake {baby} gently after 60 minutes of the morning nap today.",
+    "whyItMatters": "A shorter morning nap can help a tired baby who is fighting sleep but isn't ready for one nap.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "63": {
+    "tryToday": "Pull the high chair up to the table and eat your lunch alongside {them}.",
+    "whyItMatters": "Eating with family widens the foods {baby} sees and shapes habits for years.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "64": {
+    "tryToday": "Shorten one overnight feed by a few minutes rather than dropping it outright.",
+    "whyItMatters": "Daytime eating now covers {baby}'s nutrition, so overnight calories are no longer needed.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "65": {
+    "tryToday": "Notice whether {baby} points at a passing dog just to share it with you.",
+    "whyItMatters": "Pointing to share, not only to ask for things, is a key early sign of communication.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "66": {
+    "tryToday": "Ask, \"Where's your nose?\" then, \"Where's my nose?\" and pause.",
+    "whyItMatters": "{baby} enjoys showing off what {they} know, and that delight speeds up word learning.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "67": {
+    "tryToday": "Let go of {baby}'s hands for a moment near the sofa and stay close.",
+    "whyItMatters": "Standing and balancing alone, even with falls, is what brings first steps closer.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "68": {
+    "tryToday": "Leave {baby} barefoot on the rug for today's indoor walking practice.",
+    "whyItMatters": "Bare feet or soft-soled socks support balance and foot strength better than hard shoes.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "69": {
+    "tryToday": "Keep both naps on the calendar today rather than trialling a single midday one.",
+    "whyItMatters": "Most babies at twelve months still need two naps; the switch to one usually comes at 15 to 18 months.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "70": {
+    "tryToday": "Set a phone reminder for 6:45 PM to start {baby}'s bedtime routine.",
+    "whyItMatters": "Keeping bedtime inside that early evening window gives {baby} the strongest stretch of overnight sleep.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "71": {
+    "tryToday": "Mix a little whole milk into {their} usual milk at breakfast.",
+    "whyItMatters": "",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "72": {
+    "tryToday": "Swap the afternoon bottle for milk in a cup, starting today.",
+    "whyItMatters": "Staying on bottles past this stage is tied to tooth decay and low iron.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "73": {
+    "tryToday": "Notice {baby} saying \"ball\" while looking at you and reaching for it.",
+    "whyItMatters": "Intent to communicate through words, gestures, and eye contact counts for more than the word count.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "74": {
+    "tryToday": "Jot two questions in your phone before the 12-month visit.",
+    "whyItMatters": "This visit covers a lot at once, so arriving with questions ready helps.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "75": {
+    "tryToday": "When someone asks if {baby} walks yet, say: \"{They}'re cruising — it will come.\"",
+    "whyItMatters": "Walking anywhere from 10 to 15 months is normal, and cruising shows it is coming.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "76": {
+    "tryToday": "Latch the stair gate, then practice turning {baby} belly-down, feet-first on one step.",
+    "whyItMatters": "Now that {baby} is mobile, safe stair navigation is a skill worth practicing early.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "101": {
+    "tryToday": "Lay {baby} on your chest and read whatever book is nearest, in a low voice.",
+    "whyItMatters": "Your voice, heartbeat and warmth together soothe and stimulate {them}, even before words mean anything.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "102": {
+    "tryToday": "Roll a hand towel under {their} chest and lie down nose-to-nose for two minutes.",
+    "whyItMatters": "Being face-to-face at {their} level keeps {baby} interested through these short sessions.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "103": {
+    "tryToday": "Hold a striped card a hand's length away and drift it slowly left to right.",
+    "whyItMatters": "Bold contrast suits brand-new eyes, so {baby} can lock on and track the movement.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "104": {
+    "tryToday": "Sing the same two songs, same order, just before you lay {them} down tonight.",
+    "whyItMatters": "Repeating the same order builds a sleep cue that pays off in coming weeks.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "105": {
+    "tryToday": "Guide {their} hand to tap the dangling rattle, then wait for the surprised look.",
+    "whyItMatters": "Feeling the toy move and sound tells {baby} the cause was {them}.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "106": {
+    "tryToday": "Run a shallow warm bath and let {their} legs kick without holding them still.",
+    "whyItMatters": "Free kicking builds the leg strength {baby} will draw on for rolling and crawling.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "107": {
+    "tryToday": "Drape a muslin over your face, pause, then pull it away with a soft \"boo\".",
+    "whyItMatters": "The wait and the reveal exercise the very thinking that object permanence later grows from.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "108": {
+    "tryToday": "Shake a rattle by {their} left ear, then the right, then above {their} head.",
+    "whyItMatters": "Turning to find the sound strengthens neck muscles while sharpening early listening.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "109": {
+    "tryToday": "Bounce {them} on your knees to \"Row, Row, Row Your Boat\", facing you.",
+    "whyItMatters": "Leaning in before the bounce shows {baby} is predicting it, an early form of humour.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "110": {
+    "tryToday": "Line up a rattle, a cloth book and a teether just within arm's reach.",
+    "whyItMatters": "Working along the row means repeated reaching and grasping, which sharpens fine motor skills quickly.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "111": {
+    "tryToday": "Set a shallow bowl of warm water on a towel and stay right beside {them}.",
+    "whyItMatters": "The feel of water on {their} hands holds {baby}'s interest for a surprisingly long time.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "112": {
+    "tryToday": "Offer a soft piece of ripe avocado to squeeze and sniff before any spoon appears.",
+    "whyItMatters": "Happy early experiences touching and smelling food strongly predict easier eating later on.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "113": {
+    "tryToday": "Slide {their} favorite rattle under a blanket while {they} watch, then pause and wait.",
+    "whyItMatters": "Uncovering the toy feeds the understanding, clicking now, that things still exist when hidden.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "114": {
+    "tryToday": "Hand {baby} a plastic cup and three soft balls to drop in and tip out.",
+    "whyItMatters": "This drop-in, dump-out loop holds {their} attention far longer than any electronic toy.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "115": {
+    "tryToday": "Play a lullaby and sway, then a fast song and bounce {their} arms.",
+    "whyItMatters": "Babies this age visibly react to tempo changes, so it is musical training dressed up as play.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "116": {
+    "tryToday": "Sit facing {baby} on the rug and roll a soft ball between your legs.",
+    "whyItMatters": "Sending the ball back and forth is {their} first turn-taking game, a big social step.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "117": {
+    "tryToday": "Save a delivery box, open both ends, and tuck a soft toy inside.",
+    "whyItMatters": "An enclosed space is genuinely thrilling at nine months, and it costs you nothing.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "118": {
+    "tryToday": "Line up cushions, drape a blanket over two chairs, and put a toy at the end.",
+    "whyItMatters": "A set-up challenge grows crawling confidence and gives {baby} something to figure out.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "119": {
+    "tryToday": "Spoon yogurt with mashed raspberry onto the high chair tray and let {baby} smear.",
+    "whyItMatters": "It is safe to taste, wipes away easily, and makes for wonderful photos.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "120": {
+    "tryToday": "Push a soft ball down the hallway and cheer as {baby} crawls after it.",
+    "whyItMatters": "Short, structured rounds of chasing and returning the ball grow motor skills and anticipation.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "121": {
+    "tryToday": "Stop at the park gate and let {baby} press a palm into grass and bark.",
+    "whyItMatters": "Nature offers more sensory variety than any toy store, and the fresh air lifts everyone.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "122": {
+    "tryToday": "Set out a one-piece knob puzzle and show {baby} how to lift and replace it.",
+    "whyItMatters": "It asks for patience, but {their} concentration and eventual triumph make every attempt worth it.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "123": {
+    "tryToday": "Fill a basket with a wooden ring, silicone spoon, fabric square, and soft ball.",
+    "whyItMatters": "Emptying and examining varied textures keeps {baby} investigating, and the basket can be replayed endlessly.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "124": {
+    "tryToday": "Stack three foam blocks, wait for the swipe, then rebuild while {baby} watches.",
+    "whyItMatters": "Building and knocking down, over and over, is exactly the kind of play that suits a twelve-month-old.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "200": {
+    "tryToday": "Swaddle {baby}, hold {them} on {their} side, shush close to {their} ear, then sway.",
+    "whyItMatters": "Used together and in order, these steps settle most newborns far better than any single one.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "201": {
+    "tryToday": "Jot the start and end time of tonight's fussy stretch on the fridge.",
+    "whyItMatters": "Three days of notes turn unpredictable crying into an expected window you can plan around.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "202": {
+    "tryToday": "Mark today on the calendar as the peak, and tell yourself it eases from here.",
+    "whyItMatters": "Fussiness tops out near six weeks, so the hardest stretch is likely the one you're in now.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "203": {
+    "tryToday": "Start winding down for the nap 60 minutes after {baby} woke, not later.",
+    "whyItMatters": "Just twenty extra awake minutes can push {baby} into overtiredness that sours the hours ahead.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "204": {
+    "tryToday": "Offer an extra feed this afternoon and let the laundry wait.",
+    "whyItMatters": "A spurt near three months brings a few hungrier, fussier days that pass within about a week.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "205": {
+    "tryToday": "After the shops, take {baby} to a dim quiet room for twenty minutes.",
+    "whyItMatters": "Alert three-month-olds tip into overload easily, and less light and noise is often enough to reset.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "206": {
+    "tryToday": "Wear {baby} in the carrier through one fussy stretch this afternoon.",
+    "whyItMatters": "Sleep cycles have shifted for good, and the tiredness that follows makes everything feel heavier.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "207": {
+    "tryToday": "Run naptime in the same order today: dim the room, sleep sack, one short song.",
+    "whyItMatters": "Knowing what comes next removes the uncertainty behind much of the fussiness at this age.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "208": {
+    "tryToday": "When today feels hard, name it out loud: sore gums and a leap together.",
+    "whyItMatters": "Teething and a developmental leap landing at once is why this month feels like one of the harder ones.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "209": {
+    "tryToday": "Jot down {baby}'s hungriest, grumpiest stretches to bring to your next pediatrician visit.",
+    "whyItMatters": "With more movement and milk satisfying less, hunger-driven fussiness often climbs near six months.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "210": {
+    "tryToday": "When {baby} cries at the door, remind yourself this is attachment working.",
+    "whyItMatters": "{baby} now knows you still exist after you leave, so the upset is healthy attachment rather than a problem.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "211": {
+    "tryToday": "Note today's date in your phone and watch for a new skill this week.",
+    "whyItMatters": "A sudden jump in fussiness often comes right before {baby} masters something new.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "212": {
+    "tryToday": "Chill a teether before bed and add a few extra minutes of cuddling.",
+    "whyItMatters": "One small routine covers both sore gums and the worry about being apart from you.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "213": {
+    "tryToday": "Keep tonight's bedtime steps in exactly the same order, even after an off day.",
+    "whyItMatters": "Knowing exactly what comes next is what helps babies most during fussy stretches.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "214": {
+    "tryToday": "When {baby} whines at the couch edge, watch: {they} are working hard at cruising.",
+    "whyItMatters": "Early standing and walking attempts are tiring and frustrating, so this fussiness usually reflects real effort.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "215": {
+    "tryToday": "Start today's nap fifteen minutes earlier than the usual time.",
+    "whyItMatters": "Trimming a little awake time keeps {baby} from tipping into overtiredness, which eases much of the fussing.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "216": {
+    "tryToday": "When clinginess peaks today, tell yourself: new mobility, sleep changes, and a leap at once.",
+    "whyItMatters": "Several changes collide near the first birthday, so this emotional stretch is developmental and temporary.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "217": {
+    "tryToday": "Set today's snack at the same clock time between lunch and dinner.",
+    "whyItMatters": "Steady meal and snack timing helps even out hunger signals as milk drops and solids grow.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "220": {
+    "tryToday": "Catch one quiet, alert moment today and simply hold {baby}'s gaze.",
+    "whyItMatters": "Sharper senses flood {baby} with input, which brings fussiness alongside the first real alertness and engagement.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "221": {
+    "tryToday": "Dim the lamp and turn off the music when the evening fussing starts.",
+    "whyItMatters": "An overstimulated newborn settles with less coming in, and steady feeding and sleep windows carry extra weight now.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "222": {
+    "tryToday": "Hold {baby} about a forearm's length from your face and let {them} study you.",
+    "whyItMatters": "{baby} is beginning to pick out patterns like your face and voice, which fuels that intense focused staring.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "223": {
+    "tryToday": "Offer another feed even though the last one ended forty minutes ago.",
+    "whyItMatters": "The extra feeding is driven by a brain asking for more energy during fast growth, and it passes.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "224": {
+    "tryToday": "Move a rattle slowly across {baby}'s view and watch {their} eyes follow it.",
+    "whyItMatters": "Smoother eye tracking is the visible sign that {baby} now grasps continuous movement and transitions.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "225": {
+    "tryToday": "Write today's nap and feed times on the fridge to firm up the rhythm.",
+    "whyItMatters": "This settled stretch is your chance to set a steadier schedule before the next leap lands around nineteen weeks.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "226": {
+    "tryToday": "Notice {baby} anticipating the end of the bath before you lift {them} out.",
+    "whyItMatters": "Grasping that events have a start, middle and finish is a large jump, which is why sleep wobbles now.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "227": {
+    "tryToday": "Keep today's nap and bedtime where they were, even after a rough night.",
+    "whyItMatters": "This leap runs four to five weeks and disrupts a lot, so the schedule is what holds things steady.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "228": {
+    "tryToday": "Keep bedtime at its usual time tonight and take an unhurried cuddle first.",
+    "whyItMatters": "This calmer gap is a good moment to enjoy {baby} and firm up sleep habits before around twenty-six weeks.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "229": {
+    "tryToday": "Add ten minutes of floor play after the morning feed, before the clingy stretch.",
+    "whyItMatters": "Clinginess and fussing often build ahead of this leap, so daytime connection and a tighter schedule help.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "230": {
+    "tryToday": "Hide behind a muslin, pop out, and watch how differently peek-a-boo lands now.",
+    "whyItMatters": "{baby} is working out how things relate to each other, so hiding and reappearing suddenly makes sense.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "231": {
+    "tryToday": "Start the nap routine at the usual time even if {baby} seems wide awake.",
+    "whyItMatters": "Naps take the hit during this leap, and stretching wake time only adds overtiredness to the mix.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "232": {
+    "tryToday": "Notice how firmly {baby} chooses one particular cup at lunch today.",
+    "whyItMatters": "Sorting the world into groups, like familiar versus stranger, is what sits behind these sudden strong preferences.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "233": {
+    "tryToday": "Keep snack, nap and walk in their usual order even on a clingy day.",
+    "whyItMatters": "A predictable daily rhythm gives {baby} the security needed to handle separation while this leap unsettles things.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "234": {
+    "tryToday": "Put a basket and a few blocks on the floor and let {baby} fill it.",
+    "whyItMatters": "{baby} now understands that actions follow an order toward a goal, which is why containers hold such appeal.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "235": {
+    "tryToday": "Set out a cup and a few blocks and let {baby} fill and dump.",
+    "whyItMatters": "Cause-and-effect play gives {their} new understanding a productive outlet during wake windows.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "236": {
+    "tryToday": "Notice {baby} using a spoon at lunch, then trying the same motion on a toy bowl.",
+    "whyItMatters": "Walking, talking and self-feeding arrive together because {they} can now apply skills flexibly in different ways.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "237": {
+    "tryToday": "Serve lunch at the same clock time today, even with walking and weaning underway.",
+    "whyItMatters": "Predictable sleep and meal timing is what keeps a month of simultaneous changes manageable.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "240": {
+    "tryToday": "Note today's date and expect things to level out within about six weeks.",
+    "whyItMatters": "This is a lasting shift in how {baby} sleeps, so it settles rather than undoes itself.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "241": {
+    "tryToday": "Wake {baby} at the usual morning time tomorrow, even after a broken night.",
+    "whyItMatters": "Holding wake times steady is what gets your family through this stretch quickest.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "242": {
+    "tryToday": "Offer an extra feed and a longer cuddle tonight if {baby} seems unsettled.",
+    "whyItMatters": "For babies who do hit this, extra food, closeness, and patience usually sort it within a week or two.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "243": {
+    "tryToday": "Write down today's wake windows and check they stretch to two or three hours.",
+    "whyItMatters": "An out-of-date schedule is often behind the sudden change, not a genuine regression.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "244": {
+    "tryToday": "Stay beside {baby} tonight until {they} are drowsy, without hurrying out.",
+    "whyItMatters": "This wobble comes from missing you, so added reassurance is both fitting and useful.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "245": {
+    "tryToday": "Keep bedtime at the usual hour tonight, but add extra patting or singing.",
+    "whyItMatters": "The structure stays put because it speeds things up; only the settling help needs to grow for now.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "246": {
+    "tryToday": "Go in, comfort {baby} warmly, then settle {them} back in the cot.",
+    "whyItMatters": "Warm responses without new permanent habits is the balance that carries you through these few weeks.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "247": {
+    "tryToday": "Hold the sleep schedule steady this week and park the nap change.",
+    "whyItMatters": "Shifting several things together stretches out every disruption instead of shortening it.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "248": {
+    "tryToday": "When bedtime unravels tonight, remind yourself several changes are landing at once.",
+    "whyItMatters": "There is no single cause here; naps, movement, and words are all shifting together.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "249": {
+    "tryToday": "Start bath at 5:30 tonight so lights go out by 6:15.",
+    "whyItMatters": "Being overtired drags a regression out, while extra overnight sleep helps break the loop sooner.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "300": {
+    "tryToday": "Keep both naps on today's plan, birthday or not.",
+    "whyItMatters": "Letting go of a nap too soon builds overtiredness that comes back to disturb the night.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "301": {
+    "tryToday": "Write 7am, 9:30, 2:30, 7pm on a sticky note by the door.",
+    "whyItMatters": "Repeating the same four times each day gives the whole day a steady frame.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "302": {
+    "tryToday": "Notice {baby} leaving half of lunch, and clear the plate without comment.",
+    "whyItMatters": "Growth slows sharply after the first birthday, so {their} body simply needs less fuel.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "303": {
+    "tryToday": "Write today's plan: breakfast, snack, lunch, snack, dinner — and keep to those times.",
+    "whyItMatters": "Constant nibbling blurs hunger signals, while predictable eating times ease meals and shape lasting habits.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "304": {
+    "tryToday": "Notice {baby} lifting an empty cup toward you to ask for more.",
+    "whyItMatters": "Purposeful sharing and requesting tells you more than how many words {they} have.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "305": {
+    "tryToday": "{They} point at a bird — look, smile, and say, \"A bird, I see it.\"",
+    "whyItMatters": "Warm responses to sharing points speed language along, so answer each one.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "306": {
+    "tryToday": "Fill a basket with a wooden spoon, scarf, metal cup, pinecone, and sponge.",
+    "whyItMatters": "At this age, poking and mouthing objects with no set goal is deeply satisfying exploration.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "307": {
+    "tryToday": "Sit facing {baby}, roll a soft ball over, and say \"your turn\" when it comes back.",
+    "whyItMatters": "Taking turns with a ball gives {baby} a first taste of how social games are structured.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "308": {
+    "tryToday": "Let {baby} stand alone on the rug for a few seconds, arms out wide.",
+    "whyItMatters": "Short stretches of standing alone build balance faster than holding hands the whole time.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "309": {
+    "tryToday": "Pile cushions on the floor and let {baby} climb over and get back up.",
+    "whyItMatters": "Crawling, climbing and getting up and down strengthen the muscles behind steady, confident walking.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "310": {
+    "tryToday": "When a stacking attempt ends in tears, remind yourself how much thinking just went into it.",
+    "whyItMatters": "Combining and applying skills flexibly carries an enormous mental load, which shows up as emotional intensity.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "311": {
+    "tryToday": "Sit on the floor after dinner and let {baby} climb in and out of your lap.",
+    "whyItMatters": "Several changes land at once just after the first birthday, so {baby} needs more closeness, not less.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "312": {
+    "tryToday": "Time how long {baby} takes to fall asleep after protesting at nap time.",
+    "whyItMatters": "Dropping off fast after a fuss shows the nap is still needed, not outgrown.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "313": {
+    "tryToday": "Set a 45-minute timer when {baby} falls asleep this morning.",
+    "whyItMatters": "A long morning sleep knocks the afternoon nap off course and drags bedtime later.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "314": {
+    "tryToday": "Serve the cheese {they} turned down yesterday again, with no comment.",
+    "whyItMatters": "Rejecting familiar foods is normal wariness; acceptance grows from offering again without pressure.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "315": {
+    "tryToday": "Serve dinner, then sit down and let {baby} decide what to eat.",
+    "whyItMatters": "When you stop steering how much goes in, intake tends to improve over time.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "316": {
+    "tryToday": "Narrate the grocery aisle: \"Cold milk, red apples, and we need bread.\"",
+    "whyItMatters": "The more words {they} hear during this window, the larger the coming burst tends to be.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "317": {
+    "tryToday": "Hand {them} a spare wooden spoon and bowl while you stir dinner.",
+    "whyItMatters": "Copying your everyday actions is how toddlers learn, so safe duplicates give {them} something real to mirror.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "318": {
+    "tryToday": "Hand {baby} a toy spoon and doll and say, \"Time for dolly's breakfast.\"",
+    "whyItMatters": "Feeding or tucking in a doll signals a big step forward in imagination and early empathy.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "319": {
+    "tryToday": "Put red and blue blocks in a pile with two bowls, and drop one in as {baby} watches.",
+    "whyItMatters": "Even a rough, half-sorted pile counts as meaningful development at fourteen months.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "320": {
+    "tryToday": "Set a couch cushion beside a low foam step so {baby} can climb safely.",
+    "whyItMatters": "Giving one approved place to climb meets the urge rather than leaving you repeating no.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "321": {
+    "tryToday": "Walk the grass strip by the sidewalk, then the tiled hallway, on today's outing.",
+    "whyItMatters": "Varied ground under {their} feet sharpens balance and body awareness more than smooth indoor floors.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "322": {
+    "tryToday": "When {baby} drops food off the tray again, read it as an experiment, not defiance.",
+    "whyItMatters": "Limit-testing is how {they} work out the rules that govern how things and people behave.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "323": {
+    "tryToday": "Mark today on the calendar so you can watch the weeks tick by.",
+    "whyItMatters": "Leaps, shifting naps, and new independence are behind this, and it usually eases within two to six weeks.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "324": {
+    "tryToday": "Note how long each nap takes to start today, and whether bedtime slips late.",
+    "whyItMatters": "Those specific signs separate true readiness from a schedule that simply needs adjusting.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "325": {
+    "tryToday": "Serve a small portion and let the rest stay in the bowl.",
+    "whyItMatters": "Growth has slowed a lot, so eating very little at this age is usually nothing unusual.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "326": {
+    "tryToday": "Start a three-day food diary in your phone notes before the checkup.",
+    "whyItMatters": "A written record shows a truer picture of eating than trying to recall it later.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "327": {
+    "tryToday": "Notice if new words pause this week while {they} practice steady walking.",
+    "whyItMatters": "The brain works on one big skill at a time; words often surge once walking feels easy.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "328": {
+    "tryToday": "Jot down which you've seen: walking, three words, pointing, waving, imitating.",
+    "whyItMatters": "These are the skills the 15-month visit looks at, so noticing them helps.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "329": {
+    "tryToday": "Set a washing-up tub of water and two cups on the grass after lunch.",
+    "whyItMatters": "Pouring and splashing is early physics learning, wrapped up as pure enjoyment.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "330": {
+    "tryToday": "Put a shaker in {baby}'s hand and let {them} set the beat while you follow.",
+    "whyItMatters": "Making sound happen on {their} own terms supports rhythm, motor control, and creativity.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "331": {
+    "tryToday": "Drop a sock near {baby}'s feet and watch {them} squat down and stand back up.",
+    "whyItMatters": "That full squat-and-rise takes real effort and marks growing core strength.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "332": {
+    "tryToday": "Offer a weighted toy cart down the hallway and walk beside {baby}.",
+    "whyItMatters": "A steady but light toy supports walking confidence while balance is still coming together.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "333": {
+    "tryToday": "Keep tonight's order exactly the same: bath, two books, the same song.",
+    "whyItMatters": "The familiar sequence soothes and tells {baby} what comes next while everything else feels unsteady.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "334": {
+    "tryToday": "Put today's single nap at noon and start bedtime at 6:15 PM.",
+    "whyItMatters": "A midday nap splits the day evenly, and an earlier night covers the gap while {baby} adjusts.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "335": {
+    "tryToday": "Wake {baby} around 7am tomorrow, even if it's the weekend.",
+    "whyItMatters": "Morning wake time is the anchor the nap and bedtime hang from, so keep it steady.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "336": {
+    "tryToday": "Lay a mat under the highchair and let {baby} squish {their} pasta.",
+    "whyItMatters": "Squishing and dropping food is how toddlers learn texture, cause and effect, and self-regulation.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "337": {
+    "tryToday": "Pull {their} chair to the table tonight, even if {they} only nibble.",
+    "whyItMatters": "Sitting together shows {baby} what eating looks like and widens the variety {they} meet.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "338": {
+    "tryToday": "During the next meltdown, sit nearby quietly instead of explaining or correcting.",
+    "whyItMatters": "A tantrum is an overwhelmed nervous system, and your steady presence helps more than correction does.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "339": {
+    "tryToday": "Say it as it happens: \"You're frustrated because the block won't fit.\"",
+    "whyItMatters": "Hearing their states named builds the words {they}'ll later use to say it themselves.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "340": {
+    "tryToday": "Take chalk to the pavement and let {baby} make big sweeping arm scribbles.",
+    "whyItMatters": "Drawing large on a big surface works the shoulders and builds a sense of space.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "341": {
+    "tryToday": "Sit beside {baby} and say, \"That one has three corners,\" without moving the piece.",
+    "whyItMatters": "Letting {baby} wrestle with it is the whole point, building problem-solving, spatial thinking, and fine motor skill.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "342": {
+    "tryToday": "Take {baby} to a grassy patch and let {them} run toward you and back.",
+    "whyItMatters": "Soft ground cushions the many falls that come with running, so {baby} keeps trying.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "343": {
+    "tryToday": "Hold one hand and climb three stairs together, then come back down.",
+    "whyItMatters": "Stairs get less risky once {baby} can manage them with confidence.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "344": {
+    "tryToday": "Keep one cold teether ready in the fridge door for the fussy stretch today.",
+    "whyItMatters": "Canines have longer, sharper roots than other teeth, which is why this stretch hurts more.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "345": {
+    "tryToday": "Write down a question about bedtime pain relief before your next pediatrician call.",
+    "whyItMatters": "Canines can upset sleep that had been steady for months, so rough nights aren't a setback.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "346": {
+    "tryToday": "Move tonight's lights out to 6:30 if late afternoon turned tearful.",
+    "whyItMatters": "An earlier night offsets the crankiness while the single-nap rhythm settles over four to six weeks.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "347": {
+    "tryToday": "If today's nap ended early, start bedtime thirty minutes sooner.",
+    "whyItMatters": "Missed sleep piles up quickly and tends to surface as tantrums and extra clinginess.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "348": {
+    "tryToday": "\"Soft banana, crunchy cracker\" — name what's on the tray as you serve it.",
+    "whyItMatters": "Words for foods, colors and textures feed {their} wider vocabulary during this language surge.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "349": {
+    "tryToday": "Set snack at ten and three today, with nothing in between.",
+    "whyItMatters": "Spacing snacks lets hunger build, so {baby} comes to meals ready to try something new.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "350": {
+    "tryToday": "When {they} babble at the window, stop and answer like real conversation.",
+    "whyItMatters": "Talking, reading, and truly listening support the two to four new words arriving daily.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "351": {
+    "tryToday": "Jot down any two-word combos you hear today, like \"more milk.\"",
+    "whyItMatters": "",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "352": {
+    "tryToday": "Pour dried pasta into a shallow bin with a cup and spoon on a towel.",
+    "whyItMatters": "Toddlers genuinely want this kind of touch input, and it exercises small fingers for a good long stretch.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "353": {
+    "tryToday": "Offer a sticker sheet for ten minutes, then tape the result to the fridge.",
+    "whyItMatters": "Seeing their work on display builds pride and makes {baby} want to create again.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "354": {
+    "tryToday": "Set a large ball down and ask {baby} to kick it toward the open door.",
+    "whyItMatters": "Aiming a kick works balance and coordination, and it is fun for you both.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "355": {
+    "tryToday": "Line up a laundry basket and take turns throwing soft balls into it.",
+    "whyItMatters": "A throwing game channels the new overhead aim somewhere better than your furniture.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "356": {
+    "tryToday": "When {baby} grabs a cup and says \"mine,\" notice {they}'re testing how ownership works.",
+    "whyItMatters": "The constant \"why\" and \"mine\" are {them} mapping the interconnected rules the world runs on.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "357": {
+    "tryToday": "Chill cucumber spears in the fridge and offer one at dinner tonight.",
+    "whyItMatters": "Canines finish erupting around now, which is why many parents call this the hardest teething stretch.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "358": {
+    "tryToday": "Run tonight's routine in the usual order, even if bedtime feels harder.",
+    "whyItMatters": "With language, autonomy, and Leap 10 all at once, patience and a steady routine are what carry you through.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "359": {
+    "tryToday": "At 2am, walk {baby} back to the crib instead of starting something new.",
+    "whyItMatters": "Holding the usual structure, rather than adding fresh night habits, is what makes this stretch shorter.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "360": {
+    "tryToday": "Serve the plate, then eat your own meal with visible enjoyment.",
+    "whyItMatters": "Taking emotion out of meals works better than pushing, just as battles reach their peak.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "361": {
+    "tryToday": "Offer milk in a cup after dinner rather than before it.",
+    "whyItMatters": "Extra milk crowds out solid food, leaving less room for what's on the plate.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "362": {
+    "tryToday": "Note {baby}'s word count and one pointing example on your phone before the visit.",
+    "whyItMatters": "The visit includes a developmental and autism screen, so those exact questions will come up.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "363": {
+    "tryToday": "List the words {baby} used this week and bring the list to the visit.",
+    "whyItMatters": "Beginning speech support early works considerably better than taking a wait-and-see approach.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "364": {
+    "tryToday": "Take a twenty-minute walk round the block after the afternoon nap.",
+    "whyItMatters": "Time outside noticeably helps sleep, mood, and behaviour, and offers sensory input indoors cannot match.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "365": {
+    "tryToday": "Read three short story books today: one after breakfast, one before nap, one at bedtime.",
+    "whyItMatters": "Few things give as much back for language and thinking at this age as daily story reading.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "366": {
+    "tryToday": "Head to an open patch of park and let {baby} run wherever {they} like.",
+    "whyItMatters": "Free outdoor running sharpens motor skills and settles {baby} when the mood has tipped.",
+    "minutes": 25,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "367": {
+    "tryToday": "Put lids and small containers on a tray for {baby} to open and close.",
+    "whyItMatters": "This kind of play builds the pincer grasp and hand strength writing will later need.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "368": {
+    "tryToday": "Comfort {baby} in {their} own room tonight rather than starting something new.",
+    "whyItMatters": "Almost every family meets this, it passes, and the aim is coming out without fresh sleep crutches.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "369": {
+    "tryToday": "Tonight, count it a win if {baby} settles reasonably in {their} own space.",
+    "whyItMatters": "Flawless sleep is not the standard right now; getting through is.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "370": {
+    "tryToday": "Notice what {baby} was trying to tell you just before today's meltdown started.",
+    "whyItMatters": "Most meltdowns come from wanting to say something without the words yet, and each new word eases that strain.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "371": {
+    "tryToday": "Say, \"It's rest time — books and blanket. You don't have to sleep.\"",
+    "whyItMatters": "An hour of quiet in the crib still gives you both the break you need.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "372": {
+    "tryToday": "Keep today's nap at the same time, with the same words, despite the protest.",
+    "whyItMatters": "At this age nap refusal is limit-testing, and most toddlers keep napping until around three.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "373": {
+    "tryToday": "Serve the beloved pasta with a spoonful of something different beside it.",
+    "whyItMatters": "Eating the same few foods for weeks passes; keep variety on the plate meanwhile.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "374": {
+    "tryToday": "Load a spoon with oatmeal and set it beside {their} hand.",
+    "whyItMatters": "Thick foods stay on the spoon, so {baby} gets real practice — mess included.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "375": {
+    "tryToday": "At lunch, offer: \"Red cup or blue cup?\"",
+    "whyItMatters": "All those no's show {them} discovering autonomy; small choices respect that inside limits you keep safe.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "376": {
+    "tryToday": "\"Get your shoes and bring them here.\"",
+    "whyItMatters": "Daily practice strengthens understanding, memory and cooperation in one small exchange.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "377": {
+    "tryToday": "Put a lump of playdough on the table and let {baby} squish it however {they} like.",
+    "whyItMatters": "Free poking and flattening strengthens fingers and grows creativity and sustained attention.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "378": {
+    "tryToday": "Say \"one, two, three\" as each block goes on, and ask, \"How tall can we go?\"",
+    "whyItMatters": "One tower covers big-body movement, early number sense, and new words at the same time.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "379": {
+    "tryToday": "Step backwards yourself in the hallway and see if {baby} copies the wobbly walk.",
+    "whyItMatters": "Moving backwards demands careful spatial planning, which is why the concentration is so visible.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "380": {
+    "tryToday": "Roll the balance bike out after breakfast and walk alongside for ten minutes.",
+    "whyItMatters": "Bikes without pedals build balance and coordination more effectively than tricycles right now.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "381": {
+    "tryToday": "After leaving the park, say: \"That was really hard when we had to go.\"",
+    "whyItMatters": "Feelings outpace speech at this age, and narrating afterwards gives {baby} words for what just happened.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "382": {
+    "tryToday": "Tonight: bath, two books, one song, lights out — same order.",
+    "whyItMatters": "When {baby} can predict every step, there's far less pushing back at bedtime.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "383": {
+    "tryToday": "Say, \"One more book and one last sip, then lights out.\"",
+    "whyItMatters": "Planning the extras in advance means you aren't handing out concessions once the lights are off.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "384": {
+    "tryToday": "Hand {them} a colander of lettuce to rinse while you cook.",
+    "whyItMatters": "Toddlers who help prepare food are much more likely to taste what they made.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "385": {
+    "tryToday": "Put one slice of new fruit next to the toast and cheese {they} like.",
+    "whyItMatters": "Familiar foods on the plate ease anxiety, making a taste of the new one likelier.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "386": {
+    "tryToday": "Put {baby} down beside another child at the park with similar toys.",
+    "whyItMatters": "Playing alongside peers, rather than with them, is exactly how social skills grow at this age.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "387": {
+    "tryToday": "Listen today for any two words paired together, and count {baby}'s total words.",
+    "whyItMatters": "When words aren't pairing and the count is low, asking sooner beats waiting.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "388": {
+    "tryToday": "Take the pretend plate {baby} offers and say, \"Mmm, thank you for my soup.\"",
+    "whyItMatters": "Receiving each pretend meal warmly supports some of the richest brain development happening right now.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "389": {
+    "tryToday": "Lay out pairs of animal cards and let {baby} find the two that look the same.",
+    "whyItMatters": "Matching introduces grouping things together and can hold {their} attention longer than you would expect.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "390": {
+    "tryToday": "Hold {baby}'s hands and jump together off the bottom stair a few times.",
+    "whyItMatters": "A low, single step is the safest place to practise landing with knees bent.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "391": {
+    "tryToday": "Sit on the floor and count blocks aloud as {baby} stacks four.",
+    "whyItMatters": "If towers stall at two or three, pegs, threading, and playdough build the needed hand control.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "392": {
+    "tryToday": "Dampen a washcloth, chill it, and let {baby} chew while you read together.",
+    "whyItMatters": "Second molars are broad and flat, making them the most painful teeth of toddlerhood.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "393": {
+    "tryToday": "Open {baby}'s curtains at the same time tomorrow, weekend included.",
+    "whyItMatters": "A steady wake time quietly sets the timing of naps, hunger, and bedtime for you.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "394": {
+    "tryToday": "Stand in {baby}'s room at nap time and look for light leaks.",
+    "whyItMatters": "Even a little light dampens melatonin, so full darkness pays off at every age.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "395": {
+    "tryToday": "Invite a friend and their toddler over for a shared snack of broccoli and dip.",
+    "whyItMatters": "Watching another toddler eat something makes {baby} far more likely to give it a try.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "396": {
+    "tryToday": "Fill {their} cup with water for the mid-afternoon snack, and pour milk at dinner.",
+    "whyItMatters": "Saving milk for mealtimes leaves room for other foods when milk crowds out variety.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "397": {
+    "tryToday": "Watch whether {baby} pats the page when a book character looks sad.",
+    "whyItMatters": "Small comforting gestures like these are the first visible signs of moral development.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "398": {
+    "tryToday": "\"Put the block IN the box, now ON the box, now UNDER.\"",
+    "whyItMatters": "Words describing position underpin more complex language and the beginnings of math thinking.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "399": {
+    "tryToday": "Hand {baby} a cloth bag at the door, then sort the finds by size on the mat.",
+    "whyItMatters": "One walk folds in science, maths, language, and time outdoors together.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "400": {
+    "tryToday": "Set out a four-piece knob puzzle and let {baby} turn each piece until it drops in.",
+    "whyItMatters": "Turning and fitting pieces builds the spatial thinking that later maths and problem-solving rest on.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "401": {
+    "tryToday": "Watch {baby} run down the hall and notice the arms swinging and the deliberate stop.",
+    "whyItMatters": "Swinging arms and stopping on purpose are a real step up from the old stiff toddler run.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "402": {
+    "tryToday": "Say, \"You got it closer,\" when {baby} throws a soft ball near the box.",
+    "whyItMatters": "Raising the arm, shifting weight, and releasing is complex, so improving direction deserves notice before aim.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "403": {
+    "tryToday": "Slice a banana, freeze it an hour, and offer a piece after nap.",
+    "whyItMatters": "Molars break through in stages over weeks, and cold chewable food beats teethers at this age.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "404": {
+    "tryToday": "Count back 12 hours from {baby}'s usual wake-up time and set tonight's bedtime there.",
+    "whyItMatters": "New words get locked in during sleep, and vocabulary is growing fast at this age.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "405": {
+    "tryToday": "Plug in a small nightlight and tuck {their} bear in before lights out.",
+    "whyItMatters": "At this age imagination runs ahead of understanding, so fears show up at night.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "406": {
+    "tryToday": "Hand {baby} a pear in the cart: \"You're holding the pear. Pear.\"",
+    "whyItMatters": "Naming foods on a shopping trip grows words and warm feelings toward new foods at once.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "407": {
+    "tryToday": "Set lunch for 12:00 today and keep it there all week.",
+    "whyItMatters": "Predictable mealtimes steady hunger cues, so {baby} comes to the table genuinely ready to eat.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "408": {
+    "tryToday": "Play doctor with a teddy: {they} feel sick, get checked, then feel better.",
+    "whyItMatters": "Story sequences let {baby} replay and work through things that really happened to {them}.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "409": {
+    "tryToday": "While tidying toys, ask, \"Show me something big.\"",
+    "whyItMatters": "Beyond naming body parts, concept words are the next stretch in {their} language.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "410": {
+    "tryToday": "Tape paper to the table, offer one fat brush and two paint colors.",
+    "whyItMatters": "Gripping and dipping a brush works small hand muscles while {baby} explores color and makes something {their} own.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "411": {
+    "tryToday": "Lay out four pairs face up first, then turn them over and take turns.",
+    "whyItMatters": "Even before the rules click, {baby} gains from spotting matches and waiting for {their} turn.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "412": {
+    "tryToday": "Park the trike on flat pavement and let {baby} try pedalling without being hurried.",
+    "whyItMatters": "Alternating feet while steering is genuinely difficult, so unhurried time on level ground helps.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "413": {
+    "tryToday": "Say, \"Hand on the railing,\" each time you start up the stairs together.",
+    "whyItMatters": "At this age safe, confident stair habits matter far more than alternating feet.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "414": {
+    "tryToday": "Stand in {baby}'s room at bedtime: check darkness, white noise, and room temperature.",
+    "whyItMatters": "A solid sleep setup softens the impact of the regression coming around month 24.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "415": {
+    "tryToday": "Note how long {baby} takes to fall asleep at nap today, and bedtime tonight.",
+    "whyItMatters": "Long nap latency followed by bedtime refusal signals the drop is approaching, though most hold naps until three.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "416": {
+    "tryToday": "Hold the bowl steady while {baby} spoons peas onto {their} own plate.",
+    "whyItMatters": "Choosing what lands on the plate makes {baby} more willing to taste it.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "417": {
+    "tryToday": "Sit down with {them} and say, \"We stay in our chairs while we eat.\"",
+    "whyItMatters": "At this age {baby} copies what you do, so calm, steady expectations teach basic manners.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "418": {
+    "tryToday": "After a meltdown, sit on the floor together for ten unhurried minutes.",
+    "whyItMatters": "Extra closeness eases this stretch while {baby} reorganizes emotionally ahead of a big developmental leap.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "419": {
+    "tryToday": "Listen for three-word phrases today, such as \"more banana please.\"",
+    "whyItMatters": "",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "420": {
+    "tryToday": "Put a hat, a tote bag, and your shoes in a basket by the play space.",
+    "whyItMatters": "Pretending to be someone else stretches {their} language, imagination, and sense of how people behave together.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "421": {
+    "tryToday": "Line up red, blue, red, blue blocks and ask, \"What comes next?\"",
+    "whyItMatters": "Spotting what repeats is early math thinking, growing quietly through ordinary play.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "422": {
+    "tryToday": "Sit about three feet apart with a big soft ball and cheer each try.",
+    "whyItMatters": "",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "423": {
+    "tryToday": "Put out two fat crayons and paper, and scribble alongside {baby} without suggestions.",
+    "whyItMatters": "Thick crayons nudge {their} fingers into the grip that writing will later ask for.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "424": {
+    "tryToday": "When {baby} protests tonight, think: {they} still know how to sleep.",
+    "whyItMatters": "Leaps, fresh imagination, and a push for independence are behind this, not lost skill.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "425": {
+    "tryToday": "\"It's sleep time. I'll see you in the morning.\" Then leave, warmly and calmly.",
+    "whyItMatters": "Toddlers push on every limit, and steady follow-through shortens the regression more than negotiating does.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "426": {
+    "tryToday": "Skip the rejected peppers tonight, and still put a small spoonful of them on the table.",
+    "whyItMatters": "Honoring real preferences while keeping variety around raises a curious, capable eater rather than an eat-anything one.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "427": {
+    "tryToday": "Write \"iron, calcium, vitamin D\" on your phone before the 2-year visit.",
+    "whyItMatters": "These three nutrients come up short most often in toddler diets, so they are worth raising.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "428": {
+    "tryToday": "At bedtime, open a picture book and ask, \"Where's the dog?\" and watch {baby} point.",
+    "whyItMatters": "The two-year visit screens words, phrases, pointing and two-step directions, making it one of the key checkpoints.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "429": {
+    "tryToday": "Jot down the words you hear {baby} use this week, then bring the list to your doctor.",
+    "whyItMatters": "Starting speech therapy at two leads to better outcomes than beginning at any later age.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "430": {
+    "tryToday": "Invite one friend over, set out playdough and a water tub, skip the big party.",
+    "whyItMatters": "A quiet gathering with a couple of friends feels joyful rather than flooding a two-year-old with noise and people.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "431": {
+    "tryToday": "Plan playdough, then snack, then goodbye at 11 — and tell the other parent.",
+    "whyItMatters": "A set activity, a snack, and a clear ending make the visit go far more smoothly than leaving it open.",
+    "minutes": 30,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "432": {
+    "tryToday": "Chalk a line on the path and take turns jumping over it.",
+    "whyItMatters": "Everyday jumping chances are how the skill itself gets built and sharpened.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "433": {
+    "tryToday": "Offer both at the park and see which one {baby} keeps coming back to.",
+    "whyItMatters": "Both options feed motor development, so {their} preference is the useful guide.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "434": {
+    "tryToday": "When bedtime resistance hits tonight, say quietly to yourself: \"This is growth.\"",
+    "whyItMatters": "{baby}'s brain is rearranging around imagination, independence, and bigger feelings, which points to development rather than a fault.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "435": {
+    "tryToday": "Hold off on moving {baby} to a new bed until sleep steadies again.",
+    "whyItMatters": "The regression is already a big shift, so adding more disruptions at once makes it harder.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "436": {
+    "tryToday": "Before you address the thrown cup, kneel down and rest a hand on {baby}'s back.",
+    "whyItMatters": "A brain that cannot yet steady intense feelings responds better to closeness first, correction second.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "437": {
+    "tryToday": "When {baby} chews hard on a toy today, remember these are the last teeth.",
+    "whyItMatters": "Second molars hurt the most, and with them through, teething is almost behind you.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "438": {
+    "tryToday": "Mid-nappy change, catch {their} eye and give a big slow smile, then wait.",
+    "whyItMatters": "When {their} expressions reliably get one back, {baby} takes an early step in social learning.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "439": {
+    "tryToday": "{baby} says \"ah\" — say \"ah\" back, then stay quiet and count to five.",
+    "whyItMatters": "These take-turns exchanges lay the groundwork for language, whatever week the cooing starts.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "440": {
+    "tryToday": "Stand a black-and-white board book at {their} eye level during tummy time.",
+    "whyItMatters": "A reason to look up gradually builds neck strength, with {baby} setting the pace.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "441": {
+    "tryToday": "Spot the lip-smacking and offer the bottle right then, before {baby} works up to tears.",
+    "whyItMatters": "Crying comes late in the hunger sequence, so feeding at the first signs keeps you both calmer.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "442": {
+    "tryToday": "Pick up {baby}, rock slowly, and hum the same song each time {they} cry.",
+    "whyItMatters": "Your steady response shows {their} body how to settle, since calm is borrowed before it is learned.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "443": {
+    "tryToday": "Open a high-contrast board book and linger on one bright picture while you talk.",
+    "whyItMatters": "Your rhythm and those pauses on bold images wire up {their} earliest language and attention circuits.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "444": {
+    "tryToday": "Hold {baby} against your chest for a whole song, no phone in your other hand.",
+    "whyItMatters": "Close holding brings stress hormones down and feeds the brain circuits {baby} will later use to settle {themself}.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "445": {
+    "tryToday": "Skip the sips of water on a warm day and offer breast or bottle instead.",
+    "whyItMatters": "Milk or formula covers everything {baby} needs, hydration included, and {their} digestion isn't ready for more yet.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "446": {
+    "tryToday": "Turn the TV off during floor time and call grandparents on video instead.",
+    "whyItMatters": "Screens don't teach babies this young; it's the responsive back-and-forth with a real person that grows language.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "447": {
+    "tryToday": "Hold a soft toy a hand's length above {baby} and drift it slowly left to right.",
+    "whyItMatters": "Following a moving object trains {their} eyes now and underpins hand-eye coordination later on.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "448": {
+    "tryToday": "Blow a gentle raspberry on {their} tummy after a nappy change, then gasp playfully.",
+    "whyItMatters": "Even without a laugh yet, the playful build-up between you is what counts.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "449": {
+    "tryToday": "As you lift {them} from the cot, say, \"Up we go, {baby}.\"",
+    "whyItMatters": "Pairing {their} name with everyday actions helps {baby} learn those sounds belong to {them}.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "450": {
+    "tryToday": "Hold out a thin-handled rattle and let {them} reach, miss, and try again.",
+    "whyItMatters": "Adjusting after a miss builds the coordination {they}'ll later use to grab food and toys.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "451": {
+    "tryToday": "Put a firm blanket down after breakfast and leave the swing empty for that stretch.",
+    "whyItMatters": "Moving arms and legs freely is what builds the core strength behind rolling, sitting and crawling.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "452": {
+    "tryToday": "Cover your face with both hands, hold for a beat, then reveal and smile.",
+    "whyItMatters": "The game plants the idea that things carry on existing even when {baby} cannot see them.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "453": {
+    "tryToday": "While washing up, say, \"Now we're washing your hands. The water is warm.\"",
+    "whyItMatters": "Words tied to actions and objects build language well before {baby} says anything back.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "454": {
+    "tryToday": "When {baby} seems extra alert and hungry, offer more milk rather than a first spoonful.",
+    "whyItMatters": "Waiting on solids gives {their} gut time to mature, and milk still covers all {their} needs.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "455": {
+    "tryToday": "Sit {baby} facing you, support {their} trunk, and bounce gently while you chat.",
+    "whyItMatters": "Light bouncing builds neck and core control, and the face-to-face angle adds social play.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "456": {
+    "tryToday": "{They} catch your eye and squeak; look back and answer, \"Oh really?\"",
+    "whyItMatters": "Meeting {their} sounds with eye contact and a reply shows {baby} that {their} noises carry meaning.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "457": {
+    "tryToday": "Hum a slow lullaby while rocking before the afternoon nap.",
+    "whyItMatters": "Varied rhythms and pitches give {their} brain fresh sound patterns, and slow songs help {baby} settle before sleep.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "458": {
+    "tryToday": "Jot down which readiness signs you've seen this week and bring the list to your visit.",
+    "whyItMatters": "Checking the signs together, and with your pediatrician, helps you time the first bite for {baby}.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "459": {
+    "tryToday": "When {baby}'s lips close on the spoon, set it down and say, \"Finished.\"",
+    "whyItMatters": "Accepting {their} \"no\" from the first meals supports trust in food and in {their} own hunger signals.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "460": {
+    "tryToday": "Set {baby}'s favorite rattle just past {their} fingertips on the play mat.",
+    "whyItMatters": "Stretching and scooting toward something wanted is what builds crawling strength, without any pushing from you.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "461": {
+    "tryToday": "Touch your own nose in the mirror, then {theirs}: \"Your nose. My nose.\"",
+    "whyItMatters": "Naming what you both see grows early self-awareness along with new words.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "462": {
+    "tryToday": "Pause at the same tree each walk and say, \"Tree. Big tree.\"",
+    "whyItMatters": "Repeating names while {baby} is looking builds vocabulary long before {they} can say words.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "463": {
+    "tryToday": "Rock {baby} slowly, murmur softly, and offer {their} favorite small toy.",
+    "whyItMatters": "Repeated cues get linked with calm, which is the beginning of {baby} soothing {themselves}.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "464": {
+    "tryToday": "Hand back the dropped spoon calmly, again, and say, \"Down it goes.\"",
+    "whyItMatters": "Playing along supports a core thinking skill: learning that {their} actions cause results.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "465": {
+    "tryToday": "Knock on the page and moo in a low, silly voice.",
+    "whyItMatters": "Sound and touch hold {their} attention longer and offer more language patterns to take in.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "466": {
+    "tryToday": "Echo {their} \"ah-ah\" back, then pause and count silently to three.",
+    "whyItMatters": "Trading sounds teaches the back-and-forth rhythm {baby} will later use with real words.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "467": {
+    "tryToday": "Sit on the sofa and stand {baby} on your lap for a moment.",
+    "whyItMatters": "Brief supported weight-bearing builds leg strength, as long as you stop when {their} body says no.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "468": {
+    "tryToday": "When a neighbour greets you, hold {baby} close: \"That's Sam — he's safe.\"",
+    "whyItMatters": "Clinging near unfamiliar people shows {their} attachment to you is doing its job.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "469": {
+    "tryToday": "At pickup, take {their} hand and wave together: \"Bye-bye, Grandma.\"",
+    "whyItMatters": "Waving is one of the simplest first ways to communicate, and gestures usually arrive ahead of words.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "470": {
+    "tryToday": "{Baby} says \"bababa\" — answer, \"Yes, that's your ball.\"",
+    "whyItMatters": "{Baby} is trying out sounds, and your real words help {them} attach meaning to those sounds.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "471": {
+    "tryToday": "Squeeze your hand for \"milk\" each time you say the word at feeds.",
+    "whyItMatters": "A few signs hand {baby} a way to tell you things before speech arrives.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "472": {
+    "tryToday": "Give {baby} a plastic cup and three blocks to fill and dump.",
+    "whyItMatters": "Filling and emptying strengthens grip and teaches how one action causes another.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "473": {
+    "tryToday": "Hide a soft block under a burp cloth and wait for {baby} to lift it.",
+    "whyItMatters": "This game teaches {baby} that objects carry on existing even when they are out of sight.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "474": {
+    "tryToday": "Add up yesterday's naps and night hours before changing anything about bedtime.",
+    "whyItMatters": "Too little and too much sleep both disrupt nights, and each one calls for a different response.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "475": {
+    "tryToday": "Scatter a few pea-sized pieces of soft banana on the tray and step back.",
+    "whyItMatters": "Raking food in with fingers builds the fine-motor control utensils will later require.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "476": {
+    "tryToday": "Hand over a wooden spoon and an upturned pot while you prepare dinner.",
+    "whyItMatters": "The sound that follows each bang shows {baby} cause and effect, while the wrist movement builds coordination.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "477": {
+    "tryToday": "Use the same words each time you leave: kiss, wave, \"Back soon.\"",
+    "whyItMatters": "Slipping away quietly makes future partings harder, while a steady, calm routine builds {their} trust in you.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "478": {
+    "tryToday": "{baby} points and says \"dog\"; you answer, \"Yes, a brown dog.\"",
+    "whyItMatters": "Adding a word or two to what {baby} says teaches grammar and vocabulary without any correction.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "479": {
+    "tryToday": "Hold both of {baby}'s hands and walk slowly down the hallway together.",
+    "whyItMatters": "Hand-held walking and cruising grow the balance and confidence behind independent steps.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "480": {
+    "tryToday": "Offer a splash of milk in a small open cup, your hand steadying it.",
+    "whyItMatters": "Drinking without a lid strengthens the mouth muscles that later support clear speech.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "481": {
+    "tryToday": "Pour juice into a 4-ounce cup once, then offer water the rest of the day.",
+    "whyItMatters": "Juice brings sugar without protein or fiber and can displace more nourishing foods.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "482": {
+    "tryToday": "Sit knee-to-knee and play pat-a-cake, pausing for {baby} to join the clap.",
+    "whyItMatters": "Sharing attention during rhythm, words, and turn-taking is what makes the learning stick now.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "483": {
+    "tryToday": "Set an empty basket and a few blocks on the floor and let {baby} dump.",
+    "whyItMatters": "Filling and emptying holds {baby}'s interest while strengthening the finger grasp used for self-feeding.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "484": {
+    "tryToday": "Save \"no\" for the moment {baby} reaches toward the hot oven door.",
+    "whyItMatters": "If \"no\" plays constantly in the background, it loses power when you truly need {them} to stop.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "485": {
+    "tryToday": "Crawl your living room floor and note every cord, loose coin, and open cabinet.",
+    "whyItMatters": "Hazards like dangling cords and small objects stay hidden until you look from your baby's height.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "486": {
+    "tryToday": "Duck behind the kitchen doorway, wait two seconds, then pop out: \"Here I am.\"",
+    "whyItMatters": "The game stretches {their} sense of object permanence, and the giggles show learning is happening.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "487": {
+    "tryToday": "{baby} points at the dog — say, \"Yes, that's the dog.\"",
+    "whyItMatters": "Answering a point shows {them} that gestures work as communication before words arrive.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "488": {
+    "tryToday": "{baby} says \"ba\" — reply, \"Ball, yes, a bouncy red ball.\"",
+    "whyItMatters": "Echoing back a fuller version offers the next step without sounding like a correction.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "489": {
+    "tryToday": "Ask {them} to drop the diaper in the bin after a change.",
+    "whyItMatters": "Small jobs grow words, step-by-step thinking, and the sense of belonging to the family.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "490": {
+    "tryToday": "Once the crying eases, say: \"You wanted the cup. That was so frustrating.\"",
+    "whyItMatters": "Strong feelings arriving before enough words makes tantrums a normal stage rather than a sign you got it wrong.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "491": {
+    "tryToday": "When the block tower falls, say, \"That made you mad.\"",
+    "whyItMatters": "Hearing feelings named helps {them} recognize them, which comes before managing them.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "492": {
+    "tryToday": "Stack two blocks slowly, then say, \"Your turn,\" and let {baby} knock them over.",
+    "whyItMatters": "Building and toppling both show {baby} that {their} own actions make things happen.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "493": {
+    "tryToday": "Watch what {baby} does with the second nap today and jot it down.",
+    "whyItMatters": "Pushing back on that second nap is often the clue the one-nap shift is near.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "494": {
+    "tryToday": "{They} point at the cup — count silently to four before handing it over.",
+    "whyItMatters": "That short silence leaves room for a sound or word, and eventually {they}'ll fill it.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "495": {
+    "tryToday": "Pour a splash of water into a small open cup at lunch.",
+    "whyItMatters": "Sipping from a regular cup strengthens mouth muscles that later support clearer speech.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "496": {
+    "tryToday": "Sing \"Wheels on the Bus\" with rolling hands before bath time.",
+    "whyItMatters": "Movement paired with words gives two routes into the song and an easy way to join in.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "497": {
+    "tryToday": "Slowly pretend to sip from an empty cup, saying, \"I'm drinking water.\"",
+    "whyItMatters": "Toddlers take in the world by copying, so slow demonstrations with words give them something to follow.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "498": {
+    "tryToday": "Hold up two cups at snack: \"Water or milk?\"",
+    "whyItMatters": "Two options give {them} real say without overload, so routine moments turn into fewer standoffs.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "499": {
+    "tryToday": "Kneel down before you say, \"Time to put your shoes on.\"",
+    "whyItMatters": "Being face to face helps {them} tune in, and it lands as connection rather than a lecture.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "500": {
+    "tryToday": "Give {baby} a pot and wooden spoon and stir pretend soup together.",
+    "whyItMatters": "Pretending grows creativity and language, plus the abstract thinking {they}'ll lean on for solving problems later.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "501": {
+    "tryToday": "Tape paper to the high chair tray and hand {baby} one chunky crayon.",
+    "whyItMatters": "Scribbling strengthens small hand muscles for later writing, and one crayon keeps the choice simple.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "502": {
+    "tryToday": "\"You put your cup on the table.\"",
+    "whyItMatters": "Naming the exact action tells {them} what worked, making it far likelier to happen again.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "503": {
+    "tryToday": "Sit down with a bowl of the same soup for ten minutes tonight.",
+    "whyItMatters": "Even a short shared meal offers language practice, behavior to copy, and easier feelings about food.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "504": {
+    "tryToday": "Stop mid-page and ask, \"Where's the dog?\" then wait.",
+    "whyItMatters": "A point or a look means those brain connections are forming, even before words arrive.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "505": {
+    "tryToday": "Hand {them} a small spoon with thick yogurt and let {them} dig in.",
+    "whyItMatters": "Scooping builds the wrist rotation and grip that self-feeding skills depend on.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "506": {
+    "tryToday": "Hold the sleeve open, pause, and let {baby} push {their} arm through.",
+    "whyItMatters": "It takes longer now, but it grows independence and the body awareness self-care needs.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "507": {
+    "tryToday": "During floor play, ask \"Where's the duck?\" and accept a point as the answer.",
+    "whyItMatters": "These easy questions grow understanding and let {them} join in without any pressure to speak.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "508": {
+    "tryToday": "\"Water. Here's your water,\" you say, handing over the cup, no correction needed.",
+    "whyItMatters": "Hearing the full word inside your reply teaches it while keeping {baby} eager to keep trying.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "509": {
+    "tryToday": "Stacking blocks together, say \"My turn… your turn… my turn\" as you each add one.",
+    "whyItMatters": "Sharing isn't natural yet at two, so watching you take turns is how the skill starts forming.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "510": {
+    "tryToday": "Hand {baby} a bowl of lettuce to tear while you cook dinner.",
+    "whyItMatters": "Small kitchen jobs grow words, hand skills, and interest — helpers often eat more of the meal.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "511": {
+    "tryToday": "Sit a few feet from {baby} on the floor and roll a soft ball back.",
+    "whyItMatters": "Back-and-forth ball play grows coordination, turn-taking, and a feel for where {their} body is.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "512": {
+    "tryToday": "Set out a pop-up toy with buttons and let {baby} work out which one makes it jump.",
+    "whyItMatters": "Reliable buttons and switches show cause and effect, and sticking with the puzzle is thinking practice itself.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "513": {
+    "tryToday": "Put a hat, scarf and your old shoes in a basket and let {baby} try them on.",
+    "whyItMatters": "Playing someone else grows empathy, words and imagination, while the dressing itself practises looking after {themselves}.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "514": {
+    "tryToday": "Serve dinner, then say nothing about how much is left on the plate.",
+    "whyItMatters": "Pushing for a clean plate drowns out {their} own hunger cues; intake balances across the whole day.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "515": {
+    "tryToday": "Sit beside {baby} for one show and talk about what you both see happening.",
+    "whyItMatters": "Watching together and chatting about it turns time in front of a screen into shared learning.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "516": {
+    "tryToday": "Tape paper to the floor after lunch and set out chunky crayons.",
+    "whyItMatters": "Different grips and planning each stroke strengthen {their} hands, and mess comes with the territory.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "517": {
+    "tryToday": "Move tonight's bedtime fifteen minutes earlier if battles have been building.",
+    "whyItMatters": "An overtired toddler resists sleep harder than a merely tired one, so starting earlier helps.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "518": {
+    "tryToday": "After a feed, hold {baby} close at forearm's length and just look at each other.",
+    "whyItMatters": "At that close range {baby} can actually see you, and these quiet exchanges are {their} earliest practice at connecting.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "519": {
+    "tryToday": "\"Now I'm pouring the water, and here comes the milk.\"",
+    "whyItMatters": "Long before {baby} can reply, hearing you all day is laying the groundwork for understanding words.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "520": {
+    "tryToday": "When {baby} coos, smile and say \"Oh really?\" then wait quietly for more.",
+    "whyItMatters": "Taking turns like this shows {baby} how conversation works — one person speaks, then the other.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "521": {
+    "tryToday": "Hum the same short song every diaper change and watch how {baby} responds.",
+    "whyItMatters": "Your voice is the sound {baby} loves most, and the tune both calms {them} and feeds early language.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "522": {
+    "tryToday": "When {baby} turns {their} head away mid-play, stop and hold {them} quietly instead.",
+    "whyItMatters": "Noticing and honouring these small signals tells {baby} that {their} messages are received.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "523": {
+    "tryToday": "Read one page of whatever's on your nightstand, out loud and with expression.",
+    "whyItMatters": "The plot doesn't matter yet — {baby} is absorbing the rhythm and sound of your language.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "524": {
+    "tryToday": "Before you pick up a crying {baby}, take one slow breath and drop your voice.",
+    "whyItMatters": "{baby} cannot steady {themself} yet, so {they} borrow the calm you bring to the moment.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "525": {
+    "tryToday": "For today's short afternoon nap, lay {baby} down on {their} back, as always.",
+    "whyItMatters": "Of all sleep habits, back sleeping offers the strongest protection against SIDS.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "526": {
+    "tryToday": "Before bed, lift out the blanket and toy, leaving only the fitted sheet.",
+    "whyItMatters": "With nothing loose in the crib, there is nothing that could end up over {baby}'s face.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "527": {
+    "tryToday": "Move the bassinet within arm's reach of your side of the bed tonight.",
+    "whyItMatters": "Sleeping in the same room on separate surfaces lowers SIDS risk and simplifies night feeds.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "528": {
+    "tryToday": "After wrapping, slide two fingers at the chest and check the legs can bend.",
+    "whyItMatters": "A snug-but-not-tight wrap lets the hips move freely while {baby} settles.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "529": {
+    "tryToday": "When {baby} brings {their} hands to {their} mouth, offer a feed before any crying starts.",
+    "whyItMatters": "A baby fed at the quiet cues latches more easily than one who has worked up to frantic.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "530": {
+    "tryToday": "Feed {baby} when {they} ask through the night rather than waiting for a set hour.",
+    "whyItMatters": "Feeding on demand instead of by the clock supports your supply and keeps {baby} well-nourished.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "531": {
+    "tryToday": "Park a water bottle and a snack beside your usual feeding spot before evening.",
+    "whyItMatters": "Back-to-back evening feeds are normal, usually tied to a growth spurt, and they pass within a day or two.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "532": {
+    "tryToday": "Call your pediatrician or a lactation specialist today about the latch that hurts.",
+    "whyItMatters": "A specialist can spot small adjustments with big effects, and reaching out early is a caring choice.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "533": {
+    "tryToday": "Hold a high-contrast card a foot from {their} face and drift it slowly left, then right.",
+    "whyItMatters": "Tracking a moving object gently builds the muscles for looking and, later, turning the head.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "534": {
+    "tryToday": "After a nappy change, leave {them} unswaddled on a blanket and offer your finger to grip.",
+    "whyItMatters": "These early reflexes and free movements are how {baby} starts learning where {their} body is in space.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "535": {
+    "tryToday": "While {they} are calm and alert, poke your tongue out slowly, close to {their} face.",
+    "whyItMatters": "Faces captivate newborns, so {baby} may stare hard at you or attempt to copy.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "536": {
+    "tryToday": "Lift {baby} up and sway slowly around the kitchen to one song you love.",
+    "whyItMatters": "Rhythm and gentle movement settle {baby} and bring you close without a single toy.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "537": {
+    "tryToday": "Wear {baby} in a safe carrier while you walk around the house this afternoon.",
+    "whyItMatters": "Extra holding often reduces crying and builds security — responding to a newborn cannot spoil {them}.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "538": {
+    "tryToday": "Lay {baby} on {their} back in the crib, step out, breathe for five minutes.",
+    "whyItMatters": "Stepping away safely protects {baby} when you feel overwhelmed, and this fussier stretch is normal near six weeks.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "539": {
+    "tryToday": "Hear a contented coo and answer, \"You sound happy in there.\"",
+    "whyItMatters": "Different sounds for content and upset are {baby} telling you how {they} feel, and naming it answers {them}.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "540": {
+    "tryToday": "Lean in close at the changing table and say, \"Hello, {baby}, I'm right here.\"",
+    "whyItMatters": "When {baby} stills or turns toward your voice, it shows {their} hearing is tuning in to you.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "541": {
+    "tryToday": "Hold your face close, then sway slowly left and right while {they} watch.",
+    "whyItMatters": "Around two months many babies begin holding their gaze on a face and following you as you move.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "542": {
+    "tryToday": "Walk over smiling and say, \"There's {baby}, it's me.\" Watch for stillness or a smile.",
+    "whyItMatters": "Those flickers of recognition are real bonding, as {baby} starts knowing the people {they} love.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "543": {
+    "tryToday": "Rest a light rattle in {their} palm and watch the fingers curl around it.",
+    "whyItMatters": "Those tight newborn fists are starting to loosen now, and some babies get there earlier.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "544": {
+    "tryToday": "Lay {them} on {their} back on the floor with room to pump those legs.",
+    "whyItMatters": "Open floor time gives {them} space to practise as legs stretch out of the curled newborn position.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "545": {
+    "tryToday": "Clear the crib, then lay {baby} down on {their} back for the morning nap.",
+    "whyItMatters": "Back sleeping on a bare, firm surface is the safest position and reduces SIDS risk.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "546": {
+    "tryToday": "Tonight, feed {baby} in your room, then settle {them} back into the bassinet.",
+    "whyItMatters": "Room-sharing can halve SIDS risk, while sharing your mattress increases it.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "547": {
+    "tryToday": "On a hungrier-than-usual day, offer the breast or bottle again instead of waiting for the next slot.",
+    "whyItMatters": "Frequent feeds are exactly right now, and a growth spurt can raise {their} appetite for a few days.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "548": {
+    "tryToday": "Put your phone down, hold {baby} close and talk softly through the whole feed.",
+    "whyItMatters": "Slowing down makes feeding a moment of connection, and stopping at {their} fullness signs keeps it {their} call.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "549": {
+    "tryToday": "Lean in close, stretch a huge grin, then wait quietly for {their} reply.",
+    "whyItMatters": "{baby} is studying your face now, and these back-and-forth moments lay groundwork for communication.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "550": {
+    "tryToday": "Hold {baby} against your chest and sway side to side while humming low.",
+    "whyItMatters": "Steady rhythm and closeness recall the womb, letting {baby} take some calm from you.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "551": {
+    "tryToday": "{Baby} says \"oooo\" during a nappy change; echo it back and wait.",
+    "whyItMatters": "Taking turns with sounds is {their} first conversation and lays the groundwork for language.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "552": {
+    "tryToday": "Hide behind your hands during floor time, then peek out with a warm smile.",
+    "whyItMatters": "The game shows {baby} that something hidden from view can come back again.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "553": {
+    "tryToday": "At bath time say, \"Warm water on your toes, now the soft towel.\"",
+    "whyItMatters": "Your voice during ordinary moments feeds early brain growth and vocabulary, long before {baby} has words.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "554": {
+    "tryToday": "Puff your cheeks, make a squeaky voice, then pause and watch {their} face.",
+    "whyItMatters": "Laughing along with {baby} deepens the connection between you.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "555": {
+    "tryToday": "{Baby} squeaks from the play mat; look over and say, \"I hear you, {baby}.\"",
+    "whyItMatters": "Answering {their} bids with your face, voice and touch tells {baby} that {they} matter and you are near.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "556": {
+    "tryToday": "On the play mat, drift a bright rattle slowly across {their} view, then upward.",
+    "whyItMatters": "Following a moving object with {their} eyes strengthens visual tracking and hand-eye coordination.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "557": {
+    "tryToday": "Sweep the stuffed animals out of the crib before tonight's bedtime.",
+    "whyItMatters": "Nothing else you do overnight protects {baby} as much as back sleeping on a clear surface.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "558": {
+    "tryToday": "Set an alarm for ten minutes if you feed {baby} in bed tonight.",
+    "whyItMatters": "Keeping {baby} close but on a separate surface lowers sleep risks without losing that nearness.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "559": {
+    "tryToday": "Tonight: feed, fresh diaper, one quiet song, lights out by 7:30.",
+    "whyItMatters": "Repeating the same steps in the same order tells {baby} that sleep is coming next.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "560": {
+    "tryToday": "When {baby} stares off mid-play, dim the lights and begin winding down.",
+    "whyItMatters": "Beginning at the first quiet cues, before crying starts, makes settling far easier.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "561": {
+    "tryToday": "Dangle a soft toy just above {their} chest and let {them} swipe and grab.",
+    "whyItMatters": "Swiping, missing and trying again is exactly how arm control and hand-eye coordination get built.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "562": {
+    "tryToday": "Sit {baby} supported on your lap for a few minutes and let {them} look around.",
+    "whyItMatters": "Short bursts upright strengthen neck and shoulders, and some bobbing is still completely expected.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "563": {
+    "tryToday": "Spread a blanket on the floor and skip the bouncer for one awake stretch.",
+    "whyItMatters": "Free movement lets {them} push and reach, building muscles for the rolling and sitting ahead.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "564": {
+    "tryToday": "Offer a feed when {baby} roots at you, even if the last one was recent.",
+    "whyItMatters": "Responsive feeding supports {baby}'s growth and helps protect your supply if you are nursing.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "565": {
+    "tryToday": "Leave the juice cup and baby cereal on the shelf; offer milk or formula instead.",
+    "whyItMatters": "{Their} tummy and swallowing are still maturing, and milk alone covers everything for now.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "566": {
+    "tryToday": "When {baby} opens {their} mouth at the sight of the bottle, start the feed then.",
+    "whyItMatters": "Because crying is a late signal, learning the earlier cues makes feeds calmer for you both.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "567": {
+    "tryToday": "Lie on the mat beside {them} after breakfast, chatting about whatever {they} reach for.",
+    "whyItMatters": "Your closeness and warm chatter during play support movement, learning and a sense of safety.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "568": {
+    "tryToday": "Sing \"Twinkle, Twinkle\" while slowly cycling {their} legs, stopping when {they} look away.",
+    "whyItMatters": "Your voice paired with light movement pleases {baby} and helps {them} sense {their} own body.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "569": {
+    "tryToday": "Hold {baby} close first; if crying continues, try gentle rocking, then soft shushing.",
+    "whyItMatters": "Your presence and comfort, whatever finally works, show {baby} that {they} are not alone.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "570": {
+    "tryToday": "Lay {baby} safely in the crib, step out, and take five slow breaths.",
+    "whyItMatters": "{baby} reads your emotional state, so settling yourself first makes settling {them} easier.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "571": {
+    "tryToday": "{They} blow a raspberry on the play mat; blow one back, then wait.",
+    "whyItMatters": "Echoing {their} lip sounds and vowels shows {baby} how turn-taking in conversation works.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "572": {
+    "tryToday": "Lay {them} on {their} back with no toy, and let {their} hands lead.",
+    "whyItMatters": "Gazing at and mouthing {their} fingers is early exploring and one of {their} first ways of settling {themselves}.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "573": {
+    "tryToday": "Hold a colourful toy just above {their} eye line during tummy time.",
+    "whyItMatters": "Reaching up while pushing onto the forearms builds the neck and shoulder strength that leads to rolling.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "574": {
+    "tryToday": "With {baby} on {their} back, slide a favourite toy slowly from the middle to one side.",
+    "whyItMatters": "Reaching across {their} body helps {them} rock and, in {their} own time, roll.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "575": {
+    "tryToday": "Note the time {baby} woke, then watch for yawning as two hours approach.",
+    "whyItMatters": "Following {baby}'s wake times rather than the clock fits how {their} sleep is maturing.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "576": {
+    "tryToday": "At dinner, notice whether {baby} holds {their} head steady and watches your plate with interest.",
+    "whyItMatters": "Milk still covers everything for now, so these early signs simply show you what to watch for.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "577": {
+    "tryToday": "Turn each page slowly and name one bold picture: \"a big red ball\".",
+    "whyItMatters": "Strong patterns hold {their} gaze while your voice's rhythm lays language groundwork well before talking.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "578": {
+    "tryToday": "{They} say \"bah\"; say \"bah, bah, book\" back and hold up a board book.",
+    "whyItMatters": "These playful exchanges are {their} first conversations and show {baby} that {their} voice counts.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "579": {
+    "tryToday": "At breakfast, point and say, \"cup,\" then \"dada,\" as {they} watch.",
+    "whyItMatters": "{Baby} takes in far more than {they} can say, so each word quietly grows {their} vocabulary.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "580": {
+    "tryToday": "Drape a soft scarf over your face, then pull it away with \"peekaboo.\"",
+    "whyItMatters": "It turns a big idea, that things last even when unseen, into shared fun.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "581": {
+    "tryToday": "Put a rattle in {their} palm and wait for the first surprised shake.",
+    "whyItMatters": "When a shake makes noise, {baby} starts to see that what {they} do affects the world.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "582": {
+    "tryToday": "\"There's {baby} in the mirror, and there's your smile.\"",
+    "whyItMatters": "Your words turn a plain reflection into shared discovery and closeness.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "583": {
+    "tryToday": "During nappy changes say, \"Now I'm wiping your legs, now the clean nappy.\"",
+    "whyItMatters": "Words attached to familiar routines slowly build {their} understanding of language.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "584": {
+    "tryToday": "At bath's end say, \"You feel sad the water is going away.\"",
+    "whyItMatters": "Hearing feelings named helps {baby} gradually make sense of big emotions.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "585": {
+    "tryToday": "Set {their} favourite rattle just to one side on the floor blanket.",
+    "whyItMatters": "Open floor time and a sideways target support the growing back and neck strength behind rolling both ways.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "586": {
+    "tryToday": "Hold a rattle just above {baby}'s head during tummy time so {they} lift {their} chest.",
+    "whyItMatters": "Pushing onto straight arms strengthens the shoulders and core that sitting and crawling are built on.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "587": {
+    "tryToday": "Offer a light fabric block and wait while {baby} turns it hand to hand.",
+    "whyItMatters": "Transferring and twisting objects now is useful practice for the hand skills coming in the months ahead.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "588": {
+    "tryToday": "During a diaper change, pause and let {baby} catch {their} own toes.",
+    "whyItMatters": "Grabbing their feet quietly develops the body awareness and coordination {they} will lean on later.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "589": {
+    "tryToday": "Start the wind-down at 6:45 tonight so lights are out by 7:30.",
+    "whyItMatters": "A baby who is overtired struggles more to fall asleep, so a steady earlier bedtime helps.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "590": {
+    "tryToday": "Pick your three steps — bath, story, song — and keep that order tonight.",
+    "whyItMatters": "A brief, predictable wind-down cues {baby}'s body that sleep is on the way.",
+    "minutes": 25,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "591": {
+    "tryToday": "After the last song, lay {baby} down with eyes still half open.",
+    "whyItMatters": "Practising falling asleep unaided helps {baby} resettle during the normal wake-ups every baby has.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "592": {
+    "tryToday": "Check the thermostat reads about 70, and lift any toys from the crib.",
+    "whyItMatters": "Since some night waking is normal now, a cool, safe, clear space helps everyone rest.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "593": {
+    "tryToday": "At dinner, notice whether {baby} sits steadily and watches your fork travel to your mouth.",
+    "whyItMatters": "The signs mean most as a cluster, and they usually appear near six months, so there's time.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "594": {
+    "tryToday": "When {baby} turns away mid-feed, stop and say, \"Okay, you're all done.\"",
+    "whyItMatters": "Letting {baby} decide how much keeps {them} in touch with {their} own hunger and fullness.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "595": {
+    "tryToday": "Keep today's milk feeds exactly as they are, without shortening any of them.",
+    "whyItMatters": "Milk remains {baby}'s main nutrition; solids join in around six months rather than taking its place.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "596": {
+    "tryToday": "Clear a rug, lay {them} down with two toys nearby, and let {them} wriggle.",
+    "whyItMatters": "Uninterrupted floor time lets {baby} roll, stretch and explore, which is excellent movement practice.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "597": {
+    "tryToday": "Read one board book after the morning feed, pointing and naming the brightest pictures.",
+    "whyItMatters": "Your voice and the shared story grow early language while keeping you two close.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "598": {
+    "tryToday": "Walk the hallway with {baby} in the carrier while a fan hums nearby.",
+    "whyItMatters": "Steady movement and being held close feel reassuring, even when the fussing takes a while to fade.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "599": {
+    "tryToday": "Run a washcloth under cold water, wring it out, and hand it to {baby}.",
+    "whyItMatters": "Cool, gentle pressure calms tender gums, and a fever needs checking since teething doesn't cause it.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "600": {
+    "tryToday": "Offer one small spoon of iron-fortified cereal at lunch and stop when {baby} slows.",
+    "whyItMatters": "At this stage babies need more iron than milk alone can supply.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "601": {
+    "tryToday": "Thin a little smooth peanut butter with formula and offer one small taste.",
+    "whyItMatters": "Offering allergens early and keeping them in rotation can lower the chance of allergy.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "602": {
+    "tryToday": "Nurse or give the bottle first, then offer a couple of spoonfuls afterward.",
+    "whyItMatters": "Milk still carries the nutrition, so early solids can stay playful practice instead of full meals.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "603": {
+    "tryToday": "Blow a raspberry back during a nappy change and wait for {their} turn.",
+    "whyItMatters": "Copying {their} noises is early speech practice and shows {baby} that {their} sounds count.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "604": {
+    "tryToday": "Offer a clean silicone spoon to gum and turn over on the mat.",
+    "whyItMatters": "Mouthing is how {baby} works out what shapes and textures feel like.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "605": {
+    "tryToday": "Sit {baby} on the rug leaning on both hands, a pillow just behind.",
+    "whyItMatters": "Propping on their hands to stay upright is how balance for sitting alone develops.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "606": {
+    "tryToday": "If {baby} stirs at midnight, wait a minute before going in.",
+    "whyItMatters": "Brief wakings are normal, and a short pause gives {baby} room to settle again alone.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "607": {
+    "tryToday": "Stack three blocks, let {baby} knock them down, then rebuild and wait for the swipe.",
+    "whyItMatters": "Rebuilding what {they} topple shows {baby} that actions cause results, and keeps your back-and-forth alive.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "608": {
+    "tryToday": "When {baby} looks up at {their} name, smile and say, \"Yes, that's you.\"",
+    "whyItMatters": "Answering warmly tells {baby} that {their} sounds and attention matter.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "609": {
+    "tryToday": "Echo \"ba-ba-ba,\" then add, \"Ball. Here's your ball.\"",
+    "whyItMatters": "Copying and adding a word turns babble into a gentle back-and-forth exchange.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "610": {
+    "tryToday": "When a toy pops up, say, \"Oh, that surprised you.\"",
+    "whyItMatters": "{baby} reads your face now, so your calm expressions help {them} feel steady.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "611": {
+    "tryToday": "Say a soft \"no\" near the cables, then guide {them} to a toy.",
+    "whyItMatters": "That brief pause shows {their} listening is growing, though remembering comes later.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "612": {
+    "tryToday": "Hold {baby} on your lap while a new visitor chats with you first.",
+    "whyItMatters": "Turning away from new faces shows {baby} knows and prefers {their} favourite people.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "613": {
+    "tryToday": "Sit close to the mirror and say, \"Look at that smile looking back.\"",
+    "whyItMatters": "Reflections fascinate {baby} now, drawing out gazing, reaching and happy sounds together.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "614": {
+    "tryToday": "Finely mince a little well-cooked egg and offer it beside today's usual food.",
+    "whyItMatters": "Meat, fish, and egg bring protein and key nutrients that fuel growth at this stage.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "615": {
+    "tryToday": "Mash half a ripe pear and add soft steamed carrot sticks to the tray.",
+    "whyItMatters": "A colorful mix covers nutrient needs and widens the range of tastes {baby} enjoys.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "616": {
+    "tryToday": "Mash today's vegetables with a fork instead of blending, leaving a few soft lumps.",
+    "whyItMatters": "Lumpier food gives {baby} practice at chewing and feeding {themself}.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "617": {
+    "tryToday": "Set a little water in an open cup beside {baby}'s lunch and offer sips.",
+    "whyItMatters": "Sweet drinks can push aside the nutrient-rich foods {baby} needs at this age.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "618": {
+    "tryToday": "Offer a soft rattle off to {baby}'s side and watch {them} switch hands.",
+    "whyItMatters": "Moving an object between hands builds the coordination behind many skills coming next.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "619": {
+    "tryToday": "Scatter a few soft banana pieces on the tray and stay close.",
+    "whyItMatters": "Sweeping food in with their fingers strengthens hand control on the way to a pincer grasp.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "620": {
+    "tryToday": "Put the favorite ball just past {baby}'s fingertips and cheer the wriggling.",
+    "whyItMatters": "Encouraging the effort keeps the drive to move alive, even before {they} reach the toy.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "621": {
+    "tryToday": "Hold {baby} under the arms and let {them} bounce on your thighs.",
+    "whyItMatters": "Pressing weight through their legs builds the strength that standing will later ask for.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "622": {
+    "tryToday": "At the 2am waking, keep lights off and say quietly, \"I'm here, {baby}, it's still sleep time.\"",
+    "whyItMatters": "Waking once or twice is common now, as teething, growth, and new skills can unsettle sleep for a stretch.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "623": {
+    "tryToday": "Tonight, lay {baby} down after the last song, eyes still open, and step back.",
+    "whyItMatters": "Babies who practice settling themselves tend to bridge sleep cycles and drift back off more easily.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "624": {
+    "tryToday": "Keep tonight's bath, book, song order exactly the same, and add one extra cuddle.",
+    "whyItMatters": "New skills like sitting or scooting often stir sleep, and these phases usually pass.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "625": {
+    "tryToday": "Share one board book after the morning feed, naming each picture you point to.",
+    "whyItMatters": "Even a few minutes of reading, singing, or storytelling pours language into {baby} at this age.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "626": {
+    "tryToday": "Wave bye-bye at the door and wait to see if {baby} waves back.",
+    "whyItMatters": "These playful gestures grow communication and connection well before {baby} says any first words.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "627": {
+    "tryToday": "\"Bye, {baby}, I'll be back soon\" — then go, without drawing it out.",
+    "whyItMatters": "Missing you reflects the strong bond you've built, and short predictable goodbyes keep it steady.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "628": {
+    "tryToday": "Offer a firm rubber teething ring while {baby} sits with you after lunch.",
+    "whyItMatters": "These plain comforts are the safest relief right now, unlike gels, tablets, and necklaces.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "629": {
+    "tryToday": "When the rattle rolls under the chair, wait and watch {baby} look for it.",
+    "whyItMatters": "Searching gives {baby} practice at remembering and staying focused, and at grasping that out-of-sight things still exist.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "630": {
+    "tryToday": "\"Ba-ba-ba\" — echo it back, then pause for {baby} to answer you.",
+    "whyItMatters": "These small turn-taking exchanges show {baby} how conversation flows and encourage even more sounds.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "631": {
+    "tryToday": "During floor play, say {baby}'s name softly and pause for {them} to turn.",
+    "whyItMatters": "Many babies begin recognising their own name now, so these pauses give language somewhere to take hold.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "632": {
+    "tryToday": "\"Now we're zipping your coat\" — say it as you dress {them}.",
+    "whyItMatters": "Hearing you name what is happening, day after day, stocks {baby} with words {they} will soon use.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "633": {
+    "tryToday": "Wave and say \"bye-bye\" together as someone heads out the door.",
+    "whyItMatters": "Repeated gestures give {baby} a way to communicate with you before words arrive.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "634": {
+    "tryToday": "Mash well-cooked beans with a little water and offer a spoonful at lunch.",
+    "whyItMatters": "Early iron stores taper off around now, so these foods keep growth and energy steady.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "635": {
+    "tryToday": "Offer the spoon when {baby} leans in, and pause when {they} turn away.",
+    "whyItMatters": "Feeding in response to {baby}'s cues supports a healthy appetite and a calmer table.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "636": {
+    "tryToday": "Mash ripe banana into small pieces and sit beside {baby} for the whole meal.",
+    "whyItMatters": "Small soft pieces, plus you nearby, keep these first self-feeding attempts safer.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "637": {
+    "tryToday": "Put four cooked peas on the tray at lunch and let {baby} pinch.",
+    "whyItMatters": "The thumb-and-finger grasp is forming now, and messy hands-on practice is exactly how it grows.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "638": {
+    "tryToday": "Offer a second small toy to the hand that is already full.",
+    "whyItMatters": "Switching a toy between hands builds coordination {baby} will use in feeding and play.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "639": {
+    "tryToday": "Clear the low, sturdy coffee table edge so {baby} can pull up.",
+    "whyItMatters": "Many babies love this practice now, so being nearby covers the wobbles.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "640": {
+    "tryToday": "Tonight: bath, one short book, then the same quiet song with lights low.",
+    "whyItMatters": "Repeating the same steps tells {baby} sleep is coming, making it easier to settle.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "641": {
+    "tryToday": "Jot down today's two naps and last night's hours to see {baby}'s total.",
+    "whyItMatters": "Consistent wake, meal, and nap timing makes reaching 12 to 16 hours far easier.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "642": {
+    "tryToday": "Lay two sofa cushions down and place {their} favorite toy just past them.",
+    "whyItMatters": "Climbing toward the toy while you stay close builds {their} muscles and confidence.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "643": {
+    "tryToday": "Keep {baby} on your hip while a new visitor chats with you first.",
+    "whyItMatters": "Feeling shy with unfamiliar people at this age shows healthy attachment, not a step backward.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "644": {
+    "tryToday": "From across the room, call {their} name and beam when {they} turn.",
+    "whyItMatters": "Your delighted response helps {baby} connect that sound with {themselves}, something many babies start doing around now.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "645": {
+    "tryToday": "Before nap, share a sturdy picture book and let {baby} pat the pages.",
+    "whyItMatters": "Daily books, songs and little stories give {baby} a steady supply of words to absorb before talking begins.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "646": {
+    "tryToday": "\"You look surprised\" — say it when {baby}'s eyes go wide at the dog.",
+    "whyItMatters": "Naming the feelings {baby} shows helps {them} make sense of what is happening inside.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "647": {
+    "tryToday": "Put four well-cooked peas on the tray and sit beside {baby} while {they} pinch them up.",
+    "whyItMatters": "Self-feeding gives {baby} practice as the raking grasp slowly refines into a thumb-and-finger pinch.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "648": {
+    "tryToday": "Line the couch and ottoman close together so {baby} can side-step between them holding on.",
+    "whyItMatters": "Sturdy things to lean on and open floor are all {baby} needs as legs strengthen.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "649": {
+    "tryToday": "Put three soft pieces on the tray before you offer anything from a spoon.",
+    "whyItMatters": "Starting when {baby} is hungriest fuels the effort, and self-feeding grows coordination at {their} own pace.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "650": {
+    "tryToday": "\"Peek-a-boo\" from behind a light scarf, then let {them} hide behind {their} hands.",
+    "whyItMatters": "Popping back into view quietly teaches {baby} that things, and you, still exist out of sight.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "651": {
+    "tryToday": "Slide a favorite rattle under a dish towel while {baby} watches, then wait.",
+    "whyItMatters": "Searching and finding reinforces the new idea that objects keep existing when {baby} cannot see them.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "652": {
+    "tryToday": "When {baby} reaches toward the cup, say, \"You want water?\"",
+    "whyItMatters": "{baby} takes in far more words than {they} can say, so naming {their} wishes feeds language.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "653": {
+    "tryToday": "Wave at the door and say, \"Go bye-bye,\" then watch {baby} respond.",
+    "whyItMatters": "Familiar phrases paired with gestures are understood long before {baby} can say them back.",
+    "minutes": 3,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "654": {
+    "tryToday": "Clap twice, then pause and wait for {baby} to clap back.",
+    "whyItMatters": "Each swap of gestures gives {baby} practice at the turn-taking that conversation is built on.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "655": {
+    "tryToday": "At the door say, \"Bye, {baby}, I'll be back,\" then go.",
+    "whyItMatters": "{baby} now knows you exist out of sight, so steady returns rebuild {their} sense of safety.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "656": {
+    "tryToday": "Drop five O-cereal pieces on the tray and stay beside {baby} while {they} pick them up.",
+    "whyItMatters": "Picking up pea-sized bites refines the thumb-and-finger pinch that supports self-feeding.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "657": {
+    "tryToday": "Clear the hard-edged side table away, then kneel by the couch as {baby} pulls up.",
+    "whyItMatters": "Pulling up helps build the leg strength that comes before walking.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "658": {
+    "tryToday": "Place a favourite rattle just past {baby}'s fingertips and wait for the stretch.",
+    "whyItMatters": "That small challenge invites {baby} to move and solve a problem with you.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "659": {
+    "tryToday": "Hand {baby} two stacking cups and tap yours together in a steady beat.",
+    "whyItMatters": "Knocking objects together delights babies with sound while they discover cause and effect.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "660": {
+    "tryToday": "Dice ripe pear into pieces smaller than a dime and sit down beside {them}.",
+    "whyItMatters": "Hands-on practice with new textures is safest when you stay at the table watching.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "661": {
+    "tryToday": "Pour an inch of water into a small cup at dinner tonight.",
+    "whyItMatters": "Many babies are ready for a cup now, and sipping improves only with practice.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "662": {
+    "tryToday": "If {baby} pushes the broccoli away, set it aside calmly and offer again another day.",
+    "whyItMatters": "Warming to an unfamiliar taste often takes ten or more relaxed tries.",
+    "minutes": 2,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "663": {
+    "tryToday": "Watch for eye rubbing after morning play and start the nap routine then.",
+    "whyItMatters": "Two naps still suit most babies this age, giving {them} a recharge between busy stretches of play.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "664": {
+    "tryToday": "Bath, then one book, then a cuddle in the dark, in that order.",
+    "whyItMatters": "A familiar sequence tells {baby}'s body that sleep is close and can soften bedtime protests.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "665": {
+    "tryToday": "Roll a soft ball to {baby} saying \"here it comes, now your turn.\"",
+    "whyItMatters": "Passing the ball back and forth sharpens hand-eye coordination and makes turn-taking a pleasure.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "666": {
+    "tryToday": "Let {baby} pat the pages while you name the dog, cup, and moon.",
+    "whyItMatters": "Naming pictures together at this age grows early language and the habit of shared attention.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "667": {
+    "tryToday": "Keep {baby} on your lap while a new neighbor says hello, no rush.",
+    "whyItMatters": "Wariness of unfamiliar people right now is normal and shows how attached {baby} is to you.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "668": {
+    "tryToday": "Cover a favorite ball with a blanket while {baby} watches, then let {them} pull it off.",
+    "whyItMatters": "Looking for a hidden toy shows object permanence taking hold, and the surprise is real learning.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "669": {
+    "tryToday": "Stay seated beside {baby} while grandma waits nearby, no handover rushed.",
+    "whyItMatters": "Holding back from less-familiar faces is an early emotional milestone and a sign of healthy attachment.",
+    "minutes": null,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "670": {
+    "tryToday": "\"Bye, {baby}, I always come back,\" then leave without lingering.",
+    "whyItMatters": "Parting upset tends to peak now and fades with time, and short practice separations build security.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "671": {
+    "tryToday": "Read one board book at bedtime, naming the cat even if {baby} gnaws the corner.",
+    "whyItMatters": "Sharing books grows words and closeness during an important stretch of brain development.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "672": {
+    "tryToday": "Wave bye-bye at the window, then clap when {baby} waves back.",
+    "whyItMatters": "Gestures let {baby} communicate before words arrive and give practice trading turns.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "673": {
+    "tryToday": "At the sink say, \"Now we are washing your hands,\" then pause for a reply.",
+    "whyItMatters": "Everyday talk grows {baby}'s understanding of familiar words well before {their} first ones are spoken.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "674": {
+    "tryToday": "Push the tippy side table aside, then let {baby} shuffle along the couch edge.",
+    "whyItMatters": "Holding on while stepping sideways builds the strength and balance that come before independent steps.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "675": {
+    "tryToday": "Offer a few soft banana pieces and sit within arm's reach while {baby} eats.",
+    "whyItMatters": "Pinching between thumb and pointer finger is a fine-motor milestone behind self-feeding and later skills.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "676": {
+    "tryToday": "Set a favourite ball on a low ottoman so {baby} reaches up for it.",
+    "whyItMatters": "Pulling up strengthens the muscles {baby} needs for cruising and eventually walking.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "677": {
+    "tryToday": "Stack two sofa cushions and a box on the rug and crawl through with {baby}.",
+    "whyItMatters": "Small challenges invite coordinated movement and problem-solving while {baby} explores.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "678": {
+    "tryToday": "Drop a few cooked noodles on the tray and let {them} stop when done.",
+    "whyItMatters": "Feeding {themself} grows hand skills and independence, with {their} appetite setting the amount.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "679": {
+    "tryToday": "Buckle {baby} upright in the high chair and stay within arm's reach.",
+    "whyItMatters": "Sitting up, supervised, with small soft pieces makes choking far less likely.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "680": {
+    "tryToday": "Hold a small open cup to {their} lips at lunch and expect drips.",
+    "whyItMatters": "Spilly practice now builds toward drinking from an open cup with help by the first birthday.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "681": {
+    "tryToday": "When {they} turn away from the spoon, stop and clear the tray.",
+    "whyItMatters": "Letting {baby} set the amount supports self-regulation and a warmer relationship with food.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "682": {
+    "tryToday": "Run the bath, then one story, then lay {baby} down, same order as last night.",
+    "whyItMatters": "A familiar sequence cues {baby}'s body that sleep is near, making settling easier.",
+    "minutes": 20,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "683": {
+    "tryToday": "Lay {baby} down while {they} are still blinking, then pause a few minutes before responding.",
+    "whyItMatters": "Practising self-settling helps {baby} find sleep again after stirring in the night.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "684": {
+    "tryToday": "Pat {baby}'s back in the dark and whisper, \"I'm here, it's sleep time.\"",
+    "whyItMatters": "Separation anxiety often drives night waking now, and calm, consistent responses help it pass.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "685": {
+    "tryToday": "Sing pat-a-cake, then pause with your hands still and let {baby} clap back.",
+    "whyItMatters": "Copying each other teaches turn-taking and gestures while deepening the bond between you.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "686": {
+    "tryToday": "Put on a favorite song, offer both hands, and bounce together in the kitchen.",
+    "whyItMatters": "Moving to a beat supports rhythm, balance, and connection, and singing along adds more language.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "687": {
+    "tryToday": "Tuck {baby}'s familiar blanket into your bag before visiting somewhere new.",
+    "whyItMatters": "Big feelings about strangers and goodbyes belong to this stage, and your calm closeness is the strongest comfort.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "688": {
+    "tryToday": "Put a teething ring in the fridge, not the freezer, before {baby}'s morning nap.",
+    "whyItMatters": "Chilled pressure eases the ache with no risk, while numbing gels and necklaces can harm.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "689": {
+    "tryToday": "Wave and say \"bye-bye\" as someone leaves for work, then pause for {them}.",
+    "whyItMatters": "Repeating the same gesture gives {them} an easy model to copy as gestures emerge.",
+    "minutes": 1,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "690": {
+    "tryToday": "At the changing table say, \"Now we're snapping your pajamas.\"",
+    "whyItMatters": "Naming actions and objects stocks the word bank {they}'ll soon start drawing from.",
+    "minutes": 5,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "691": {
+    "tryToday": "Put a few pieces of ripe banana on {their} tray and step back.",
+    "whyItMatters": "Picking food up alone lets {baby} practice judging how much {they} actually need.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "692": {
+    "tryToday": "Clear a floor path and let {baby} pull up on the sofa while you sit nearby.",
+    "whyItMatters": "Walkers can tip near stairs and don't teach walking; free practice builds balance and leg strength.",
+    "minutes": 10,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  },
+  "693": {
+    "tryToday": "Lay two sofa cushions and a pillow in a row; sit at the end and call {baby} over.",
+    "whyItMatters": "Climbing toward you builds big muscles and coordination, and it feels like a game rather than practice.",
+    "minutes": 15,
+    "grounded": true,
+    "note": "",
+    "model": "claude-opus-5",
+    "at": "2026-09-15"
+  }
+}
