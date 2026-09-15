@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { WHO, getPercentile, ordinal, monthsBetween } from '../data/whoStandards'
-import DevelopmentChecklist from '../components/DevelopmentChecklist'
 
 const MONTHS25 = Array.from({ length: 25 }, (_, i) => i)
 
@@ -101,11 +100,9 @@ function loadEntries() {
   try { return JSON.parse(localStorage.getItem('growthEntries') || '[]') } catch { return [] }
 }
 
-import { statItemsFor, AGE_STATS_SOURCE } from '../data/ageStats'
-import { StatTile } from '../components/ui'
-import { getBabyAgeInMonths } from '../data/tips'
-
-export default function StatsScreen({ profile, onProfileChange }) {
+// Health segment of the Growth screen: WHO percentiles, the chart, and the
+// measurement log. Lifted out of the old StatsScreen unchanged.
+export default function GrowthHealth({ profile, onProfileChange }) {
   const [entries, setEntries] = useState(loadEntries)
   const [metric, setMetric] = useState('weight')
   const [showForm, setShowForm] = useState(false)
@@ -157,36 +154,7 @@ export default function StatsScreen({ profile, onProfileChange }) {
   }
 
   return (
-    <div style={{ maxWidth: '480px', margin: '0 auto', padding: '28px 16px 16px', minHeight: '100vh' }}>
-
-      {/* Header */}
-      <div style={{
-        background: '#fff', borderRadius: '24px', padding: '22px 20px',
-        marginBottom: '14px', boxShadow: '0 4px 24px rgba(100,100,180,0.08)',
-      }}>
-        <p style={{ margin: '0 0 4px', fontSize: '14px', color: '#9ca3af', fontWeight: '500' }}>Growth</p>
-        <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '700', color: '#1e1b4b' }}>
-          {babyName}'s Stats
-        </h1>
-      </div>
-
-      {/* Typical at this age — reference numbers, never something to log */}
-      {(() => {
-        const m = Math.max(0, Math.min(24, getBabyAgeInMonths(dateOfBirth)))
-        return (
-          <div style={{ marginBottom: '14px' }}>
-            <p style={{ margin: '0 4px 8px', fontSize: '11px', fontWeight: 700, color: 'rgba(30,27,75,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Typical at {m} months
-            </p>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              {statItemsFor(m).map(s => <StatTile key={s.label} emoji={s.emoji} value={s.value} label={s.label} />)}
-            </div>
-            <p style={{ margin: '8px 4px 0', fontSize: '10px', color: '#c4c4d4', textAlign: 'center', lineHeight: 1.5 }}>
-              Ranges, not targets — based on {AGE_STATS_SOURCE} guidance
-            </p>
-          </div>
-        )
-      })()}
+    <div>
 
       {/* Sex picker — shown once */}
       {!sex && (
@@ -469,8 +437,6 @@ export default function StatsScreen({ profile, onProfileChange }) {
         </>
       )}
 
-      {/* Development — what baby is doing, alongside how baby is growing */}
-      <DevelopmentChecklist profile={profile} />
     </div>
   )
 }

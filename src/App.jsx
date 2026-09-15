@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import HomeScreen from './screens/HomeScreen'
 import OnboardingScreen from './screens/OnboardingScreen'
 import StoriesScreen from './screens/StoriesScreen'
-import StatsScreen from './screens/StatsScreen'
+import GrowthScreen from './screens/GrowthScreen'
 import JournalScreen from './screens/JournalScreen'
 import AuthScreen from './screens/AuthScreen'
 import TipDetail from './screens/TipDetail'
@@ -185,7 +185,7 @@ export default function App() {
       <div key={activeTab} style={{ paddingBottom: '72px', animation: 'fadeIn 0.22s ease' }}>
         {activeTab === 'home'    && <HomeScreen profile={profile} onOpen={push} onOpenJournal={() => goToTab('journal')} photoVersion={photoVersion} />}
         {activeTab === 'stories' && <StoriesScreen profile={profile} openedForBedtime={openedForBedtime} onGoHome={() => goToTab('home')} />}
-        {activeTab === 'stats'   && <StatsScreen profile={profile} onProfileChange={handleProfileChange} />}
+        {activeTab === 'stats'   && <GrowthScreen profile={profile} onProfileChange={handleProfileChange} onOpen={push} />}
         {activeTab === 'journal' && <JournalScreen profile={profile} />}
       </div>
 

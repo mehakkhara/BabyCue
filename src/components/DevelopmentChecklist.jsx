@@ -10,7 +10,9 @@ import Burst from './Burst'
 // own additions. Lives on the Growth screen next to weight and height — same
 // question, "how is baby doing". Photos of these moments belong in the
 // journal, so there are none here.
-export default function DevelopmentChecklist({ profile }) {
+// `domain` narrows the list to one category (from the Growth overview tiles);
+// `onClearDomain` removes that filter.
+export default function DevelopmentChecklist({ profile, domain = null, onClearDomain }) {
   const { babyName, dateOfBirth } = profile
   const ageInMonths = getBabyAgeInMonths(dateOfBirth)
 
@@ -25,7 +27,8 @@ export default function DevelopmentChecklist({ profile }) {
   const ownForCheckpoint = customForCheckpoint(custom, activeCheckpoint)
   // The parent's own milestones lead the list — they went out of their way to
   // add them. They count toward the same tally as the curated ones.
-  const list = [...ownForCheckpoint, ...(MILESTONES[activeCheckpoint] || [])]
+  const all = [...ownForCheckpoint, ...(MILESTONES[activeCheckpoint] || [])]
+  const list = domain ? all.filter(m => m.domain === domain) : all
   const suggestions = ideasFor(activeCheckpoint, ownForCheckpoint)
   const done = list.filter(m => statuses[m.id] === 'done').length
   const idx = CHECKPOINTS.indexOf(activeCheckpoint)
@@ -66,8 +69,16 @@ export default function DevelopmentChecklist({ profile }) {
       padding: '18px',
       marginBottom: '14px',
       boxShadow: '0 4px 20px rgba(100,100,180,0.07)',
-      borderLeft: '4px solid #7C6FF7',
     }}>
+      {domain && (
+        <button onClick={onClearDomain} style={{
+          display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '10px',
+          border: 'none', background: '#ede9fe', color: '#7C6FF7', borderRadius: '999px',
+          padding: '5px 10px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+        }}>
+          {DOMAINS[domain]?.emoji} {DOMAINS[domain]?.label} <span aria-hidden="true">×</span>
+        </button>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '11px', fontWeight: '700', color: '#7C6FF7', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Development · around {activeCheckpoint} months
