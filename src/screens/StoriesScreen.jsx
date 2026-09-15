@@ -8,7 +8,7 @@ import { getBabyAgeInMonths } from '../data/tips'
 import { bandForAge, storiesForAge, pickTonight, STORIES, storyExtras, readingMinutes } from '../data/stories'
 import { getReadIds, getFavourites, todayKey } from '../lib/storyProgress'
 import { Screen, IconButton, Pill, SectionHeader } from '../components/ui'
-import { color, shadow, type } from '../theme'
+import { color, type } from '../theme'
 
 const SERIF = "Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif"
 
@@ -65,13 +65,15 @@ export default function StoriesScreen({ profile, openedForBedtime = false, onGoH
   const tonightArt = tonight ? PAINTINGS[tonight.pages[0].art] : null
 
   return (
-    <Screen>
+    <Screen style={{ background: '#fffdf9' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
         <div style={{ minWidth: 0 }}>
           <h1 style={{ ...type.h1, fontSize: '24px' }}>Stories</h1>
           <p style={{ ...type.body, marginTop: '4px' }}>Calm, meaningful stories for curious minds</p>
         </div>
-        <IconButton label="Search" active={showSearch} onClick={() => { setShowSearch(v => !v); setQuery('') }}>🔍</IconButton>
+        <IconButton label="Search stories" active={showSearch} onClick={() => { setShowSearch(v => !v); setQuery('') }}>
+          <SearchIcon />
+        </IconButton>
       </div>
 
       {showSearch && (
@@ -108,27 +110,20 @@ export default function StoriesScreen({ profile, openedForBedtime = false, onGoH
         <>
           {/* Tonight */}
           {tonight && (
-            <div style={{ borderRadius: '24px', overflow: 'hidden', background: '#10131f', boxShadow: shadow.cardLg, position: 'relative' }}>
-              <div style={{ position: 'relative', height: '250px' }}>
-                <PaintingCanvas id={tonight.pages[0].art} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(16,19,31,0) 20%, rgba(16,19,31,0.35) 55%, rgba(16,19,31,0.92) 100%)' }} />
-                <div style={{ position: 'absolute', left: '18px', right: '18px', bottom: '16px' }}>
-                  <div style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#e8b13d', fontWeight: 700, marginBottom: '6px' }}>
-                    Tonight's story
-                  </div>
-                  <div style={{ fontFamily: SERIF, fontSize: '24px', lineHeight: 1.15, color: '#f3e6c8' }}>{tonight.title}</div>
-                  <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>
-                    <Pill style={{ background: 'rgba(255,255,255,0.14)', color: '#f3e6c8' }}>⏱ {readingMinutes(tonight)} min</Pill>
-                    <Pill style={{ background: 'rgba(255,255,255,0.14)', color: '#f3e6c8' }}>👶 {band.age}</Pill>
-                  </div>
-                  <button onClick={() => setOpen(tonight)} style={{
-                    marginTop: '12px', border: 'none', borderRadius: '999px', padding: '10px 18px',
-                    background: color.primary, color: '#fff', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                    boxShadow: '0 6px 16px rgba(124,111,247,0.35)',
-                  }}>
-                    ▶ Read now
-                  </button>
+            <div style={{ borderRadius: '22px', overflow: 'hidden', background: '#fff', border: '1px solid #f1eadf', boxShadow: '0 10px 26px rgba(77, 62, 38, .09)', position: 'relative' }}>
+              <div style={{ position: 'relative', height: '238px' }}>
+                <PaintingCanvas id={tonight.pages[0].art} fit="contain" style={{ background: '#f7f0df' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 46%, rgba(28,24,59,.18) 100%)' }} />
+              </div>
+              <div style={{ padding: '16px 17px 17px' }}>
+                <div style={{ fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase', color: color.primary, fontWeight: 800, marginBottom: '5px' }}>Tonight's story</div>
+                <div style={{ fontFamily: SERIF, fontSize: '25px', lineHeight: 1.12, color: color.ink }}>{tonight.title}</div>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '8px', color: color.inkSoft, fontSize: '12px', fontWeight: 600 }}>
+                  <span>◷ {readingMinutes(tonight)} min</span><span>▣ {band.age}</span>
                 </div>
+                <button onClick={() => setOpen(tonight)} style={{ marginTop: '14px', border: 'none', borderRadius: '999px', padding: '11px 22px', background: 'linear-gradient(135deg, #7869f3, #967df7)', color: '#fff', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 14px rgba(124,111,247,.28)' }}>
+                  <span style={{ marginRight: '8px' }}>▶</span> Read now
+                </button>
               </div>
             </div>
           )}
@@ -168,15 +163,15 @@ function List({ stories, readIds, favourites, onOpen, dim = false }) {
         const fav = favourites.includes(story.id)
         return (
           <button key={story.id} onClick={() => onOpen(story)} style={{
-            display: 'flex', alignItems: 'center', gap: '13px', width: '100%', padding: '9px',
-            border: 'none', borderRadius: '16px', backgroundColor: color.surface, boxShadow: shadow.card,
+            display: 'flex', alignItems: 'center', gap: '13px', width: '100%', padding: '8px',
+            border: '1px solid #f0ebf6', borderRadius: '15px', backgroundColor: color.surface,
             cursor: 'pointer', textAlign: 'left', opacity: dim ? 0.78 : 1, fontFamily: 'inherit',
           }}>
-            <div style={{ flex: '0 0 58px', height: '58px', borderRadius: '12px', overflow: 'hidden' }}>
-              <PaintingCanvas id={story.pages[0].art} />
+            <div style={{ flex: '0 0 62px', height: '62px', borderRadius: '11px', overflow: 'hidden' }}>
+              <PaintingCanvas id={story.pages[0].art} fit="contain" style={{ background: '#f7f0df' }} />
             </div>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontFamily: SERIF, fontSize: '16.5px', lineHeight: 1.25, color: color.ink, marginBottom: '3px' }}>
+              <div style={{ fontFamily: SERIF, fontSize: '16px', lineHeight: 1.2, color: color.ink, marginBottom: '4px' }}>
                 {story.title}
               </div>
               <div style={{ fontSize: '11.5px', color: color.faint }}>
@@ -184,10 +179,14 @@ function List({ stories, readIds, favourites, onOpen, dim = false }) {
                 {read && <span style={{ color: color.primary, fontWeight: 600 }}> · Read</span>}
               </div>
             </div>
-            {fav && <span aria-label="Favourite" style={{ fontSize: '14px', flexShrink: 0 }}>💜</span>}
+            {fav && <span aria-label="Favourite" style={{ fontSize: '14px', flexShrink: 0, color: color.primary }}>♥</span>}
           </button>
         )
       })}
     </div>
   )
+}
+
+function SearchIcon() {
+  return <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
 }

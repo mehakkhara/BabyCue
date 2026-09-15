@@ -8,7 +8,7 @@ import { paintTo } from '../lib/paintingCanvas'
  *
  * `style` is spread last so callers control sizing and radius.
  */
-export default function PaintingCanvas({ id, alt = '', style = {} }) {
+export default function PaintingCanvas({ id, alt = '', style = {}, fit = 'cover' }) {
   const ref = useRef(null)
   const painting = PAINTINGS[id]
   const file = painting?.file
@@ -43,7 +43,7 @@ export default function PaintingCanvas({ id, alt = '', style = {} }) {
       <img
         src={file}
         alt={alt || painting.title}
-        style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', ...style }}
+        style={{ display: 'block', width: '100%', height: '100%', objectFit: fit, ...style }}
       />
     )
   }

@@ -18,7 +18,9 @@ export default function StoryReader({ story, profile, onClose }) {
   const [page, setPage] = useState(0)
   const [hint, setHint] = useState(true)
   const [fav, setFav] = useState(() => isFavourite(story.id))
-  const prompt = storyExtras(story.id).prompt
+  const extras = storyExtras(story.id)
+  const prompt = extras.prompt
+  const lesson = extras.learn
   const textRef = useRef(null)
   const touchX = useRef(0)
 
@@ -100,7 +102,7 @@ export default function StoryReader({ story, profile, onClose }) {
       }}>
         {/* Painting */}
         <div style={{ position: 'relative', flex: '0 0 auto', height: '46dvh', overflow: 'hidden' }}>
-          <PaintingCanvas id={current.art} />
+          <PaintingCanvas id={current.art} fit="contain" style={{ background: NIGHT }} />
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -170,6 +172,19 @@ export default function StoryReader({ story, profile, onClose }) {
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: GOLD, marginBottom: '3px' }}>Try this while reading</div>
                 <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'rgba(243,230,200,0.85)' }}>{renderLine(prompt, profile)}</div>
+              </div>
+            </div>
+          )}
+          {page === 0 && lesson && (
+            <div style={{
+              marginTop: '10px', display: 'flex', gap: '10px', alignItems: 'flex-start',
+              background: 'rgba(196,181,253,0.12)', border: '1px solid rgba(196,181,253,0.24)',
+              borderRadius: '14px', padding: '11px 13px', fontFamily: 'Inter, system-ui, sans-serif',
+            }}>
+              <span style={{ fontSize: '16px', lineHeight: 1 }}>✦</span>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#c4b5fd', marginBottom: '3px' }}>We discovered</div>
+                <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'rgba(243,230,200,0.9)' }}>{lesson}</div>
               </div>
             </div>
           )}
