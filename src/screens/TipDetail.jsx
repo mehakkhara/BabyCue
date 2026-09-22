@@ -8,12 +8,12 @@ import { getBabyAgeInMonths } from '../data/tips'
 import { isSaved, loadSaved, toggleSaved } from '../lib/savedTips'
 import { markCheckIn } from '../lib/streak'
 import { getRating, setRating, RATINGS } from '../lib/activityFeedback'
-import { relatedTips, ageRangeLabel, topicLabel, clampMonth } from '../lib/dailyTip'
+import { relatedTips, ageRangeLabel, topicLabel, clampMonth, TOPIC_EMOJI, TOPIC_HUE } from '../lib/dailyTip'
 import { Screen, IconButton, Pill, PrimaryButton, SecondaryButton, InfoRow, SectionHeader, Card, IconTile, Chevron } from '../components/ui'
 import Burst from '../components/Burst'
 import { color, shadow, type } from '../theme'
 
-const KICKER = { tip: "Today's tip", activity: "Today's activity", saved: 'Saved tip', related: 'Related tip' }
+const KICKER = { tip: "Today's tip", activity: "Today's activity", saved: 'Saved tip', related: 'Related tip', browse: 'From the library' }
 
 export default function TipDetail({ tip, kind = 'tip', profile, onBack, onOpenTip }) {
   const [saved, setSaved] = useState(() => isSaved(tip.id, loadSaved()))
@@ -85,15 +85,9 @@ export default function TipDetail({ tip, kind = 'tip', profile, onBack, onOpenTi
         </div>
       )}
       {tip.tryToday && (
-        <Card style={{ background: color.tintLight, boxShadow: 'none', marginBottom: '14px' }} padding="14px 16px">
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-            <IconTile emoji="💬" size={30} />
-            <div>
-              <p style={{ ...type.bodyStrong, fontSize: '13px', color: color.primary }}>Try it today</p>
-              <p style={{ ...type.body, fontSize: '14px', color: color.ink, marginTop: '2px' }}>“{personalize(tip.tryToday, profile)}”</p>
-            </div>
-          </div>
-        </Card>
+        <div style={{ marginBottom: '14px' }}>
+          <InfoRow emoji="💬" hue="peach" title="Try it today" text={`“${personalize(tip.tryToday, profile)}”`} />
+        </div>
       )}
 
       <div style={{ marginBottom: '18px' }}>
@@ -163,5 +157,3 @@ export default function TipDetail({ tip, kind = 'tip', profile, onBack, onOpenTi
   )
 }
 
-const TOPIC_EMOJI = { sleep: '🌙', feeding: '🍼', development: '🧠', motor: '💪', regression: '🔄', activity: '🎨', play: '🎨', fussy: '😮‍💨', leap: '🧩', teething: '🦷' }
-const TOPIC_HUE = { sleep: 'lavender', feeding: 'sky', development: 'mint', motor: 'amber', regression: 'rose', activity: 'peach', play: 'peach', fussy: 'rose', leap: 'mint', teething: 'sky' }

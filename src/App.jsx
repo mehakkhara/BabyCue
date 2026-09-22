@@ -9,6 +9,8 @@ import TipDetail from './screens/TipDetail'
 import MoodScreen from './screens/MoodScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import SavedTipsScreen from './screens/SavedTipsScreen'
+import BrowseScreen from './screens/BrowseScreen'
+import MonthScreen from './screens/MonthScreen'
 import StoryReader from './screens/StoryReader'
 import PhotoHunt from './components/PhotoHunt'
 import { Screen } from './components/ui'
@@ -174,6 +176,8 @@ export default function App() {
       />
     )
     else if (name === 'savedTips') page = <SavedTipsScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'saved' })} />
+    else if (name === 'month') page = <MonthScreen profile={profile} onBack={pop} />
+    else if (name === 'browse') page = <BrowseScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'browse' })} />
     else if (name === 'editProfile') page = <OnboardingScreen onComplete={async p => { await handleProfileChange(p); pop() }} />
     else if (name === 'story') page = <StoryReader story={params.story} profile={profile} onClose={pop} />
     else if (name === 'photoHunt') page = (

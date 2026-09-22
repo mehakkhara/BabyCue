@@ -64,3 +64,7 @@ const TOPIC_LABEL = {
 export function topicLabel(topic) {
   return TOPIC_LABEL[topic] || 'Tip'
 }
+
+// Topic icon + tile colour, shared by the detail page and the month browser.
+export const TOPIC_EMOJI = { sleep: '🌙', feeding: '🍼', development: '🧠', motor: '💪', regression: '🔄', activity: '🎨', play: '🎨', fussy: '😮‍💨', leap: '🧩', teething: '🦷' }
+export const TOPIC_HUE = { sleep: 'lavender', feeding: 'sky', development: 'mint', motor: 'amber', regression: 'rose', activity: 'peach', play: 'peach', fussy: 'rose', leap: 'mint', teething: 'sky' }
