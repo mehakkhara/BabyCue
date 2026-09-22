@@ -5,6 +5,7 @@ import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { pickTonight, STORIES } from '../data/stories'
 import { getReadIds, todayKey as storyDayKey } from '../lib/storyProgress'
 import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
+import { overviewForMonth } from '../data/monthOverview'
 import { getTodayMoods, topicForMoods } from '../lib/moodLog'
 import { BABY_STATES } from '../data/babyStates'
 import { getBabyPhoto, latestJournalPhotoUrl } from '../lib/babyPhoto'
@@ -83,6 +84,7 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   const moodTopic = topicForMoods(moods)
   const tip = useMemo(() => pickDailyTip(month, { topic: moodTopic }), [month, moodTopic])
   const activity = useMemo(() => pickDailyActivity(month), [month])
+  const overview = overviewForMonth(month)
   const tonight = useMemo(
     () => pickTonight(ageInMonths, { seed: `${storyDayKey()}:${babyName || ''}`, readIds: getReadIds() }),
     [ageInMonths, babyName],
@@ -130,7 +132,7 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
       <p style={{ ...type.small, textAlign: 'center', margin: '12px 0 4px', fontStyle: 'italic', color: color.inkSoft }}>“{quote}”</p>
 
       {/* Today for you */}
-      <SectionHeader title="Today for you" style={{ marginTop: '18px' }} />
+      <SectionHeader title="Today for you" action="Browse by month" onAction={() => onOpen('browse')} style={{ marginTop: '18px' }} />
       <Card padding="4px 14px">
         <ListRow
           emoji="💡" hue="amber" title="Learn"
@@ -154,6 +156,18 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
           last
         />
       </Card>
+
+      {/* This month: what to expect (free, always one tap away) */}
+      {overview && (
+        <Card padding="4px 14px" style={{ marginTop: '14px' }}>
+          <ListRow
+            emoji="📅" hue="mint" title={`Month ${month}: what to expect`}
+            subtitle={personalize(overview.headsUp, profile)}
+            onClick={() => onOpen('month')}
+            last
+          />
+        </Card>
+      )}
 
       {/* Mood check-in */}
       <Card onClick={() => onOpen('mood')} style={{ marginTop: '14px' }} padding="14px 18px">

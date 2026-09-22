@@ -61,6 +61,38 @@ After Phases 1 + 2, the still-thin months (likely 5, 7, 11, 19-23 — older todd
 
 ---
 
+## Up Next — 2026-09-21 (content pass)
+
+Decided with Mehak on 2026-09-21. Feature work for v1 is considered done; this pass is about the content, because the content is the product. Built as small PRs she reviews one at a time.
+
+### PR 1 — `feat/browse-by-month` (built, awaiting review)
+- [x] "Try it today" rendered as an InfoRow so its icon lines up with the rows around it.
+- [x] "This month: what to expect" card on Today (under "Today for you") → `screens/MonthScreen.jsx`: sleep / feeding / growing / heads-up for the baby's own month from `data/monthOverview.js`, sourced, plus a one-line peek at next month. **Free** — Mehak wants this the most accessible thing in the app.
+- [x] Browse-by-month screen (`screens/BrowseScreen.jsx`) from "Browse by month" on Today: month strip 1–24 (opens on baby's month), every tip and activity for the month grouped by topic. Opens the normal tip page with kicker "From the library". **Planned as a paid feature** (no paywall built yet).
+- [ ] Mehak to skim `monthOverview.js` — 24 entries written by Claude from AAP/CDC general guidance, needs her eye like the tip enrichment did.
+
+### PR 2 — richer "Why it matters"
+- [ ] Loosen the 2026-09-14 rule: the model may give ONE reason from the tip's cited source even if the body doesn't state it. Each entry tagged `restated` | `from source` so the review page shows which is which.
+- [ ] Run a 10-tip sample first (cents) and show the before/after before the full 540 rerun (~2 USD).
+
+### PR 3 — parent checklists
+- [ ] Well visits on the AAP schedule (1, 2, 4, 6, 9, 12, 15, 18, 24 months): what the visit covers, questions to ask, what to bring, how baby may feel after. **No symptom / red-flag / "call the doctor" content — Mehak explicitly does not want the app to go there.**
+- [ ] Starting solids readiness; babyproofing when crawling starts. Later: first daycare week, travel.
+- [ ] Checkable items saved per baby; a "To do" card on Today only when something is due; a Checklists screen to browse.
+
+### PR 4 — tip series
+- [ ] Multi-day series where consecutive days build on each other (solids week 1–5, bedtime routine build-up, tummy-time progression). Data: `series` id + `step` on tips; Today follows the series once started.
+- [ ] **Opt-out is required:** "skip this series" on the tip (drops back to the daily pick) and a Profile setting to turn series off entirely. A parent who doesn't care must never feel stuck in one.
+
+### PR 5 — library hygiene + parent wellbeing
+- [ ] Script pass over the 540 tips for near-duplicates and contradictions (old gentle/schedule variants are the likely source); fix what it finds.
+- [ ] Parent wellbeing tips: postpartum mood, asking for help, rest — sourced, no screening or diagnosis content.
+- [ ] Weeks instead of months for the first three months, if the month browser shows that month 1–3 content is too coarse.
+
+Dropped on purpose: "When to call the doctor by age" — Mehak: "leave the doctor part out, I don't want to get into that."
+
+---
+
 ## Up Next — 2026-09-12
 
 Left over after the photo-hunt camera work (`feat/photo-hunt-camera`) and the September dogfood pass (`feat/dogfood-sept-2026`, all 10 findings in `dogfood-output/2026-09-08.html` built). Mockup of the camera options: `public/photo-hunt-camera-mockup.html` (A and B built, C below).
