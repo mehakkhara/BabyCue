@@ -1,0 +1,38 @@
+name: Build check
+
+# Runs the production build on every PR into main, so a broken build shows a
+# red X on the PR before it is merged. It never publishes anything — the
+# deploy itself still happens in deploy.yml after the merge.
+on:
+  pull_request:
+    branches: [main]
+
+# Read-only: this job only needs to check the code out.
+permissions:
+  contents: read
+
+# A newer push to the same PR supersedes an in-flight check.
+concurrency:
+  group: build-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # No Supabase secrets here on purpose: the build succeeds without them
+      # (guest mode), and a check that only compiles has no need for keys.
+      - name: Build
+        run: npm run build
