@@ -5,7 +5,9 @@ import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { pickTonight, STORIES } from '../data/stories'
 import { getReadIds, todayKey as storyDayKey } from '../lib/storyProgress'
 import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
+
 import { overviewForMonth } from '../data/monthOverview'
+
 import { getTodayMoods, topicForMoods } from '../lib/moodLog'
 import { BABY_STATES } from '../data/babyStates'
 import { getBabyPhoto, latestJournalPhotoUrl } from '../lib/babyPhoto'
@@ -157,16 +159,23 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
         />
       </Card>
 
-      {/* This month: what to expect (free, always one tap away) */}
-      {overview && (
-        <Card padding="4px 14px" style={{ marginTop: '14px' }}>
-          <ListRow
-            emoji="📅" hue="mint" title={`Month ${month}: what to expect`}
-            subtitle={personalize(overview.headsUp, profile)}
-            onClick={() => onOpen('month')}
-            last
-          />
-        </Card>
+      {/* To do: checklists due right now */}
+      {todos.length > 0 && (
+        <>
+          <SectionHeader title="To do" action="All checklists" onAction={() => onOpen('checklists')} style={{ marginTop: '18px' }} />
+          <Card padding="4px 14px">
+            {todos.slice(0, 2).map(({ c, done, total }, i, arr) => (
+              <ListRow
+                key={c.id}
+                emoji={c.emoji} hue={c.hue}
+                title={personalize(c.title, profile)}
+                subtitle={done === 0 ? personalize(c.intro, profile) : `${done} of ${total} done`}
+                onClick={() => onOpen('checklist', { id: c.id })}
+                last={i === arr.length - 1}
+              />
+            ))}
+          </Card>
+        </>
       )}
 
       {/* Mood check-in */}

@@ -16,7 +16,7 @@ import StreakRow from '../components/StreakRow'
 import { Screen, Card, ListRow, Avatar, PrimaryButton } from '../components/ui'
 import { color, gradient, shadow, type } from '../theme'
 
-export default function ProfileScreen({ profile, onBack, onEditProfile, onSavedTips, onSignOut, onPhotoChange }) {
+export default function ProfileScreen({ profile, onBack, onEditProfile, onSavedTips, onChecklists, onSignOut, onPhotoChange }) {
   const babyName = (profile.babyName || '').trim() || 'your baby'
   const momName = (profile.momName || '').trim() || 'Mama'
   const ageInMonths = getBabyAgeInMonths(profile.dateOfBirth)
@@ -126,7 +126,8 @@ export default function ProfileScreen({ profile, onBack, onEditProfile, onSavedT
 
       <Card style={{ marginBottom: '14px' }} padding="4px 14px">
         <ListRow emoji="👶" hue="lavender" title="Edit profile" subtitle="Name, birthday, feeding and sleep details" onClick={onEditProfile} />
-        <ListRow emoji="🔖" hue="amber" title="Saved tips" subtitle={savedCount === 0 ? 'Nothing saved yet' : `${savedCount} saved`} onClick={onSavedTips} last={!notifsSupported()} />
+        <ListRow emoji="🔖" hue="amber" title="Saved tips" subtitle={savedCount === 0 ? 'Nothing saved yet' : `${savedCount} saved`} onClick={onSavedTips} />
+        <ListRow emoji="✅" hue="mint" title="Checklists" subtitle="Well visits, starting solids, babyproofing" onClick={onChecklists} last={!notifsSupported()} />
         {notifsSupported() && (
           <ListRow
             emoji="🔔" hue="sky" title="Daily nudge"

@@ -9,8 +9,8 @@ import TipDetail from './screens/TipDetail'
 import MoodScreen from './screens/MoodScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import SavedTipsScreen from './screens/SavedTipsScreen'
-import BrowseScreen from './screens/BrowseScreen'
-import MonthScreen from './screens/MonthScreen'
+import ChecklistsScreen from './screens/ChecklistsScreen'
+import ChecklistDetail from './screens/ChecklistDetail'
 import StoryReader from './screens/StoryReader'
 import PhotoHunt from './components/PhotoHunt'
 import { Screen } from './components/ui'
@@ -171,10 +171,13 @@ export default function App() {
         onBack={pop}
         onEditProfile={() => push('editProfile')}
         onSavedTips={() => push('savedTips')}
+        onChecklists={() => push('checklists')}
         onSignOut={isSupabaseConfigured ? handleSignOut : null}
         onPhotoChange={() => setPhotoVersion(v => v + 1)}
       />
     )
+    else if (name === 'checklists') page = <ChecklistsScreen profile={profile} onBack={pop} onOpenChecklist={id => push('checklist', { id })} />
+    else if (name === 'checklist') page = <ChecklistDetail id={params.id} profile={profile} onBack={pop} />
     else if (name === 'savedTips') page = <SavedTipsScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'saved' })} />
     else if (name === 'month') page = <MonthScreen profile={profile} onBack={pop} />
     else if (name === 'browse') page = <BrowseScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'browse' })} />
