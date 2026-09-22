@@ -5,6 +5,8 @@ import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { pickTonight, STORIES } from '../data/stories'
 import { getReadIds, todayKey as storyDayKey } from '../lib/storyProgress'
 import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
+import { dueChecklists, itemCount } from '../data/checklists'
+import { loadProgress, doneCount, isComplete, isHidden } from '../lib/checklistProgress'
 import { getTodayMoods, topicForMoods } from '../lib/moodLog'
 import { BABY_STATES } from '../data/babyStates'
 import { getBabyPhoto, latestJournalPhotoUrl } from '../lib/babyPhoto'
@@ -83,6 +85,11 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   const moodTopic = topicForMoods(moods)
   const tip = useMemo(() => pickDailyTip(month, { topic: moodTopic }), [month, moodTopic])
   const activity = useMemo(() => pickDailyActivity(month), [month])
+  // To-dos: checklists due for this age that aren't finished or hidden.
+  const todos = useMemo(() => {
+    const p = loadProgress()
+    return dueChecklists(ageInMonths).filter(c => !isComplete(p, c) && !isHidden(p, c.id)).map(c => ({ c, done: doneCount(p, c), total: itemCount(c) }))
+  }, [ageInMonths])
   const tonight = useMemo(
     () => pickTonight(ageInMonths, { seed: `${storyDayKey()}:${babyName || ''}`, readIds: getReadIds() }),
     [ageInMonths, babyName],
@@ -154,6 +161,25 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
           last
         />
       </Card>
+
+      {/* To do: checklists due right now */}
+      {todos.length > 0 && (
+        <>
+          <SectionHeader title="To do" action="All checklists" onAction={() => onOpen('checklists')} style={{ marginTop: '18px' }} />
+          <Card padding="4px 14px">
+            {todos.slice(0, 2).map(({ c, done, total }, i, arr) => (
+              <ListRow
+                key={c.id}
+                emoji={c.emoji} hue={c.hue}
+                title={personalize(c.title, profile)}
+                subtitle={done === 0 ? personalize(c.intro, profile) : `${done} of ${total} done`}
+                onClick={() => onOpen('checklist', { id: c.id })}
+                last={i === arr.length - 1}
+              />
+            ))}
+          </Card>
+        </>
+      )}
 
       {/* Mood check-in */}
       <Card onClick={() => onOpen('mood')} style={{ marginTop: '14px' }} padding="14px 18px">
