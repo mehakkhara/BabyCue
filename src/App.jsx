@@ -179,6 +179,8 @@ export default function App() {
     else if (name === 'checklists') page = <ChecklistsScreen profile={profile} onBack={pop} onOpenChecklist={id => push('checklist', { id })} />
     else if (name === 'checklist') page = <ChecklistDetail id={params.id} profile={profile} onBack={pop} />
     else if (name === 'savedTips') page = <SavedTipsScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'saved' })} />
+    else if (name === 'month') page = <MonthScreen profile={profile} onBack={pop} />
+    else if (name === 'browse') page = <BrowseScreen profile={profile} onBack={pop} onOpenTip={tip => push('tip', { tip, kind: 'browse' })} />
     else if (name === 'editProfile') page = <OnboardingScreen onComplete={async p => { await handleProfileChange(p); pop() }} />
     else if (name === 'story') page = <StoryReader story={params.story} profile={profile} onClose={pop} />
     else if (name === 'photoHunt') page = (

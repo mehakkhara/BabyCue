@@ -5,8 +5,9 @@ import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { pickTonight, STORIES } from '../data/stories'
 import { getReadIds, todayKey as storyDayKey } from '../lib/storyProgress'
 import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
-import { dueChecklists, itemCount } from '../data/checklists'
-import { loadProgress, doneCount, isComplete, isHidden } from '../lib/checklistProgress'
+
+import { overviewForMonth } from '../data/monthOverview'
+
 import { getTodayMoods, topicForMoods } from '../lib/moodLog'
 import { BABY_STATES } from '../data/babyStates'
 import { getBabyPhoto, latestJournalPhotoUrl } from '../lib/babyPhoto'
@@ -85,11 +86,7 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   const moodTopic = topicForMoods(moods)
   const tip = useMemo(() => pickDailyTip(month, { topic: moodTopic }), [month, moodTopic])
   const activity = useMemo(() => pickDailyActivity(month), [month])
-  // To-dos: checklists due for this age that aren't finished or hidden.
-  const todos = useMemo(() => {
-    const p = loadProgress()
-    return dueChecklists(ageInMonths).filter(c => !isComplete(p, c) && !isHidden(p, c.id)).map(c => ({ c, done: doneCount(p, c), total: itemCount(c) }))
-  }, [ageInMonths])
+  const overview = overviewForMonth(month)
   const tonight = useMemo(
     () => pickTonight(ageInMonths, { seed: `${storyDayKey()}:${babyName || ''}`, readIds: getReadIds() }),
     [ageInMonths, babyName],
@@ -137,7 +134,7 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
       <p style={{ ...type.small, textAlign: 'center', margin: '12px 0 4px', fontStyle: 'italic', color: color.inkSoft }}>“{quote}”</p>
 
       {/* Today for you */}
-      <SectionHeader title="Today for you" style={{ marginTop: '18px' }} />
+      <SectionHeader title="Today for you" action="Browse by month" onAction={() => onOpen('browse')} style={{ marginTop: '18px' }} />
       <Card padding="4px 14px">
         <ListRow
           emoji="💡" hue="amber" title="Learn"
