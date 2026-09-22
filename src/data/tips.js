@@ -31,7 +31,7 @@ const RAW_TIPS = [
   { id: 24, month: 4, style: 'schedule', topic: 'teething', title: 'Teething vs. Illness', body: 'Teething may cause mild fussiness and drooling but should NOT cause high fever or diarrhea. If those appear, it\'s likely illness — call your pediatrician.', source: 'AAP' },
 
   // Month 5
-  { id: 15, month: 5, style: 'gentle', topic: 'sleep', title: 'Introduce a Lovey', body: 'A small, safe comfort object (once baby can roll both ways) can become a soothing anchor for sleep — great for gentle sleep approaches.', source: 'AAP' },
+  { id: 15, month: 5, style: 'gentle', topic: 'sleep', title: 'Introduce a Lovey (for Awake Time)', body: 'A small soft toy or cloth can become a comfort object your baby reaches for during cuddles, wind-down and stroller rides. Keep it out of the crib for now: AAP safe-sleep guidance keeps the sleep space bare until 12 months, so the lovey joins bedtime only after the first birthday.', source: 'AAP' },
   { id: 16, month: 5, style: 'gentle', topic: 'motor', title: 'Supported Sitting Play', body: 'Use pillows to help baby sit upright for play. This builds core strength and spatial awareness ahead of independent sitting.', source: 'AAP' },
   { id: 17, month: 5, style: 'schedule', topic: 'feeding', title: 'Start Solid Food Prep', body: 'Talk to your pediatrician now about starting solids at 6 months. Signs of readiness: sits with support, shows interest in food, lost tongue-thrust reflex.', source: 'WHO / AAP' },
   { id: 25, month: 5, style: 'gentle', topic: 'teething', title: 'Gum Massage', body: 'Gently rub your baby\'s gums with a clean finger for 1–2 minutes. The counter-pressure relieves teething discomfort and many babies find it calming.', source: 'AAP' },
