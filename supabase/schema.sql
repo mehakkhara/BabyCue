@@ -140,3 +140,25 @@ create policy "photos_owner_update"
 create policy "photos_owner_delete"
   on storage.objects for delete
   using (bucket_id = 'baby-photos' and auth.uid()::text = (storage.foldername(name))[1]);
+
+-- =============================================================
+-- Journal sync (2026-09-22, sync-scope.md Phase A)
+-- Safe to re-run. Adds the columns the app already stores locally, plus the
+-- fields the sync needs: a device-independent id, a soft delete, and an
+-- updated_at for last-write-wins.
+-- =============================================================
+alter table public.journal_entries alter column profile_id drop not null;
+alter table public.journal_entries
+  add column if not exists client_id   uuid,
+  add column if not exists kind        text not null default 'memory',
+  add column if not exists source      text,
+  add column if not exists entry_at    timestamptz,
+  add column if not exists media_type  text,
+  add column if not exists width       integer,
+  add column if not exists height      integer,
+  add column if not exists fit         text,
+  add column if not exists position    text,
+  add column if not exists updated_at  timestamptz not null default now(),
+  add column if not exists deleted_at  timestamptz;
+create unique index if not exists journal_client_id on public.journal_entries (client_id);
+create index if not exists journal_user_updated on public.journal_entries (user_id, updated_at);

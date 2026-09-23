@@ -1,10 +1,11 @@
 // Mom's corner: the baby photo, profile edits, saved tips, the daily nudge,
 // her check-in streak, password and sign-out. Everything that used to sit at
 // the bottom of Home lives here so Today stays calm.
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { loadSaved } from '../lib/savedTips'
 import { streakSummary } from '../lib/streak'
+import { getSyncStatus, onSyncChange, refreshSyncStatus, runSync } from '../lib/sync'
 import { pickNudge } from '../data/nudges'
 import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { getBabyPhoto, setBabyPhoto, clearBabyPhoto } from '../lib/babyPhoto'
@@ -25,6 +26,9 @@ export default function ProfileScreen({ profile, onBack, onEditProfile, onSavedT
   const [photo, setPhoto] = useState(() => getBabyPhoto())
   const [photoBusy, setPhotoBusy] = useState(false)
   const fileRef = useRef(null)
+
+  const [sync, setSync] = useState(() => getSyncStatus())
+  useEffect(() => { refreshSyncStatus(); return onSyncChange(setSync) }, [])
 
   const [nudgeOn, setNudgeOn] = useState(() => nudgeIsEnabled())
   const [nudgePerm, setNudgePerm] = useState(() => notifPermission())
@@ -127,7 +131,14 @@ export default function ProfileScreen({ profile, onBack, onEditProfile, onSavedT
       <Card style={{ marginBottom: '14px' }} padding="4px 14px">
         <ListRow emoji="👶" hue="lavender" title="Edit profile" subtitle="Name, birthday, feeding and sleep details" onClick={onEditProfile} />
         <ListRow emoji="🔖" hue="amber" title="Saved tips" subtitle={savedCount === 0 ? 'Nothing saved yet' : `${savedCount} saved`} onClick={onSavedTips} />
-        <ListRow emoji="✅" hue="mint" title="Checklists" subtitle="Well visits, starting solids, babyproofing" onClick={onChecklists} last={!notifsSupported()} />
+        <ListRow emoji="✅" hue="mint" title="Checklists" subtitle="Well visits, starting solids, babyproofing" onClick={onChecklists} />
+        <ListRow
+          emoji="☁️" hue="sky" title="Backup"
+          subtitle={backupLine(sync)}
+          onClick={() => runSync('manual')}
+          right={sync.configured && sync.signedIn ? undefined : null}
+          last={!notifsSupported()}
+        />
         {notifsSupported() && (
           <ListRow
             emoji="🔔" hue="sky" title="Daily nudge"
@@ -186,4 +197,15 @@ function Toggle({ on }) {
       <span style={{ position: 'absolute', top: '3px', left: on ? '21px' : '3px', width: '22px', height: '22px', borderRadius: '50%', background: '#fff', transition: 'left 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
     </span>
   )
+}
+
+// One line for the Backup row. Reads as a status, never as a setting.
+function backupLine(sync) {
+  if (!sync.configured) return 'Memories stay on this device'
+  if (!sync.signedIn) return 'Sign in to back up your memories'
+  if (sync.running) return sync.pending > 0 ? `Uploading… ${sync.pending} left` : 'Checking…'
+  if (sync.lastError) return sync.lastError
+  if (sync.pending > 0) return `${sync.pending} ${sync.pending === 1 ? 'memory' : 'memories'} waiting to upload · tap to retry`
+  if (sync.lastSyncAt) return `All memories backed up · ${new Date(sync.lastSyncAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+  return 'All memories backed up'
 }
