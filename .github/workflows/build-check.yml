@@ -32,6 +32,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Catches names used but never defined or imported (the bug a merge
+      # conflict leaves behind that the bundler does not see).
+      - name: Lint
+        run: npm run lint
+
       # No Supabase secrets here on purpose: the build succeeds without them
       # (guest mode), and a check that only compiles has no need for keys.
       - name: Build
