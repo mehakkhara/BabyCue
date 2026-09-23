@@ -8,11 +8,14 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 import {
   listOutbox, removeJob, updateJob, getEntryByClientId, markSynced, unsyncedClientIds, enqueue,
+  upsertFromRemote, deleteByClientId, attachMedia, entriesMissingMedia,
 } from '../data/journalStore'
 
 const BUCKET = 'baby-photos'
 const TABLE = 'journal_entries'
 const LAST_SYNC_KEY = 'journalSync:lastAt'
+const LAST_PULL_KEY = 'journalSync:lastPull:'   // + user id
+const PAGE = 200
 const MAX_ATTEMPTS = 8
 
 const state = {
@@ -22,6 +25,8 @@ const state = {
   pending: 0,
   lastSyncAt: readLastSyncAt(),
   lastError: null,
+  // Pull progress: memories arriving from other devices.
+  downloading: null,   // { done, total } while media is coming down, else null
 }
 const listeners = new Set()
 let inFlight = null
@@ -135,6 +140,70 @@ async function backfill() {
   return ids.length
 }
 
+function readLastPull(uid) {
+  try { return localStorage.getItem(LAST_PULL_KEY + uid) || null } catch { return null }
+}
+function writeLastPull(uid, iso) {
+  try { localStorage.setItem(LAST_PULL_KEY + uid, iso) } catch { /* quota */ }
+}
+
+function announcePulled() {
+  try { window.dispatchEvent(new Event('journal:pulled')) } catch { /* not in a browser */ }
+}
+
+// Server → this device. Rows changed since the last pull, oldest change
+// first so the watermark can move as pages complete. Media comes separately.
+async function pull(uid) {
+  let since = readLastPull(uid)
+  let changed = 0
+  for (;;) {
+    let q = supabase.from(TABLE).select('*').eq('user_id', uid).order('updated_at', { ascending: true }).limit(PAGE)
+    if (since) q = q.gt('updated_at', since)
+    const { data, error } = await q
+    if (error) throw error
+    if (!data || data.length === 0) break
+    for (const row of data) {
+      if (!row.client_id) continue          // rows from before sync existed
+      if (row.deleted_at) { if (await deleteByClientId(row.client_id)) changed++ }
+      else { const r = await upsertFromRemote(row); if (r !== 'kept') changed++ }
+      since = row.updated_at
+    }
+    writeLastPull(uid, since)
+    if (data.length < PAGE) break
+  }
+  if (changed > 0) announcePulled()
+  return changed
+}
+
+// Fetch media for entries that arrived without it, newest first, one at a
+// time so a big journal streams in rather than stalls.
+async function downloadMedia() {
+  const todo = await entriesMissingMedia()
+  if (todo.length === 0) { state.downloading = null; emit(); return 0 }
+  state.downloading = { done: 0, total: todo.length }
+  emit()
+  let got = 0
+  for (const item of todo) {
+    if (!navigator.onLine) break
+    const { data, error } = await supabase.storage.from(BUCKET).download(item.remotePath)
+    if (error) {
+      if (isTransient(error)) break
+      // Missing on the server: leave the entry, it still has its note.
+      state.downloading.done++
+      continue
+    }
+    await attachMedia(item.clientId, await data.arrayBuffer(), data.type || item.photoType)
+    got++
+    state.downloading.done++
+    if (got % 3 === 0) announcePulled()
+    emit()
+  }
+  state.downloading = null
+  if (got > 0) announcePulled()
+  emit()
+  return got
+}
+
 // Drain the outbox. Safe to call often; concurrent calls share one run.
 export function runSync(reason = 'manual') {
   if (inFlight) return inFlight
@@ -169,6 +238,13 @@ export function runSync(reason = 'manual') {
           if (attempts >= MAX_ATTEMPTS) { /* leave it; Profile shows the error */ }
           // A bad job should not block the rest: keep going.
         }
+      }
+      // Then bring down what other devices added.
+      try {
+        await pull(uid)
+        await downloadMedia()
+      } catch (err) {
+        state.lastError = isTransient(err) ? 'Waiting for a connection' : friendly(err)
       }
       if (done > 0 || state.pending === 0) { state.lastSyncAt = Date.now(); writeLastSyncAt(state.lastSyncAt) }
     } finally {
