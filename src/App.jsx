@@ -16,6 +16,7 @@ import ChecklistDetail from './screens/ChecklistDetail'
 import StoryReader from './screens/StoryReader'
 import PhotoHunt from './components/PhotoHunt'
 import { Screen } from './components/ui'
+import { startSync } from './lib/sync'
 import { markCheckIn } from './lib/streak'
 import { isSupabaseConfigured } from './lib/supabase'
 import { useSession, signOut } from './lib/useSession'
@@ -120,6 +121,8 @@ export default function App() {
           : null
         const p = backfilled ?? (await getProfile())
         if (!cancelled) setProfile(p)
+        // Signed in with a profile: back up the journal in the background.
+        if (!cancelled && p && isSupabaseConfigured && session) startSync()
       } catch (err) {
         console.error('Profile load failed:', err)
         if (!cancelled) setProfile(null)
