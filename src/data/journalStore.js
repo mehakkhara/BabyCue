@@ -315,6 +315,108 @@ export async function unsyncedClientIds() {
   return entries.filter(e => e.clientId && !e.synced && !queued.has(e.clientId)).map(e => e.clientId)
 }
 
+// ---- Pull side (server → this device), used by lib/sync.js ---------------
+
+function entryFromRemote(row) {
+  return {
+    clientId: row.client_id,
+    note: row.note || '',
+    kind: row.kind === KEEPSAKE_KIND ? KEEPSAKE_KIND : 'memory',
+    source: row.source === PHOTO_HUNT_SOURCE ? PHOTO_HUNT_SOURCE : undefined,
+    photoType: row.media_type || 'image/jpeg',
+    width: row.width || null,
+    height: row.height || null,
+    fit: row.fit === 'contain' ? 'contain' : 'cover',
+    position: row.position || 'center',
+    createdAt: row.entry_at ? new Date(row.entry_at).getTime() : Date.now(),
+    updatedAt: row.updated_at ? new Date(row.updated_at).getTime() : Date.now(),
+    synced: true,
+    remotePath: row.photo_path || null,
+    // true until the media is downloaded (or the entry has none)
+    mediaPending: !!row.photo_path,
+  }
+}
+
+// Insert or update a local entry from a server row. Last write wins: a local
+// copy with a newer updatedAt is left alone. The media buffer is never touched
+// here. Returns 'inserted' | 'updated' | 'kept'.
+export async function upsertFromRemote(row) {
+  const db = await openDb()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    const store = tx.objectStore(STORE_NAME)
+    const req = store.index('clientId').openCursor(IDBKeyRange.only(row.client_id))
+    req.onsuccess = () => {
+      const cursor = req.result
+      const incoming = entryFromRemote(row)
+      if (!cursor) {
+        const add = store.add({ ...incoming, photoBuffer: null })
+        add.onsuccess = () => resolve('inserted')
+        add.onerror = () => reject(add.error)
+        return
+      }
+      const local = cursor.value
+      if ((local.updatedAt || 0) > incoming.updatedAt) { resolve('kept'); return }
+      const hasMedia = !!local.photoBuffer
+      const put = store.put({
+        ...local, ...incoming,
+        photoBuffer: local.photoBuffer || null,
+        mediaPending: incoming.mediaPending && !hasMedia,
+      })
+      put.onsuccess = () => resolve('updated')
+      put.onerror = () => reject(put.error)
+    }
+    req.onerror = () => reject(req.error)
+  })
+}
+
+// Remove a local entry because another device deleted it. No outbox job.
+export async function deleteByClientId(clientId) {
+  const db = await openDb()
+  await removeJobsFor(clientId, db)
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    const req = tx.objectStore(STORE_NAME).index('clientId').openCursor(IDBKeyRange.only(clientId))
+    req.onsuccess = () => {
+      const cursor = req.result
+      if (!cursor) { resolve(false); return }
+      cursor.delete()
+      resolve(true)
+    }
+    req.onerror = () => reject(req.error)
+  })
+}
+
+// Store downloaded media on an entry that arrived without it.
+export async function attachMedia(clientId, buffer, type) {
+  const db = await openDb()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    const req = tx.objectStore(STORE_NAME).index('clientId').openCursor(IDBKeyRange.only(clientId))
+    req.onsuccess = () => {
+      const cursor = req.result
+      if (!cursor) { resolve(false); return }
+      cursor.update({ ...cursor.value, photoBuffer: buffer, photoType: type || cursor.value.photoType, mediaPending: false })
+      resolve(true)
+    }
+    req.onerror = () => reject(req.error)
+  })
+}
+
+// Entries waiting for their media, newest first: [{ clientId, remotePath, photoType }].
+export async function entriesMissingMedia() {
+  const db = await openDb()
+  const all = await new Promise((resolve, reject) => {
+    const req = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll()
+    req.onsuccess = () => resolve(req.result || [])
+    req.onerror = () => reject(req.error)
+  })
+  return all
+    .filter(e => e.mediaPending && e.remotePath && !e.photoBuffer)
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    .map(e => ({ clientId: e.clientId, remotePath: e.remotePath, photoType: e.photoType }))
+}
+
 // Pixel size of an image blob/file. Resolves null if it can't be decoded.
 export async function imageDimensions(blob) {
   const url = URL.createObjectURL(blob)

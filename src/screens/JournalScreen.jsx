@@ -14,6 +14,7 @@ import DateStrip from '../components/DateStrip'
 import VoiceMemo from '../components/VoiceMemo'
 import AudioPlayer from '../components/AudioPlayer'
 import { markCheckIn, dayKey } from '../lib/streak'
+import { getSyncStatus, onSyncChange } from '../lib/sync'
 import { Screen, Card, IconButton, IconTile } from '../components/ui'
 import { color, type } from '../theme'
 
@@ -432,6 +433,16 @@ export default function JournalScreen({ profile, onOpen }) {
 
   useEffect(() => { refresh() }, [])
 
+  // Memories arriving from another device: reload as they land, and show
+  // how far along the download is.
+  const [sync, setSync] = useState(() => getSyncStatus())
+  useEffect(() => {
+    const onPulled = () => { refresh() }
+    window.addEventListener('journal:pulled', onPulled)
+    const off = onSyncChange(setSync)
+    return () => { window.removeEventListener('journal:pulled', onPulled); off() }
+  }, [])
+
   async function handleDelete(id) {
     await deleteEntry(id)
     setOpened(null)
@@ -483,6 +494,11 @@ export default function JournalScreen({ profile, onOpen }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
         <div style={{ minWidth: 0 }}>
           <h1 style={{ ...type.h1, fontSize: '24px' }}>Journal</h1>
+          {sync.downloading && (
+            <p style={{ ...type.small, color: color.primary, marginTop: '2px' }}>
+              Bringing over {sync.downloading.total - sync.downloading.done} {sync.downloading.total - sync.downloading.done === 1 ? 'memory' : 'memories'}…
+            </p>
+          )}
           <p style={{ ...type.body, marginTop: '4px' }}>Little moments. A big story.</p>
         </div>
         <IconButton label="Search" active={showSearch} onClick={() => { setShowSearch(v => !v); setQuery(''); setSelectedDay(null) }}>🔍</IconButton>
