@@ -164,6 +164,18 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
         />
       </Card>
 
+      {/* This month: what to expect (free, always one tap away) */}
+      {overview && (
+        <Card padding="4px 14px" style={{ marginTop: '14px' }}>
+          <ListRow
+            emoji="📅" hue="mint" title={`Month ${month}: what to expect`}
+            subtitle={personalize(overview.headsUp, profile)}
+            onClick={() => onOpen('month')}
+            last
+          />
+        </Card>
+      )}
+
       {/* To do: checklists due right now */}
       {todos.length > 0 && (
         <>
