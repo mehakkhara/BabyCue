@@ -5,9 +5,9 @@ import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { pickTonight, STORIES } from '../data/stories'
 import { getReadIds, todayKey as storyDayKey } from '../lib/storyProgress'
 import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
-
+import { dueChecklists, itemCount } from '../data/checklists'
+import { loadProgress, doneCount, isComplete, isHidden } from '../lib/checklistProgress'
 import { overviewForMonth } from '../data/monthOverview'
-
 import { getTodayMoods, topicForMoods } from '../lib/moodLog'
 import { BABY_STATES } from '../data/babyStates'
 import { getBabyPhoto, latestJournalPhotoUrl } from '../lib/babyPhoto'
@@ -87,6 +87,11 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   const tip = useMemo(() => pickDailyTip(month, { topic: moodTopic }), [month, moodTopic])
   const activity = useMemo(() => pickDailyActivity(month), [month])
   const overview = overviewForMonth(month)
+  // To-dos: checklists due for this age that aren't finished or hidden.
+  const todos = useMemo(() => {
+    const p = loadProgress()
+    return dueChecklists(ageInMonths).filter(c => !isComplete(p, c) && !isHidden(p, c.id)).map(c => ({ c, done: doneCount(p, c), total: itemCount(c) }))
+  }, [ageInMonths])
   const tonight = useMemo(
     () => pickTonight(ageInMonths, { seed: `${storyDayKey()}:${babyName || ''}`, readIds: getReadIds() }),
     [ageInMonths, babyName],
