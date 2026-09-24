@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PAINTINGS } from '../data/paintings'
 import { paintTo } from '../lib/paintingCanvas'
 
@@ -11,7 +11,12 @@ import { paintTo } from '../lib/paintingCanvas'
 export default function PaintingCanvas({ id, alt = '', style = {}, fit = 'cover' }) {
   const ref = useRef(null)
   const painting = PAINTINGS[id]
-  const file = painting?.file
+  // A painting can name its file before the image lands in public/story-art/.
+  // If the browser can't load it, draw the placeholder instead of a broken icon.
+  const [missing, setMissing] = useState(false)
+  const file = missing ? null : painting?.file
+
+  useEffect(() => { setMissing(false) }, [id])
 
   useEffect(() => {
     if (file) return
@@ -43,6 +48,7 @@ export default function PaintingCanvas({ id, alt = '', style = {}, fit = 'cover'
       <img
         src={file}
         alt={alt || painting.title}
+        onError={() => setMissing(true)}
         style={{ display: 'block', width: '100%', height: '100%', objectFit: fit, ...style }}
       />
     )

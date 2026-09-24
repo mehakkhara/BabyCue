@@ -12,28 +12,10 @@ import { color, type } from '../theme'
 
 const SERIF = "Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif"
 
-const BEDTIME_CUE_KEY = 'storiesBedtimeCueShown'
-const BEDTIME_CUE_TIMES = 3
-
-// The app opens on Stories during wind-down hours. Say so the first few
-// times, so it reads as a choice rather than the app losing her place.
-function useBedtimeCue(openedForBedtime) {
-  const [show, setShow] = useState(() => {
-    if (!openedForBedtime) return false
-    let n = 0
-    try { n = Number(localStorage.getItem(BEDTIME_CUE_KEY) || 0) } catch { /* private mode */ }
-    if (n >= BEDTIME_CUE_TIMES) return false
-    try { localStorage.setItem(BEDTIME_CUE_KEY, String(n + 1)) } catch { /* ignore */ }
-    return true
-  })
-  return [show, () => setShow(false)]
-}
-
-export default function StoriesScreen({ profile, openedForBedtime = false, onGoHome }) {
+export default function StoriesScreen({ profile }) {
   const [open, setOpen] = useState(null)
   // Bumped when the reader closes, so "already read" and favourites refresh.
   const [version, setVersion] = useState(0)
-  const [showCue, dismissCue] = useBedtimeCue(openedForBedtime)
   const [showSearch, setShowSearch] = useState(false)
   const [query, setQuery] = useState('')
   const [showAll, setShowAll] = useState(false)
@@ -52,7 +34,8 @@ export default function StoriesScreen({ profile, openedForBedtime = false, onGoH
 
   const forAge = storiesForAge(ageInMonths)
   const others = STORIES.filter(s => !forAge.includes(s))
-  const animalStories = STORIES.filter(s => ['A6', 'B6', 'C6'].includes(s.id))
+  const discovery = forAge.filter(s => s.series === 'discovery' && s !== tonight)
+  const museum = forAge.filter(s => s.series === 'museum' && s !== tonight)
   const q = query.trim().toLowerCase()
   const matches = q
     ? STORIES.filter(s => s.title.toLowerCase().includes(q) || PAINTINGS[s.pages[0].art].title.toLowerCase().includes(q))
@@ -87,20 +70,6 @@ export default function StoriesScreen({ profile, openedForBedtime = false, onGoH
         />
       )}
 
-      {showCue && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#1a1a2e', color: '#fff', borderRadius: '14px', padding: '10px 12px', marginBottom: '14px' }}>
-          <span style={{ fontSize: '18px' }}>🌙</span>
-          <p style={{ flex: 1, margin: 0, fontSize: '12.5px', lineHeight: 1.45 }}>
-            It's bedtime, so we opened Stories.{' '}
-            {onGoHome ? (
-              <button onClick={onGoHome} style={{ background: 'none', border: 'none', padding: 0, color: '#c4b5fd', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline' }}>
-                Today is still a tap away.
-              </button>
-            ) : 'Today is still a tap away.'}
-          </p>
-          <button onClick={dismissCue} aria-label="Dismiss" style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: '16px', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}>×</button>
-        </div>
-      )}
 
       {matches ? (
         <>
@@ -134,20 +103,29 @@ export default function StoriesScreen({ profile, openedForBedtime = false, onGoH
             </p>
           )}
 
-          <SectionHeader title="Animal discovery" />
-          <p style={{ ...type.small, margin: '-4px 2px 10px', color: color.inkSoft }}>Original stories for learning through looking, listening, and play.</p>
-          <List stories={animalStories} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+          <SectionHeader title={`Discovery stories for ${babyName}`} />
+          <p style={{ ...type.small, margin: '-4px 2px 10px', color: color.inkSoft }}>One small thing to learn in each: an animal, a colour, a number, a routine.</p>
+          <List stories={discovery} readIds={readIds} favourites={favourites} onOpen={setOpen} />
 
-          <SectionHeader
-            title={`More stories for ${babyName}`}
-            action={others.length > 0 ? (showAll ? 'Just this age' : 'See all') : null}
-            onAction={() => setShowAll(v => !v)}
-          />
-          <List stories={forAge.filter(s => s !== tonight && !animalStories.includes(s))} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+          {museum.length > 0 && (
+            <>
+              <SectionHeader title="From the museum" />
+              <p style={{ ...type.small, margin: '-4px 2px 10px', color: color.inkSoft }}>A real painting to look at together, with calm words to go with it.</p>
+              <List stories={museum} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+            </>
+          )}
+
+          {others.length > 0 && (
+            <SectionHeader
+              title="Other ages"
+              action={showAll ? 'Just this age' : 'See all'}
+              onAction={() => setShowAll(v => !v)}
+              style={{ marginTop: '6px' }}
+            />
+          )}
 
           {showAll && others.length > 0 && (
             <>
-              <SectionHeader title="The rest of the shelf" />
               <p style={{ ...type.small, margin: '-4px 2px 10px' }}>Written for other ages. Read them whenever you like.</p>
               <List stories={others} readIds={readIds} favourites={favourites} onOpen={setOpen} dim />
             </>

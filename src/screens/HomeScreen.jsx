@@ -18,7 +18,8 @@ import { pickFlashback } from '../components/Flashback'
 import Flashback from '../components/Flashback'
 import MemoryForm from '../components/MemoryForm'
 import { markCheckIn } from '../lib/streak'
-import { Screen, Card, ListRow, Avatar, SectionHeader, Chevron } from '../components/ui'
+import { hasSeenFirstTip, markFirstTipSeen } from '../lib/firstTip'
+import { Screen, Card, ListRow, Avatar, SectionHeader, Chevron, PrimaryButton, SecondaryButton } from '../components/ui'
 import { color, shadow, type } from '../theme'
 
 // Warm, non-clinical lines under the photo. Not advice — just a breath.
@@ -52,6 +53,9 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   const [savedNote, setSavedNote] = useState(null)
   const [heroUrl, setHeroUrl] = useState(() => getBabyPhoto())
   const [flashback, setFlashback] = useState(null)
+  // First open ever on this device: surface today's tip in full, once, so the
+  // very first visit teaches something instead of landing on a quiet list.
+  const [showFirstTip, setShowFirstTip] = useState(() => !hasSeenFirstTip())
 
   // Re-read the clock and today's mood on resume so the screen follows the day.
   useEffect(() => {
@@ -100,6 +104,21 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   const dateLabel = new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
   const pickedStates = BABY_STATES.filter(s => moods.includes(s.key))
 
+  function dismissFirstTip() {
+    markFirstTipSeen()
+    setShowFirstTip(false)
+  }
+
+  function firstTipGotIt() {
+    markCheckIn('tip')
+    dismissFirstTip()
+  }
+
+  function firstTipReadMore() {
+    dismissFirstTip()
+    onOpen('tip', { tip, kind: 'tip' })
+  }
+
   function handleMemorySaved(first) {
     setAdding(false)
     markCheckIn('photo')
@@ -137,6 +156,21 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
         </div>
       </button>
       <p style={{ ...type.small, textAlign: 'center', margin: '12px 0 4px', fontStyle: 'italic', color: color.inkSoft }}>“{quote}”</p>
+
+      {/* Your first tip: shown once, on the very first open */}
+      {showFirstTip && tip && (
+        <Card padding="18px" style={{ marginTop: '18px', background: color.paper, border: '1px solid #eee7db' }}>
+          <p style={type.kicker}>💡 Your first tip</p>
+          <p style={{ ...type.bodyStrong, fontSize: '17px', marginTop: '8px' }}>{personalize(tip.title, profile)}</p>
+          <p style={{ ...type.body, color: color.text, marginTop: '8px' }}>{personalize(tip.body, profile)}</p>
+          {tip.source && <p style={{ ...type.small, marginTop: '8px' }}>Source: {tip.source}</p>}
+          <p style={{ ...type.small, marginTop: '10px' }}>A new one lands here every day, matched to {babyName}'s age.</p>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+            <SecondaryButton onClick={firstTipReadMore} style={{ flex: 1 }}>Read more</SecondaryButton>
+            <PrimaryButton onClick={firstTipGotIt} style={{ flex: 1, padding: '12px' }}>✓ Got it</PrimaryButton>
+          </div>
+        </Card>
+      )}
 
       {/* Today for you */}
       <SectionHeader title="Today for you" action="Browse by month" onAction={() => onOpen('browse')} style={{ marginTop: '18px' }} />

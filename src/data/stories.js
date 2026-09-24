@@ -1,12 +1,15 @@
-// Fifteen original goodnight stories, written for Numae.
+// Goodnight stories, written for the app.
 //
-// The text is ours — no third-party rights, no translation or trademark
-// exposure. Each story is three pages, one painting per page, and every one
-// ends in sleep.
+// Two shelves:
+//   discovery — original illustrated stories in the robin/otter/rabbit style.
+//               Simple words, one thing to learn, a "try this" prompt.
+//   museum    — a few stories built around real Van Gogh paintings, one per
+//               age band. They only make sense once the painting files are in
+//               public/story-art/ (see data/paintings.js).
 //
-// {name} and friends are substituted at render time by lib/storyText.js.
-// Tokens are ONLY ever the baby: animals and objects in these stories use
-// fixed "it"/"its" so the replacer never touches them.
+// Every story is three pages and ends in sleep. Tokens ({name}, {parent},
+// {bed}, pronouns) are substituted at render time by lib/storyText.js and
+// ONLY ever refer to the baby or the parent; animals use fixed "it"/"its".
 
 export const BANDS = [
   { id: 'A', name: 'Newborn',   min: 0,  max: 8,   age: '0–9 months' },
@@ -15,9 +18,116 @@ export const BANDS = [
 ]
 
 export const STORIES = [
-  // ---------- Band A · 0–9 months · rhythm over plot ----------
+  // ---------- Animal discovery (original illustrations) ----------
   {
-    id: 'A1', band: 'A', title: 'Goodnight, Little Star',
+    id: 'A6', series: 'discovery', band: 'A', title: 'Robin Says Hello',
+    pages: [
+      { art: 'robinMeadow', text: ['Hello, little robin.', 'The robin sits on a branch. It has feathers. Its chest is orange.', 'Can you see the bird?'] },
+      { art: 'robinMeadow', text: ['The robin looks this way. Then that way.', 'Its small feet hold tight to the branch.', 'Bird. Feet. Branch.'] },
+      { art: 'robinMeadow', text: ['The robin gives a tiny chirp, then flutters its wings.', 'Bye-bye, robin.', 'Can you wave hello and bye-bye?'] },
+    ],
+  },
+  {
+    id: 'B6', series: 'discovery', band: 'B', title: 'Ollie Otter and the Smooth Pebble',
+    pages: [
+      { art: 'otterStream', text: ['Ollie the otter floats in a stream.', 'Look — Ollie is holding a smooth pebble with two little paws.', 'Can you point to Ollie’s paws?'] },
+      { art: 'otterStream', text: ['Otters can swim. Ollie’s feet help it paddle through the water.', 'Paddle, paddle. The water makes small circles.', 'Can you make a swimming motion with your hands?'] },
+      { art: 'otterStream', text: ['Ollie puts the pebble down and swims toward the reeds.', 'Splash, splash — off Ollie goes.', 'Can you wave goodbye to the little swimmer?'] },
+    ],
+  },
+  {
+    id: 'C6', series: 'discovery', band: 'C', title: 'Rory Rabbit Listens',
+    pages: [
+      { art: 'rabbitBurrow', text: ['Rory Rabbit sits outside a burrow in the meadow.', 'A burrow is a tunnel under the ground. It is a safe place for a rabbit to rest.', 'Can you find the dark burrow behind Rory?'] },
+      { art: 'rabbitBurrow', text: ['Rory’s long ears stand tall. They help Rory hear small sounds: a leaf rustling, a bee buzzing, the grass moving in the breeze.', 'Hold your hands beside your ears. What can you hear?'] },
+      { art: 'rabbitBurrow', text: ['Rory twitches its ears, then hops into the burrow for a rest.', 'The meadow is still there to explore another day.', 'What sound would you like to listen for next?'] },
+    ],
+  },
+
+  // ---------- Discovery stories · Band A · 0–9 months ----------
+  // Rhythm, repetition, sounds, and one simple idea per story.
+  {
+    id: 'A7', series: 'discovery', band: 'A', title: 'Moo, Says the Cow',
+    pages: [
+      { art: 'farmMorning', text: ['Good morning, cow.', 'The cow stands in the green grass. It is big, and brown, and white.', '*Moo*, says the cow.', 'Can you say moo?'] },
+      { art: 'farmMorning', text: ['Here comes a duck. Waddle, waddle.', 'It is small and yellow.', '*Quack*, says the duck.', 'Can you say quack?'] },
+      { art: 'farmMorning', text: ['The cow lies down. The duck tucks in its head.', 'The sun goes low. The farm goes quiet.', 'Moo. Quack. Shh.', 'Goodnight, cow. Goodnight, duck.', 'Goodnight, {name}.'] },
+    ],
+  },
+  {
+    id: 'A8', series: 'discovery', band: 'A', title: 'Splish, Splash, Bath',
+    pages: [
+      { art: 'bathDuck', text: ['Splish, splash! It is bath time.', 'The water is warm. The bubbles are white and soft.', 'A little yellow duck floats by. Bob, bob, bob.'] },
+      { art: 'bathDuck', text: ['Wash two hands. *Splash!*', 'Wash two feet. *Splash!*', 'Wash one round tummy. *Splish!*', "Where are {name's} hands? Where are {name's} feet?"] },
+      { art: 'bathDuck', text: ['Out of the bath. Into a big soft towel.', 'Warm and dry. Warm and dry.', 'The little duck rests by the tub.', 'Goodnight, duck. Goodnight, bubbles.', 'Goodnight, {name}.'] },
+    ],
+  },
+  {
+    id: 'A9', series: 'discovery', band: 'A', title: 'Where Is the Moon?',
+    pages: [
+      { art: 'moonCloud', text: ['It is night. The sky is dark blue.', 'Where is the moon?', 'There! Round and white, up high.', 'Hello, moon.'] },
+      { art: 'moonCloud', text: ['A soft grey cloud floats by.', 'Slowly, slowly, it covers the moon.', 'Where did the moon go?', 'Wait… wait…', '*Peekaboo!* There it is again.'] },
+      { art: 'moonCloud', text: ['The moon shines on the little house.', 'It shines on the window. It shines on {bed}.', 'The moon stays up all night, so you can sleep.', 'Goodnight, moon.', 'Goodnight, {name}.'] },
+    ],
+  },
+
+  // ---------- Discovery stories · Band B · 9–15 months ----------
+  // Naming, pointing, first words, colours, and counting to three.
+  {
+    id: 'B7', series: 'discovery', band: 'B', title: 'Three Little Ducks',
+    pages: [
+      { art: 'pondDucks', text: ['A pond. Still and blue.', 'Mama Duck swims across, and behind her come her ducklings.', "Let's count them.", '*One* little duck. *Two* little ducks. *Three* little ducks.', 'Can you point to each one?'] },
+      { art: 'pondDucks', text: ['Mama Duck says *quack*.', 'One little duck says *peep*. Two little ducks say *peep, peep*. Three little ducks say *peep, peep, peep*.', 'A big frog on a lily pad watches them go by.'] },
+      { art: 'pondDucks', text: ['The sun sinks low and the pond turns gold.', 'One, two, three little ducks paddle home to the reeds.', 'They tuck their heads under their wings.', 'Goodnight, one. Goodnight, two. Goodnight, three.', 'Goodnight, {name}.'] },
+    ],
+  },
+  {
+    id: 'B8', series: 'discovery', band: 'B', title: 'Big Bear, Little Mouse',
+    pages: [
+      { art: 'bearMouse', text: ['Under the tall tree lives a bear.', 'The bear is *big*. Big paws. Big nose. Big, slow steps.', 'Can you show me big? Stretch your arms up high!'] },
+      { art: 'bearMouse', text: ['In the grass lives a mouse.', 'The mouse is *little*. Little paws. Little nose. Little, quick steps.', 'Can you show me little? Curl up small, like a ball.'] },
+      { art: 'bearMouse', text: ['Night comes. The bear yawns a big yawn.', 'The mouse yawns a little yawn.', 'They share one blanket, big and little, side by side.', 'Goodnight, big bear. Goodnight, little mouse.', 'Goodnight, {name}.'] },
+    ],
+  },
+  {
+    id: 'B9', series: 'discovery', band: 'B', title: 'Red Apple, Yellow Sun',
+    pages: [
+      { art: 'appleTree', text: ['On the hill stands an apple tree.', 'The apples are *red*. Red, red, red.', 'Can you find something red?'] },
+      { art: 'appleTree', text: ['Above the tree, the sun is *yellow*. Warm and round.', 'Around the tree, the grass is *green*. Soft and cool.', 'Over everything, the sky is *blue*.', 'Red apple. Yellow sun. Green grass. Blue sky.'] },
+      { art: 'appleTree', text: ['The yellow sun slides down behind the hill.', 'The blue sky turns dark. The red apples rest in the leaves.', 'All the colours go to sleep.', 'Goodnight, colours.', 'Goodnight, {name}.'] },
+    ],
+  },
+
+  // ---------- Discovery stories · Band C · 15 months and up ----------
+  // A simple plot, a feeling, a sequence, and counting to five.
+  {
+    id: 'C7', series: 'discovery', band: 'C', title: 'The Little Seed',
+    pages: [
+      { art: 'windowsillSprout', text: ['{name} found a seed. It was small, and brown, and very quiet.', '"What do you do?" asked {name}.', "The seed said nothing. Seeds don't talk. They wait.", 'So {name} put the seed in a pot of soft dark soil, on the windowsill where the sun comes in.'] },
+      { art: 'windowsillSprout', text: ['Every morning, {name} gave the seed a little water. Not too much. Just enough.', 'Every morning, the sun came through the window and warmed the pot.', 'One day. Two days. Three days. Nothing.', '"Waiting is hard," said {name}.', '"I know," said {parent}. "But the seed is working, down where we can\'t see."'] },
+      { art: 'windowsillSprout', text: ['And then one morning, there it was.', 'A tiny green sprout, standing up in the pot, stretching toward the light.', '"You grew!" said {name}.', 'The sprout would grow taller tomorrow, and taller the day after that. But that was for tomorrow.', 'Tonight, the little plant rested in the dark, and so did {name}.', 'Goodnight, little seed.', 'Goodnight, {name}.'] },
+    ],
+  },
+  {
+    id: 'C8', series: 'discovery', band: 'C', title: 'Night-Night, Everyone',
+    pages: [
+      { art: 'cosyBedroom', text: ['The day is done. It is time for night-night.', 'First, the bath. Splash, splash, all clean.', 'Then, pyjamas. One arm, two arms. One leg, two legs.', 'Then, teeth. Brush, brush, brush.', 'What comes next, {name}?'] },
+      { art: 'cosyBedroom', text: ['Next comes a book. This book!', '{parent} turns the pages. One, two, three.', 'The lamp is on. The room is warm. Teddy is listening too.', 'Night-night, bath. Night-night, pyjamas. Night-night, toothbrush.'] },
+      { art: 'cosyBedroom', text: ['Last of all, into {bed}.', 'Night-night, teddy. Night-night, lamp. *Click.*', 'Night-night, {parent}. And {parent} says: night-night, {name}.', 'The same steps tomorrow. And the same steps the night after that.', 'Goodnight, {name}.'] },
+    ],
+  },
+  {
+    id: 'C9', series: 'discovery', band: 'C', title: 'Freddie Frog Counts to Five',
+    pages: [
+      { art: 'frogLilypads', text: ['Freddie Frog sits on a lily pad in the pond.', 'Across the water there are more lily pads, all in a row.', 'Freddie wants to get to the other side.', '"I\'ll count my hops," says Freddie.'] },
+      { art: 'frogLilypads', text: ['*One!* Hop. A splash of water.', '*Two!* Hop. A dragonfly zips by.', '*Three!* Hop. Wobble, wobble, steady.', '*Four!* Hop. Nearly there.', '*Five!* Hop. Freddie lands on the soft green bank.', 'Can you count with Freddie? One, two, three, four, five.'] },
+      { art: 'frogLilypads', text: ['Freddie is tired from all that hopping.', 'The pond is still. The lily pads float in the moonlight: one, two, three, four, five.', 'Freddie closes its eyes on the soft green bank.', 'Goodnight, Freddie.', 'Goodnight, {name}.'] },
+    ],
+  },
+
+  // ---------- From the museum (Van Gogh, one per band) ----------
+  {
+    id: 'A1', series: 'museum', band: 'A', title: 'Goodnight, Little Star',
     pages: [
       { art: 'rhone', text: [
         'The river is quiet tonight.',
@@ -41,128 +151,7 @@ export const STORIES = [
     ],
   },
   {
-    id: 'A2', band: 'A', title: 'The Blossom Song',
-    pages: [
-      { art: 'almond', text: [
-        'Look up, {name}.',
-        'The branches are full of blossom — pink and white and open wide, all across a sky as blue as morning.',
-        'The wind comes through and the blossoms move.',
-        'They do not fall. They only sway.',
-      ] },
-      { art: 'branch', text: [
-        'Someone brought one small branch inside.',
-        'They put it in a glass of water on the table, where it is warm.',
-        'Just a few blossoms now. Just enough.',
-        'It leans a little — the way you lean when you are getting sleepy.',
-      ] },
-      { art: 'bedroom', text: [
-        'Outside, the tree keeps blossoming in the dark.',
-        'Inside, the room is quiet and the blanket is turned down.',
-        'The branch on the table is sleeping too.',
-        'Goodnight, blossom.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-  {
-    id: 'A3', band: 'A', title: 'All the Yellow Things',
-    pages: [
-      { art: 'sunflower', text: [
-        'Yellow, yellow, yellow.',
-        'Fourteen sunflowers in a fat yellow pot, leaning every which way. Some are wide open. Some have closed up small for the night.',
-        'Yellow like butter. Yellow like a bath towel. Yellow like the light in the hall.',
-      ] },
-      { art: 'harvest', text: [
-        'Out in the fields it is yellow too.',
-        'Yellow wheat, all the way to the blue hills. A little cart. A little ladder. A little blue wagon standing still.',
-        'Everyone has gone home now.',
-        'The field is warm, and empty, and gold.',
-      ] },
-      { art: 'greenwheat', text: [
-        'And when the sun goes down, the yellow goes soft.',
-        'The green wheat moves like water. The wind walks through it, and lies down.',
-        'All the yellow things are closing.',
-        'Goodnight, yellow.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-  {
-    id: 'A4', band: 'A', title: 'The Boats Come In',
-    pages: [
-      { art: 'boats', text: [
-        'The little boats have come back.',
-        'Red one, blue one, green one, white — pulled up onto the sand with their sails rolled tight.',
-        'They were out all day on the water.',
-        'Now they are done.',
-      ] },
-      { art: 'rhone', text: [
-        'The sea goes flat, and dark, and shining.',
-        'The lights come on along the shore. One. Then one. Then one.',
-        'Everything that was moving is slowing down.',
-        'Even the water. Even the wind.',
-      ] },
-      { art: 'bedroom', text: [
-        'Somewhere up the beach there is a small room with a small bed in it.',
-        'The shoes are off. The window is open a little.',
-        'The boats are sleeping on the sand.',
-        'Goodnight, boats.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-  {
-    id: 'A5', band: 'A', title: 'Soft',
-    pages: [
-      { art: 'irises', text: [
-        'Soft.',
-        'A whole crowd of blue irises, standing close together in the dark green.',
-        'One white one in the middle, taller than the rest, looking around.',
-        'They lean on each other. Nobody minds.',
-      ] },
-      { art: 'roses', text: [
-        'Soft.',
-        'White roses in a green glass, opening slowly, the way slow things open.',
-        'Some petals have come down onto the table.',
-        'Nobody picks them up. They can stay there.',
-      ] },
-      { art: 'almond', text: [
-        'Soft.',
-        'Blossoms on the branches, all the way up into the blue.',
-        'Everything today was loud, and bright, and new.',
-        'Now everything is soft.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-
-  // ---------- Band B · 9–15 months · naming, gentle motion ----------
-  {
-    id: 'B1', band: 'B', title: 'The Little Yellow Bird Goes Home',
-    pages: [
-      { art: 'lark', text: [
-        'There is a bird in this field.',
-        'Can you find it? There — the small one, going up.',
-        'All morning the little bird flew over the wheat. Up and down, up and down, singing the whole time.',
-        'The wheat went *swish*. The bird went up.',
-      ] },
-      { art: 'greenwheat', text: [
-        'Now it is evening, and the field has gone green and quiet.',
-        'The wind lies down flat.',
-        'The little bird stops singing and just floats — round, and round, and round — looking for the way home.',
-        "Down there. The small dark tree. That's the one.",
-      ] },
-      { art: 'starry', text: [
-        'The bird tucks into the branches.',
-        'Above the tree, the whole sky begins to turn: big slow circles of blue, and yellow stars, and one round gold moon like a lamp somebody left on.',
-        'The little bird puts its head under its wing.',
-        'Goodnight, little bird.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-  {
-    id: 'B2', band: 'B', title: 'Who Is Still Awake?',
+    id: 'B2', series: 'museum', band: 'B', title: 'Who Is Still Awake?',
     pages: [
       { art: 'cafe', text: [
         'It is late, {name}, and almost everyone has gone home.',
@@ -186,140 +175,7 @@ export const STORIES = [
     ],
   },
   {
-    id: 'B3', band: 'B', title: 'The Day It Snowed', season: 'winter',
-    pages: [
-      { art: 'snow', text: [
-        'Look what happened while we were sleeping.',
-        'The whole field went white.',
-        'There are little dark lines where the ground pokes through, and a low red roof, and one person walking with a dog, making small holes in the snow with their feet.',
-        'It goes very quiet when it snows. Have you noticed that?',
-      ] },
-      { art: 'mulberry', text: [
-        "The big tree on the rocks doesn't mind the cold.",
-        'Its leaves have gone bright — orange and gold and yellow — and they shake all together in the wind, like hundreds of small hands waving.',
-        'Wave back, {name}.',
-        'Now the wind is stopping.',
-      ] },
-      { art: 'bedroom', text: [
-        'Inside, somebody has taken off their coat.',
-        'The room is warm. The blanket is red. There is a little frost in the corner of the window.',
-        'Out in the field the snow keeps coming down, slow and slow, covering everything up soft.',
-        'Goodnight, snow.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-  {
-    id: 'B4', band: 'B', title: 'Butterflies',
-    pages: [
-      { art: 'butterfly', text: [
-        'Two white butterflies over the grass.',
-        "Up, down, sideways, up. They don't fly straight, butterflies. They fly like a leaf falling upward.",
-        'Underneath them the red poppies stand very still and let them pass.',
-        'Watch. Watch.',
-        'There they go.',
-      ] },
-      { art: 'irisfield', text: [
-        'Now the butterflies come to the iris field.',
-        'Purple and white and green, all the way to the little town — and the yellow field behind that, and the blue sky behind that.',
-        'The butterflies land.',
-        'They fold their wings up, like two hands closing.',
-      ] },
-      { art: 'almond', text: [
-        'When it gets dark, a butterfly finds a branch and holds on tight.',
-        "Up in the blossom, where it's pink and white and quiet, it stays all night without moving.",
-        "That's how butterflies sleep, {name}.",
-        'Hold on tight. Stay still.',
-        'Here comes the night.',
-      ] },
-    ],
-  },
-  {
-    id: 'B5', band: 'B', title: 'The Tall Tree and the Tall Sky',
-    pages: [
-      { art: 'mulberry', text: [
-        'This tree is old.',
-        "It has stood on these white rocks a long, long time, and every autumn it lights up gold all over, like it's having a party.",
-        'The wind pushes it. It leans, and comes back. Leans, and comes back.',
-        'Trees are good at that.',
-      ] },
-      { art: 'cypress', text: [
-        'Over the wheat, the clouds are enormous — great white ones, rolling and piling up over the blue hills.',
-        'And there, on the right, the dark green tree stands up like a candle flame.',
-        'Everything else moves.',
-        'That one holds still.',
-      ] },
-      { art: 'starry', text: [
-        'And at night the tall dark tree is still standing, right up in front of all those stars.',
-        'The sky rolls past it. The gold moon comes up at the edge.',
-        "The tree doesn't need to go anywhere. It's already home.",
-        'So are you, {name}.',
-        'Goodnight.',
-      ] },
-    ],
-  },
-
-  // ---------- Band C · 15–24 months · a small journey ----------
-  {
-    id: 'C1', band: 'C', title: 'The Little Bird Who Wanted to See the Sea',
-    pages: [
-      { art: 'greenwheat', text: [
-        'The little yellow bird had lived in the green field its whole life.',
-        'It was a good field. The wheat moved like water when the wind came through, and there were seeds, and there was a low stone wall to sit on.',
-        'But one morning the bird heard something far away. A sound like wind, only slower.',
-        '*Hush… hush… hush…*',
-        '“What’s that?” said the little bird.',
-        '“That’s the sea,” said the wheat.',
-        'So the little bird went to see it.',
-      ] },
-      { art: 'boats', text: [
-        'It flew a long way.',
-        'Over the hills, over a road, over a town with a bell — and then the ground turned into sand, and the sand turned into water, and the water went all the way out to the end of the sky.',
-        'Four little boats were pulled up on the beach. Red, and blue, and green, with their sails rolled and their masts crossed like fingers.',
-        '*Hush,* said the sea. *Hush. Hush.*',
-        'The little bird sat on the red boat and watched the water come in and go out, come in and go out, all afternoon — until its eyes went heavy.',
-      ] },
-      { art: 'rhone', text: [
-        'When the little bird woke up, the sky had gone dark blue and the lamps had come on along the shore.',
-        'Each lamp put a long gold ribbon down into the water, and the water rocked them, slow and slow.',
-        'The little bird thought about the green field, far away, with the low stone wall.',
-        'It could go home tomorrow.',
-        'Tonight it would stay right here, on the warm red boat, under all those stars.',
-        '*Hush,* said the sea. *Hush. Hush.*',
-        'Goodnight, little bird.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-  {
-    id: 'C2', band: 'C', title: 'The Last Sunflower',
-    pages: [
-      { art: 'sunflower', text: [
-        'There were fourteen sunflowers in the yellow pot on the table.',
-        'By evening, thirteen of them had begun to close. They folded their petals in, one by one — the way you fold a blanket — and let their heads go heavy.',
-        'But the one at the top stayed wide open.',
-        '“Aren’t you tired?” asked the others.',
-        '“Not yet,” said the last sunflower. “I want to see what happens.”',
-      ] },
-      { art: 'harvest', text: [
-        'Out the window, the last sunflower watched the whole day finish.',
-        'It watched the wheat go gold. It watched the little blue cart stand still, and the ladder lean against the haystack with nobody on it. It watched a man walk home along the edge of the field with his hands in his pockets. It watched the blue hills go soft at the edges.',
-        'It watched all the way until there was nothing left to watch.',
-        '“Oh,” said the last sunflower. “*That’s* what happens.”',
-      ] },
-      { art: 'bedroom', text: [
-        'In the little yellow room, the day was finished too.',
-        'The chairs had stopped. The shoes were under the bed. The window was open a crack, and the night came in cool and quiet and sat down on the red blanket.',
-        'The last sunflower folded its petals in.',
-        'It had seen the whole day, right to the end.',
-        'Now it could sleep.',
-        'Goodnight, sunflowers.',
-        'Goodnight, {name}.',
-      ] },
-    ],
-  },
-  {
-    id: 'C3', band: 'C', title: 'The Long Way Home',
+    id: 'C3', series: 'museum', band: 'C', title: 'The Long Way Home',
     pages: [
       { art: 'harvest', text: [
         'It had been a very big day.',
@@ -345,88 +201,6 @@ export const STORIES = [
         'And you got here.',
         'Goodnight.',
       ] },
-    ],
-  },
-  {
-    id: 'C4', band: 'C', title: 'Somebody Planted This',
-    pages: [
-      { art: 'sower', text: [
-        'Very early, when the sky was still orange, a man walked across an empty field.',
-        'He had a bag over his shoulder, and as he walked he swung his arm out — *shhk* — and the seeds went flying into the dirt.',
-        'There was nothing to see. Just brown ground, and a big yellow sun coming up behind him, and one dark tree leaning sideways.',
-        '“Where did they go?” said {name}.',
-        '“Under,” said the man. “Now we wait.”',
-      ] },
-      { art: 'greenwheat', text: [
-        'Waiting takes a long time. Longer than a nap. Longer than a whole day.',
-        'But if you wait long enough —',
-        'The whole field came up green.',
-        'Green wheat everywhere, moving like water, all the way to the little houses at the edge. The wind walked through it and pushed it flat, and it stood back up. Down, and up. Down, and up.',
-        '“It was under there the whole time?” said {name}.',
-        '“The whole time,” said the wheat.',
-      ] },
-      { art: 'bedroom', text: [
-        'That night the little yellow room was very quiet.',
-        'The blanket was turned down. The window was open a crack.',
-        'Outside, the green field went on doing its slow work in the dark — the way it does every single night, without anybody watching.',
-        "Things grow while you're sleeping, {name}.",
-        "That's how it works.",
-        'Goodnight.',
-      ] },
-    ],
-  },
-  {
-    id: 'C5', band: 'C', title: 'The Night the Sky Went Round',
-    pages: [
-      { art: 'almond', text: [
-        'Some nights the sky is just the sky.',
-        'But some nights — if you are lucky, and still awake — the sky does something else.',
-        'It started with the almond tree. All day it had held its blossoms up, pink and white against the blue, perfectly still, the way trees do.',
-        'Then the wind came, and every blossom moved at once.',
-        '“Something’s happening,” said {name}.',
-      ] },
-      { art: 'irises', text: [
-        'Down in the garden, the irises had noticed too.',
-        'A whole crowd of them, blue and leaning, packed in close with their green leaves crossing over each other — and right in the middle, the one white iris, standing taller, looking up.',
-        '“What is it?” said the irises.',
-        '“Wait,” said the white one. “Watch the sky.”',
-      ] },
-      { art: 'starry', text: [
-        'And then the sky went round.',
-        'Great slow blue curls of it, turning and turning over the sleeping town. Yellow stars, each one with a soft ring of light around it, like a candle seen through a window. A gold moon coming up at the edge.',
-        'And the tall dark tree standing in front of it all, leaning up, watching the whole thing happen.',
-        'Nobody in the town saw it. They were all asleep.',
-        'But you saw it, {name}.',
-        'Now close your eyes.',
-        'The sky will keep turning while you sleep.',
-        'Goodnight.',
-      ] },
-    ],
-  },
-  // Original animal-discovery stories. Each offers one concrete fact and a
-  // simple looking or movement prompt appropriate to its age band.
-  {
-    id: 'A6', band: 'A', title: 'Robin Says Hello',
-    pages: [
-      { art: 'robinMeadow', text: ['Hello, little robin.', 'The robin sits on a branch. It has feathers. Its chest is orange.', 'Can you see the bird?'] },
-      { art: 'robinMeadow', text: ['The robin looks this way. Then that way.', 'Its small feet hold tight to the branch.', 'Bird. Feet. Branch.'] },
-      { art: 'robinMeadow', text: ['The robin gives a tiny chirp, then flutters its wings.', 'Bye-bye, robin.', 'Can you wave hello and bye-bye?'] },
-    ],
-  },
-  {
-    id: 'B6', band: 'B', title: 'Ollie Otter and the Smooth Pebble',
-    pages: [
-      { art: 'otterStream', text: ['Ollie the otter floats in a stream.', 'Look — Ollie is holding a smooth pebble with two little paws.', 'Can you point to Ollie’s paws?'] },
-      { art: 'otterStream', text: ['Otters can swim. Ollie’s feet help it paddle through the water.', 'Paddle, paddle. The water makes small circles.', 'Can you make a swimming motion with your hands?'] },
-      { art: 'otterStream', text: ['Ollie puts the pebble down and swims toward the reeds.', 'Splash, splash — off Ollie goes.', 'Can you wave goodbye to the little swimmer?'] },
-    ],
-  },
-  {
-    id: 'C6', band: 'C', title: 'Rory Rabbit Listens',
-    pages: [
-      { art: 'rabbitBurrow', text: ['Rory Rabbit sits outside a burrow in the meadow.', 'A burrow is a tunnel under the ground. It is a safe place for a rabbit to rest.', 'Can you find the dark burrow behind Rory?'] },
-      { art: 'rabbitBurrow', text: ['Rory’s long ears stand tall. They help Rory hear small sounds: a leaf rustling, a bee buzzing, the grass moving in the breeze.', 'Hold your hands beside your ears. What can you hear?'] },
-      { art: 'rabbitBurrow', text: ['Rory twitches its ears, then hops into the burrow for a rest.', 'The meadow is still there to explore another day.', 'What sound would you like to listen for next?'] },
     ],
   },
 ]
@@ -471,24 +245,26 @@ export function pickTonight(ageInMonths, { seed = '', readIds = [] } = {}) {
 // concrete thing to do with the baby, not advice. Reading time comes from
 // the word count at a read-aloud pace.
 export const STORY_EXTRAS = {
-  A1: { blurb: 'A river, a star, and the quiet of night.', prompt: 'Whisper "goodnight" to the star and let {name} hear the hush.' },
-  A2: { blurb: 'Pink blossoms against a soft blue sky.', prompt: 'Look up together and say "up". Pause and watch {name}\'s eyes.' },
-  A3: { blurb: 'Sunflowers, wheat, and everything yellow.', prompt: 'Find something yellow in the room and hold it near the page.' },
-  A4: { blurb: 'The little boats come home for the night.', prompt: 'Rock {name} gently like a boat as you read.' },
-  A5: { blurb: 'Soft petals, soft words, soft sleep.', prompt: 'Stroke {name}\'s hand slowly each time you read "soft".' },
+  // Animal discovery
   A6: { blurb: 'Meet a robin, its feathers, and its bright orange chest.', prompt: 'Point to the robin and say “bird.” Pause so {name} can look.', learn: 'A robin is a bird. Birds have feathers and feet.' },
-  B1: { blurb: 'A small bird finds its way home across the field.', prompt: 'Point to the bird and say "bird". Pause and let {name} respond.' },
-  B2: { blurb: 'Late at night, who is still awake in the café?', prompt: 'Ask "who is awake?" and wait. Then whisper "you are".' },
-  B3: { blurb: 'Everything is white and quiet after the snow.', prompt: 'Blow a soft breath on {name}\'s cheek when the snow falls.' },
-  B4: { blurb: 'Two white butterflies dance over the grass.', prompt: 'Flutter your fingers like wings and let {name} chase them.' },
-  B5: { blurb: 'A story about curiosity, growing, and all the big things ahead.', prompt: 'Point to the tree and say "tree". Pause and let {name} respond.' },
   B6: { blurb: 'An otter floats, paddles, and holds a smooth pebble.', prompt: 'Show a gentle swimming motion with your hands and invite {name} to copy.', learn: 'Otters swim. Their feet help them paddle in water.' },
-  C1: { blurb: 'A field bird sets off to see the sea.', prompt: 'Ask "where is the bird going?" and let {name} point.' },
-  C2: { blurb: 'Fourteen sunflowers, and the last one to bloom.', prompt: 'Count the sunflowers together on your fingers.' },
-  C3: { blurb: 'A very big day, and the long way home.', prompt: 'Ask {name} what was big about today. Any answer counts.' },
-  C4: { blurb: 'A man, a field, and a handful of seeds.', prompt: 'Pretend to scatter seeds with your hand and let {name} copy you.' },
-  C5: { blurb: 'Some nights the sky is just the sky. Some nights it spins.', prompt: 'Trace a slow circle in the air and say "round and round".' },
   C6: { blurb: 'A rabbit’s ears listen for the sounds of the meadow.', prompt: 'Cup your hands behind your ears and take turns listening for a sound.', learn: 'A burrow is a tunnel under the ground. Rabbits use their ears to hear.' },
+  // Discovery · A
+  A7: { blurb: 'A cow, a duck, and the sounds they make.', prompt: 'Say each animal sound slowly and watch {name}’s face.', learn: 'Cows say moo. Ducks say quack.' },
+  A8: { blurb: 'Warm water, white bubbles, and one yellow duck.', prompt: 'Touch {name}’s hands, then feet, then tummy as you read each line.', learn: 'We have two hands, two feet, and one tummy.' },
+  A9: { blurb: 'The moon plays peekaboo behind a cloud.', prompt: 'Cover your face on “where did the moon go?” and peek out on “peekaboo”.', learn: 'The moon comes out at night. When a cloud hides it, it is still there.' },
+  // Discovery · B
+  B7: { blurb: 'One, two, three ducklings follow Mama across the pond.', prompt: 'Hold up one finger, then two, then three as you count the ducklings.', learn: 'We can count: one, two, three. Ducklings follow their mama.' },
+  B8: { blurb: 'A big bear, a little mouse, and one shared blanket.', prompt: 'Stretch tall for “big” and curl up small for “little”. Let {name} copy you.', learn: 'Big and little are opposites. A bear is big. A mouse is little.' },
+  B9: { blurb: 'Red, yellow, green, and blue, all on one hill.', prompt: 'Point to each colour on the page, then find the same colour in the room.', learn: 'Apples can be red. The sun is yellow. Grass is green. The sky is blue.' },
+  // Discovery · C
+  C7: { blurb: 'A seed, some water, some sun, and a little patience.', prompt: 'Ask {name} what a seed needs to grow. Water, sun, and time are all good answers.', learn: 'Seeds need soil, water, sun, and time to grow into plants.' },
+  C8: { blurb: 'Bath, pyjamas, teeth, a book, and bed. In that order.', prompt: 'Ask “what comes next?” before each step and let {name} answer or point.', learn: 'Bedtime has steps that go in order: bath, pyjamas, teeth, a book, then bed.' },
+  C9: { blurb: 'Five lily pads, five hops, and one tired frog.', prompt: 'Count on your fingers as Freddie hops, then bounce {name} on your knee five times.', learn: 'We can count to five: one, two, three, four, five. Frogs hop.' },
+  // Museum
+  A1: { blurb: 'A river, a star, and the quiet of night.', prompt: 'Whisper “goodnight” to the star and let {name} hear the hush.' },
+  B2: { blurb: 'Late at night, who is still awake in the café?', prompt: 'Ask “who is awake?” and wait. Then whisper “you are”.' },
+  C3: { blurb: 'A very big day, and the long way home.', prompt: 'Ask {name} what was big about today. Any answer counts.' },
 }
 
 export function storyExtras(id) {
