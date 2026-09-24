@@ -34,7 +34,8 @@ export default function StoriesScreen({ profile }) {
 
   const forAge = storiesForAge(ageInMonths)
   const others = STORIES.filter(s => !forAge.includes(s))
-  const animalStories = STORIES.filter(s => ['A6', 'B6', 'C6'].includes(s.id))
+  const discovery = forAge.filter(s => s.series === 'discovery' && s !== tonight)
+  const museum = forAge.filter(s => s.series === 'museum' && s !== tonight)
   const q = query.trim().toLowerCase()
   const matches = q
     ? STORIES.filter(s => s.title.toLowerCase().includes(q) || PAINTINGS[s.pages[0].art].title.toLowerCase().includes(q))
@@ -102,20 +103,29 @@ export default function StoriesScreen({ profile }) {
             </p>
           )}
 
-          <SectionHeader title="Animal discovery" />
-          <p style={{ ...type.small, margin: '-4px 2px 10px', color: color.inkSoft }}>Original stories for learning through looking, listening, and play.</p>
-          <List stories={animalStories} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+          <SectionHeader title={`Discovery stories for ${babyName}`} />
+          <p style={{ ...type.small, margin: '-4px 2px 10px', color: color.inkSoft }}>One small thing to learn in each: an animal, a colour, a number, a routine.</p>
+          <List stories={discovery} readIds={readIds} favourites={favourites} onOpen={setOpen} />
 
-          <SectionHeader
-            title={`More stories for ${babyName}`}
-            action={others.length > 0 ? (showAll ? 'Just this age' : 'See all') : null}
-            onAction={() => setShowAll(v => !v)}
-          />
-          <List stories={forAge.filter(s => s !== tonight && !animalStories.includes(s))} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+          {museum.length > 0 && (
+            <>
+              <SectionHeader title="From the museum" />
+              <p style={{ ...type.small, margin: '-4px 2px 10px', color: color.inkSoft }}>A real painting to look at together, with calm words to go with it.</p>
+              <List stories={museum} readIds={readIds} favourites={favourites} onOpen={setOpen} />
+            </>
+          )}
+
+          {others.length > 0 && (
+            <SectionHeader
+              title="Other ages"
+              action={showAll ? 'Just this age' : 'See all'}
+              onAction={() => setShowAll(v => !v)}
+              style={{ marginTop: '6px' }}
+            />
+          )}
 
           {showAll && others.length > 0 && (
             <>
-              <SectionHeader title="The rest of the shelf" />
               <p style={{ ...type.small, margin: '-4px 2px 10px' }}>Written for other ages. Read them whenever you like.</p>
               <List stories={others} readIds={readIds} favourites={favourites} onOpen={setOpen} dim />
             </>

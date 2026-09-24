@@ -5,6 +5,7 @@ import { renderSegments } from '../lib/storyText'
 import { markRead, isFavourite, toggleFavourite } from '../lib/storyProgress'
 import { storyExtras } from '../data/stories'
 import { renderLine } from '../lib/storyText'
+import { getBabyPhoto } from '../lib/babyPhoto'
 
 const SERIF = "Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif"
 
@@ -23,6 +24,8 @@ export default function StoryReader({ story, profile, onClose }) {
   const lesson = extras.learn
   const textRef = useRef(null)
   const touchX = useRef(0)
+  // The last page says goodnight to the baby by name; show their face with it.
+  const [babyPhoto] = useState(() => getBabyPhoto())
 
   const total = story.pages.length
   const current = story.pages[page]
@@ -135,6 +138,11 @@ export default function StoryReader({ story, profile, onClose }) {
             <span style={{ fontStyle: 'normal', letterSpacing: '0.09em', fontSize: '10.5px' }}>
               {art.collection}
             </span>
+            {art.credit && (
+              <div style={{ fontStyle: 'normal', letterSpacing: '0.06em', fontSize: '9.5px', marginTop: '2px', color: 'rgba(243,230,200,0.45)' }}>
+                {art.credit}
+              </div>
+            )}
           </div>
         </div>
 
@@ -153,6 +161,13 @@ export default function StoryReader({ story, profile, onClose }) {
             animation: 'fadeIn 0.5s ease both',
           }}
         >
+          {isLast && babyPhoto && (
+            <img
+              src={babyPhoto}
+              alt=""
+              style={{ display: 'block', width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 18px', border: `2px solid ${GOLD}`, boxShadow: '0 0 0 4px rgba(232,177,61,0.18)' }}
+            />
+          )}
           {current.text.map((line, i) => (
             <p key={i} style={{ margin: i === current.text.length - 1 ? 0 : '0 0 1.05em' }}>
               {renderSegments(line, profile).map((seg, j) => (

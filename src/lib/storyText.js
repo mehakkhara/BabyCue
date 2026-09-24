@@ -24,14 +24,25 @@ function possessive(name) {
  * Tokens always refer to the baby. Animals and objects in the stories use
  * fixed "it"/"its" precisely so this function can't touch them.
  */
+// Where the baby sleeps, from onboarding. A nested {parent} is resolved after.
+const BED = {
+  own_room:   'your own little bed',
+  room_share: 'your bed, close to {parent}',
+  bed_share:  'the big bed, snuggled up next to {parent}',
+}
+
 export function renderLine(line, profile = {}) {
   const name = (profile.babyName || '').trim() || 'your baby'
+  const parent = (profile.momName || '').trim() || 'Mama'
+  const bed = BED[profile.sleepArrangement] || 'your bed'
   const p = PRONOUNS[profile.babySex] || PRONOUNS.X
 
   return String(line)
     // {name's} first — otherwise {name} matches the opening brace and leaves "'s}"
     .replace(/\{name's\}/g, possessive(name))
     .replace(/\{name\}/g, name)
+    .replace(/\{bed\}/g, bed)
+    .replace(/\{parent\}/g, parent)
     .replace(/\{They\}/g, capitalize(p.they))
     .replace(/\{they\}/g, p.they)
     .replace(/\{Them\}/g, capitalize(p.them))
