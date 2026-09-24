@@ -71,12 +71,9 @@ export default function App() {
   const { status, session, passwordRecovery, endPasswordRecovery } = useSession()
   // undefined = loading, null = no profile yet, object = ready
   const [profile, setProfile] = useState(undefined)
-  // During wind-down hours the app opens on Stories — bedtime is what she's
-  // here for at 8pm. Initial tab only; navigation stays entirely hers.
-  const [activeTab, setActiveTab] = useState(() => (isBedtimeHour() ? 'stories' : 'home'))
-  // True only when the app itself chose Stories at launch — Stories uses it
-  // to say why, the first few times.
-  const [openedForBedtime] = useState(() => isBedtimeHour())
+  // Always land on Today, whatever the hour. The dusk theme still marks
+  // wind-down time; Stories is one tap away on the tab bar.
+  const [activeTab, setActiveTab] = useState('home')
   // Detail pages (tip, activity, mood, profile, story) sit on top of the tabs.
   const { view, push, pop, replace } = useViewStack()
   const [photoVersion, setPhotoVersion] = useState(0)
@@ -211,7 +208,7 @@ export default function App() {
     <div style={{ maxWidth: '480px', margin: '0 auto', position: 'relative', minHeight: '100vh' }}>
       <div key={activeTab} style={{ paddingBottom: '72px', animation: 'fadeIn 0.22s ease' }}>
         {activeTab === 'home'    && <HomeScreen profile={profile} onOpen={push} onOpenJournal={() => goToTab('journal')} photoVersion={photoVersion} />}
-        {activeTab === 'stories' && <StoriesScreen profile={profile} openedForBedtime={openedForBedtime} onGoHome={() => goToTab('home')} />}
+        {activeTab === 'stories' && <StoriesScreen profile={profile} />}
         {activeTab === 'stats'   && <GrowthScreen profile={profile} onProfileChange={handleProfileChange} onOpen={push} />}
         {activeTab === 'journal' && <JournalScreen profile={profile} onOpen={push} />}
       </div>
@@ -234,7 +231,6 @@ export default function App() {
       }}>
         {NAV_ITEMS.map(({ id, label, Icon }) => {
           const isActive = activeTab === id
-          const bedtimeMark = id === 'stories' && openedForBedtime
           return (
             <button
               key={id}
@@ -254,10 +250,6 @@ export default function App() {
             >
               <span style={{ position: 'relative', display: 'inline-flex' }}>
                 <Icon active={isActive} />
-                {/* A tiny moon during wind-down hours: opening on Stories was on purpose. */}
-                {bedtimeMark && (
-                  <span aria-hidden="true" style={{ position: 'absolute', top: '-6px', right: '-9px', fontSize: '10px', lineHeight: 1 }}>🌙</span>
-                )}
               </span>
               <span style={{ fontSize: '11px', fontWeight: isActive ? 700 : 600, color: isActive ? ICON_ON : ICON_OFF, letterSpacing: '0.01em' }}>
                 {label}
