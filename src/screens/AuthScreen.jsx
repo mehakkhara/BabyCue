@@ -7,7 +7,7 @@ export default function AuthScreen() {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [phase, setPhase] = useState('idle') // 'idle' | 'submitting' | 'magicLinkSent' | 'confirmEmail' | 'error'
+  const [phase, setPhase] = useState('idle') // 'idle' | 'submitting' | 'magicLinkSent' | 'confirmEmail' | 'resetSent' | 'error'
   const [errorMsg, setErrorMsg] = useState('')
 
   async function handlePasswordSubmit(e) {
@@ -62,6 +62,30 @@ export default function AuthScreen() {
       setErrorMsg(error.message || 'Could not send the magic link. Please try again.')
     } else {
       setPhase('magicLinkSent')
+    }
+  }
+
+  async function handleForgotPassword() {
+    const trimmedEmail = email.trim()
+    if (!trimmedEmail) {
+      setPhase('error')
+      setErrorMsg('Enter your email first, then tap "Forgot password?".')
+      return
+    }
+    setPhase('submitting')
+    setErrorMsg('')
+
+    // The link in the email brings them back here signed in, with
+    // type=recovery in the URL; useSession spots that and App shows the
+    // "pick a new password" screen before anything else.
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+      redirectTo: window.location.origin + window.location.pathname,
+    })
+    if (error) {
+      setPhase('error')
+      setErrorMsg(error.message || 'Could not send the reset email. Please try again.')
+    } else {
+      setPhase('resetSent')
     }
   }
 
@@ -137,6 +161,19 @@ export default function AuthScreen() {
           }}>
             Check <strong>{email}</strong> — we sent a sign-in link. Tap it on this device to continue.
           </div>
+        ) : phase === 'resetSent' ? (
+          <div style={{
+            background: '#ecfdf5',
+            border: '1px solid #a7f3d0',
+            borderRadius: '14px',
+            padding: '16px',
+            color: '#065f46',
+            fontSize: '14px',
+            lineHeight: 1.5,
+            textAlign: 'center',
+          }}>
+            Check <strong>{email}</strong> — we sent a link to reset your password. Tap it on this device to choose a new one.
+          </div>
         ) : phase === 'confirmEmail' ? (
           <div style={{
             background: '#ecfdf5',
@@ -176,6 +213,27 @@ export default function AuthScreen() {
                 placeholder="Password"
                 style={inputStyle}
               />
+
+              {mode === 'signin' && (
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={submitting}
+                  style={{
+                    display: 'block',
+                    marginLeft: 'auto',
+                    marginBottom: '12px',
+                    padding: 0,
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '13px',
+                    color: '#7C6FF7',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  Forgot password?
+                </button>
+              )}
 
               {phase === 'error' && (
                 <p style={{

@@ -5,6 +5,7 @@ import StoriesScreen from './screens/StoriesScreen'
 import GrowthScreen from './screens/GrowthScreen'
 import JournalScreen from './screens/JournalScreen'
 import AuthScreen from './screens/AuthScreen'
+import ResetPasswordScreen from './screens/ResetPasswordScreen'
 import TipDetail from './screens/TipDetail'
 import MoodScreen from './screens/MoodScreen'
 import ProfileScreen from './screens/ProfileScreen'
@@ -67,7 +68,7 @@ const NAV_ITEMS = [
 ]
 
 export default function App() {
-  const { status, session } = useSession()
+  const { status, session, passwordRecovery, endPasswordRecovery } = useSession()
   // undefined = loading, null = no profile yet, object = ready
   const [profile, setProfile] = useState(undefined)
   // During wind-down hours the app opens on Stories — bedtime is what she's
@@ -151,6 +152,12 @@ export default function App() {
   // When it isn't, fall straight through to guest mode (localStorage).
   if (isSupabaseConfigured && !session) {
     return <AuthScreen />
+  }
+
+  // Came in through a "reset your password" email: ask for the new password
+  // before showing anything else, so the old one is replaced in one sitting.
+  if (passwordRecovery) {
+    return <ResetPasswordScreen onDone={endPasswordRecovery} />
   }
 
   if (!profile) {
