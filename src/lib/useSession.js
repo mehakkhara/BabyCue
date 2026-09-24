@@ -13,9 +13,19 @@ function isAuthRejection(error) {
   return error?.status === 401 || error?.status === 403
 }
 
+// True while the person arrived via a "reset your password" email and hasn't
+// picked a new one yet. Supabase signs them in from the link and then fires a
+// PASSWORD_RECOVERY event; we also peek at the URL hash in case the event beat
+// our listener to it.
+function arrivedFromRecoveryLink() {
+  if (typeof window === 'undefined') return false
+  return /type=recovery/.test(window.location.hash)
+}
+
 export function useSession() {
   const [status, setStatus] = useState(isSupabaseConfigured ? 'loading' : 'ready')
   const [session, setSession] = useState(null)
+  const [passwordRecovery, setPasswordRecovery] = useState(arrivedFromRecoveryLink)
 
   useEffect(() => {
     if (!isSupabaseConfigured) return
@@ -49,8 +59,10 @@ export function useSession() {
       setStatus('ready')
     })
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
       setSession(next ?? null)
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+      if (event === 'SIGNED_OUT') setPasswordRecovery(false)
     })
 
     return () => {
@@ -59,7 +71,7 @@ export function useSession() {
     }
   }, [])
 
-  return { status, session }
+  return { status, session, passwordRecovery, endPasswordRecovery: () => setPasswordRecovery(false) }
 }
 
 export async function signOut() {
