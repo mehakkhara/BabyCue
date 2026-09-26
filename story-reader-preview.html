@@ -1,0 +1,703 @@
+<title>Numae — Goodnight Stories</title>
+
+<style>
+  :root {
+    --night:    #10131f;
+    --glow:     #f3e6c8;
+    --gold:     #e8b13d;
+    --purple:   #7C6FF7;
+    --bg:       #FAFAFA;
+    --card:     #ffffff;
+    --ink:      #1a1a2e;
+    --ink-2:    #888888;
+    --ink-3:    #aaaaaa;
+    --shadow:   0 1px 4px rgba(0,0,0,.07);
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161f; --card: #1c1f2b; --ink: #eceaf3;
+      --ink-2: #9a9aa8; --ink-3: #6f6f80;
+      --shadow: 0 1px 4px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161f; --card: #1c1f2b; --ink: #eceaf3;
+    --ink-2: #9a9aa8; --ink-3: #6f6f80;
+    --shadow: 0 1px 4px rgba(0,0,0,.4);
+  }
+  :root[data-theme="light"] {
+    --bg: #FAFAFA; --card: #ffffff; --ink: #1a1a2e;
+    --ink-2: #888888; --ink-3: #aaaaaa;
+    --shadow: 0 1px 4px rgba(0,0,0,.07);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); -webkit-font-smoothing: antialiased;
+  }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; }
+
+  /* header — mirrors StoriesScreen.jsx */
+  .head {
+    padding: 20px 20px 16px; background: var(--card); box-shadow: var(--shadow);
+  }
+  .head h1 { margin: 0 0 2px; font-size: 20px; font-weight: 700; }
+  .head p  { margin: 0; font-size: 13px; color: var(--ink-2); }
+
+  .rig {
+    display: flex; gap: 10px; align-items: flex-end;
+    padding: 11px 20px 13px; background: var(--card);
+    border-top: 1px solid rgba(128,128,128,.16);
+  }
+  .rig .tag {
+    font-size: 9.5px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 700; flex: 1 0 100%; margin-bottom: 2px;
+  }
+  .rig label { font-size: 10.5px; color: var(--ink-3); display: block; margin-bottom: 3px; }
+  .rig input, .rig select {
+    font: inherit; font-size: 14px; padding: 6px 9px; border-radius: 8px;
+    border: 1px solid rgba(128,128,128,.28); background: var(--bg); color: var(--ink);
+    max-width: 120px;
+  }
+  :focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+
+  .body { padding: 16px; }
+
+  .sect {
+    font-size: 11px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--purple); font-weight: 700; margin-bottom: 10px;
+  }
+  .sect .soft { color: var(--ink-3); font-weight: 500; }
+  .note { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+
+  /* tonight hero */
+  .tonight {
+    width: 100%; display: block; padding: 0; border: 0; cursor: pointer;
+    border-radius: 16px; overflow: hidden; background: var(--night);
+    box-shadow: 0 2px 10px rgba(26,26,46,.16); margin-bottom: 26px; text-align: left;
+  }
+  .tonight .frame { position: relative; height: 168px; }
+  .tonight canvas { width: 100%; height: 100%; display: block; }
+  .tonight .veil {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(16,19,31,0) 30%, rgba(16,19,31,.94) 100%);
+  }
+  .tonight .cap { position: absolute; left: 18px; right: 18px; bottom: 14px; }
+  .tonight .eyebrow {
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--gold); font-weight: 700; margin-bottom: 5px;
+  }
+  .tonight .name { font-family: var(--serif); font-size: 22px; line-height: 1.2; color: var(--glow); }
+
+  /* shelf rows */
+  .rows { display: flex; flex-direction: column; gap: 9px; }
+  .row {
+    display: flex; align-items: center; gap: 13px; width: 100%;
+    padding: 9px; border: 0; border-radius: 14px; background: var(--card);
+    box-shadow: var(--shadow); cursor: pointer; text-align: left; color: inherit;
+    font: inherit;
+  }
+  .row.dim { opacity: .72; }
+  .row canvas { width: 56px; height: 56px; flex: 0 0 56px; border-radius: 10px; display: block; }
+  .row .t { font-family: var(--serif); font-size: 16.5px; line-height: 1.25; margin-bottom: 3px; }
+  .row .m { font-size: 11.5px; color: var(--ink-3); }
+  .row .m .read { color: var(--purple); font-weight: 600; }
+  .rows + .sect { margin-top: 26px; }
+
+  /* ---------- reader ---------- */
+  .reader {
+    position: fixed; inset: 0; z-index: 200; background: var(--night);
+    color: var(--glow); display: none; flex-direction: column;
+  }
+  .reader.on { display: flex; }
+  .rin {
+    max-width: 480px; width: 100%; margin: 0 auto; flex: 1;
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .art { position: relative; flex: 0 0 auto; height: 46dvh; overflow: hidden; }
+  .art canvas { width: 100%; height: 100%; display: block; }
+  .art .veil {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(16,19,31,.22) 0%, rgba(16,19,31,0) 34%, #10131f 100%);
+  }
+  .wall {
+    position: absolute; left: 0; right: 0; bottom: 9px; text-align: center; padding: 0 22px;
+    font-family: var(--serif); font-style: italic; font-size: 11.5px;
+    letter-spacing: .05em; color: rgba(243,230,200,.62);
+  }
+  .wall span { font-style: normal; letter-spacing: .09em; font-size: 10.5px; }
+
+  .story {
+    flex: 1; min-height: 0; overflow-y: auto; padding: 24px 30px 20px;
+    font-family: var(--serif); font-size: 20px; line-height: 1.72;
+  }
+  .story p { margin: 0 0 1.05em; text-wrap: pretty; }
+  .story p:last-child { margin-bottom: 0; }
+  .story em { color: var(--gold); }
+  .fade { animation: fade .5s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+
+  .foot {
+    flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; padding: 12px 22px calc(16px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(243,230,200,.09);
+  }
+  .dots { display: flex; gap: 7px; }
+  .dots i {
+    width: 6px; height: 6px; border-radius: 50%; background: rgba(243,230,200,.24);
+    transition: background .3s ease, transform .3s ease;
+  }
+  .dots i.on { background: var(--gold); transform: scale(1.35); }
+  .btn {
+    background: none; border: 1px solid rgba(243,230,200,.2); color: rgba(243,230,200,.8);
+    font: inherit; font-size: 13px; padding: 7px 15px; border-radius: 20px; cursor: pointer;
+  }
+  .btn.go { border-color: var(--gold); background: var(--gold); color: var(--night); font-weight: 600; }
+
+  .zones { position: absolute; top: 0; left: 0; right: 0; bottom: 74px; display: flex; }
+  .zones button {
+    background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .zones button:first-child { flex: 0 0 32%; }
+  .zones button:last-child { flex: 1; }
+
+  .hint {
+    position: absolute; left: 0; right: 0; bottom: 84px; text-align: center;
+    font-size: 11px; letter-spacing: .09em; text-transform: uppercase;
+    color: rgba(243,230,200,.3); pointer-events: none; transition: opacity .6s ease;
+  }
+  .hint.gone { opacity: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+  @media (max-height: 680px) {
+    .art { height: 38dvh; }
+    .story { font-size: 18px; padding-top: 18px; }
+  }
+</style>
+
+<div class="app">
+  <div class="head">
+    <h1>Stories</h1>
+    <p id="sub">Bedtime stories for Kabir, told through paintings</p>
+  </div>
+
+  <div class="rig">
+    <div class="tag">Preview controls — the app reads these from the baby's profile</div>
+    <div>
+      <label for="nm">Name</label>
+      <input id="nm" value="Kabir" autocomplete="off" spellcheck="false" />
+    </div>
+    <div>
+      <label for="sx">Pronouns</label>
+      <select id="sx">
+        <option value="M">he / him</option>
+        <option value="F">she / her</option>
+        <option value="">they / them</option>
+      </select>
+    </div>
+    <div>
+      <label for="ag">Age</label>
+      <select id="ag">
+        <option value="3">3 months</option>
+        <option value="11">11 months</option>
+        <option value="19">19 months</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="body" id="body"></div>
+</div>
+
+<div class="reader" id="reader" role="dialog" aria-modal="true" aria-label="Story reader">
+  <div class="rin">
+    <div class="art">
+      <canvas id="rArt"></canvas>
+      <div class="veil"></div>
+      <div class="wall" id="rWall"></div>
+    </div>
+    <div class="story" id="rText"></div>
+    <div class="foot">
+      <button class="btn" id="rClose">Shelf</button>
+      <div class="dots" id="rDots"></div>
+      <button class="btn go" id="rNext">Next</button>
+    </div>
+  </div>
+  <div class="zones">
+    <button id="rPrev" aria-label="Previous page"></button>
+    <button id="rFwd" aria-label="Next page"></button>
+  </div>
+  <div class="hint" id="rHint">Tap right to turn the page</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var P = {
+    bedroom:   { t:"The Bedroom", y:1888, c:"Van Gogh Museum, Amsterdam", m:"interior",
+                 p:["#9db7a8","#cba94a","#8c3b2e","#3f5f7a","#dccf96"] },
+    starry:    { t:"The Starry Night", y:1889, c:"Museum of Modern Art, New York", m:"swirl",
+                 p:["#16244f","#2f4a9c","#e8c34a","#0c1229","#6f86c9"] },
+    rhone:     { t:"Starry Night Over the Rhône", y:1888, c:"Musée d'Orsay, Paris", m:"swirl",
+                 p:["#0f1a38","#1e3468","#e9b83c","#294677","#c9a63a"] },
+    almond:    { t:"Almond Blossom", y:1890, c:"Van Gogh Museum, Amsterdam", m:"blossom",
+                 p:["#5fb2b8","#7fd0d2","#f2e8e6","#d9a7b0","#3e6f74"] },
+    greenwheat:{ t:"Green Wheat Fields, Auvers", y:1890, c:"National Gallery of Art, Washington", m:"field",
+                 p:["#7fa64a","#a9c463","#5f7f39","#cfd98a","#7d92b8"] },
+    harvest:   { t:"The Harvest", y:1888, c:"Van Gogh Museum, Amsterdam", m:"field",
+                 p:["#d9b23c","#e6cf72","#5f7fa8","#a07d3a","#2f4f6f"] },
+    sunflower: { t:"Sunflowers", y:1888, c:"National Gallery, London", m:"flowers",
+                 p:["#e5b129","#f0d06a","#c98b1e","#8a6a2a","#e8dcae"] },
+    irises:    { t:"Irises", y:1889, c:"J. Paul Getty Museum, Los Angeles", m:"flowers",
+                 p:["#2f3f7a","#4a5aa0","#3f6b3a","#7f9c4a","#e8e4d6"] },
+    boats:     { t:"Fishing Boats on the Beach at Saintes-Maries", y:1888, c:"Van Gogh Museum, Amsterdam", m:"sea",
+                 p:["#4a86a8","#e0d3ae","#b03a2e","#2f6f4f","#dcc98a"] },
+    mulberry:  { t:"The Mulberry Tree", y:1889, c:"Norton Simon Museum, Pasadena", m:"tree",
+                 p:["#e0a02a","#f0c65a","#8a6a3a","#b8bfae","#6f7f5a"] },
+    cypress:   { t:"Wheat Field with Cypresses", y:1889, c:"The Metropolitan Museum of Art, New York", m:"field",
+                 p:["#2b4a2f","#d9b84a","#e6e0cc","#6f8fb0","#8fae6a"] },
+    branch:    { t:"Blossoming Almond Branch in a Glass", y:1888, c:"Van Gogh Museum, Amsterdam", m:"blossom",
+                 p:["#d9c9a8","#f0e6d2","#c9a0a8","#7f9c8a","#5f6f5a"] },
+    roses:     { t:"Roses", y:1890, c:"National Gallery of Art, Washington", m:"flowers",
+                 p:["#e8e4d2","#f2efe2","#7f9c6a","#c9c4a8","#5f6f4a"] },
+    lark:      { t:"Wheatfield with a Lark", y:1887, c:"Van Gogh Museum, Amsterdam", m:"field",
+                 p:["#d9c04a","#e6d97a","#8fa8c4","#a88f3a","#cfd9a0"] },
+    cafe:      { t:"Café Terrace at Night", y:1888, c:"Kröller-Müller Museum, Otterlo", m:"nightstreet",
+                 p:["#e8c04a","#1a3260","#2f5a8a","#f0d98a","#3f3226"] },
+    snow:      { t:"Landscape with Snow", y:1888, c:"Guggenheim Museum, New York", m:"snow",
+                 p:["#e6e6dc","#c4c4b8","#8a5a4a","#7f8f9c","#5f6f5a"] },
+    butterfly: { t:"Butterflies and Poppies", y:1890, c:"Van Gogh Museum, Amsterdam", m:"flowers",
+                 p:["#8fa86a","#c4d1a0","#b03a3a","#e8e4d2","#6f8f5a"] },
+    irisfield: { t:"Field with Irises near Arles", y:1888, c:"Van Gogh Museum, Amsterdam", m:"field",
+                 p:["#6a5a9c","#8f7fb8","#7fa04a","#d9c04a","#8fa8c4"] },
+    sower:     { t:"The Sower", y:1888, c:"Kröller-Müller Museum, Otterlo", m:"field",
+                 p:["#e8a02a","#f0c45a","#4a3a5a","#8a6a4a","#332c3f"] }
+  };
+
+  var BANDS = [
+    { id:"A", min:0,  max:8,   age:"0–9 months" },
+    { id:"B", min:9,  max:14,  age:"9–15 months" },
+    { id:"C", min:15, max:999, age:"15 months and up" }
+  ];
+
+  var S = [
+  { id:"A1", band:"A", title:"Goodnight, Little Star", pages:[
+    { art:"rhone", text:["The river is quiet tonight.","The lamps along the water have all turned gold, and each one drops a long gold ribbon down into the dark.","The water rocks them. Slow, and slow, and slow.","Goodnight, gold lights. Goodnight, quiet river."] },
+    { art:"starry", text:["Up above the sleeping town, the sky is turning.","Round and round go the big blue swirls. Round and round go the little stars, warm and yellow, like small lit windows very far away.","The tall dark tree leans up to watch them.","Goodnight, turning sky. Goodnight, small bright stars."] },
+    { art:"bedroom", text:["And here, in a small yellow room, there is a bed.","There is a red blanket, and two soft pillows, and a window with the night behind it.","The room is waiting. It has been waiting all day.","Goodnight, little room.","Goodnight, {name}."] }
+  ]},
+  { id:"A2", band:"A", title:"The Blossom Song", pages:[
+    { art:"almond", text:["Look up, {name}.","The branches are full of blossom — pink and white and open wide, all across a sky as blue as morning.","The wind comes through and the blossoms move.","They do not fall. They only sway."] },
+    { art:"branch", text:["Someone brought one small branch inside.","They put it in a glass of water on the table, where it is warm.","Just a few blossoms now. Just enough.","It leans a little — the way you lean when you are getting sleepy."] },
+    { art:"bedroom", text:["Outside, the tree keeps blossoming in the dark.","Inside, the room is quiet and the blanket is turned down.","The branch on the table is sleeping too.","Goodnight, blossom.","Goodnight, {name}."] }
+  ]},
+  { id:"A3", band:"A", title:"All the Yellow Things", pages:[
+    { art:"sunflower", text:["Yellow, yellow, yellow.","Fourteen sunflowers in a fat yellow pot, leaning every which way. Some are wide open. Some have closed up small for the night.","Yellow like butter. Yellow like a bath towel. Yellow like the light in the hall."] },
+    { art:"harvest", text:["Out in the fields it is yellow too.","Yellow wheat, all the way to the blue hills. A little cart. A little ladder. A little blue wagon standing still.","Everyone has gone home now.","The field is warm, and empty, and gold."] },
+    { art:"greenwheat", text:["And when the sun goes down, the yellow goes soft.","The green wheat moves like water. The wind walks through it, and lies down.","All the yellow things are closing.","Goodnight, yellow.","Goodnight, {name}."] }
+  ]},
+  { id:"A4", band:"A", title:"The Boats Come In", pages:[
+    { art:"boats", text:["The little boats have come back.","Red one, blue one, green one, white — pulled up onto the sand with their sails rolled tight.","They were out all day on the water.","Now they are done."] },
+    { art:"rhone", text:["The sea goes flat, and dark, and shining.","The lights come on along the shore. One. Then one. Then one.","Everything that was moving is slowing down.","Even the water. Even the wind."] },
+    { art:"bedroom", text:["Somewhere up the beach there is a small room with a small bed in it.","The shoes are off. The window is open a little.","The boats are sleeping on the sand.","Goodnight, boats.","Goodnight, {name}."] }
+  ]},
+  { id:"A5", band:"A", title:"Soft", pages:[
+    { art:"irises", text:["Soft.","A whole crowd of blue irises, standing close together in the dark green.","One white one in the middle, taller than the rest, looking around.","They lean on each other. Nobody minds."] },
+    { art:"roses", text:["Soft.","White roses in a green glass, opening slowly, the way slow things open.","Some petals have come down onto the table.","Nobody picks them up. They can stay there."] },
+    { art:"almond", text:["Soft.","Blossoms on the branches, all the way up into the blue.","Everything today was loud, and bright, and new.","Now everything is soft.","Goodnight, {name}."] }
+  ]},
+  { id:"B1", band:"B", title:"The Little Yellow Bird Goes Home", pages:[
+    { art:"lark", text:["There is a bird in this field.","Can you find it? There — the small one, going up.","All morning the little bird flew over the wheat. Up and down, up and down, singing the whole time.","The wheat went *swish*. The bird went up."] },
+    { art:"greenwheat", text:["Now it is evening, and the field has gone green and quiet.","The wind lies down flat.","The little bird stops singing and just floats — round, and round, and round — looking for the way home.","Down there. The small dark tree. That's the one."] },
+    { art:"starry", text:["The bird tucks into the branches.","Above the tree, the whole sky begins to turn: big slow circles of blue, and yellow stars, and one round gold moon like a lamp somebody left on.","The little bird puts its head under its wing.","Goodnight, little bird.","Goodnight, {name}."] }
+  ]},
+  { id:"B2", band:"B", title:"Who Is Still Awake?", pages:[
+    { art:"cafe", text:["It is late, {name}, and almost everyone has gone home.","But look — the yellow awning is still lit, and the little round tables are still out, and one or two people are still sitting there, talking quietly.","The waiter in white is carrying something.","The stones of the street have gone blue."] },
+    { art:"rhone", text:["Down at the river, two people are walking.","Slow steps. No hurry.","The lamps lay long gold ribbons on the water, and the water rocks them back and forth.","Above them the stars are out — big ones, wobbly ones, all of them awake."] },
+    { art:"bedroom", text:["Who is still awake?","Not the chairs. Not the table. Not the two blue doors.","Not the little towel on its hook. Not the shoes under the bed. Not the pictures on the wall.","Everyone here is asleep, {name}.","The stars will keep watch. You can close your eyes."] }
+  ]},
+  { id:"B3", band:"B", title:"The Day It Snowed", pages:[
+    { art:"snow", text:["Look what happened while we were sleeping.","The whole field went white.","There are little dark lines where the ground pokes through, and a low red roof, and one person walking with a dog, making small holes in the snow with their feet.","It goes very quiet when it snows. Have you noticed that?"] },
+    { art:"mulberry", text:["The big tree on the rocks doesn't mind the cold.","Its leaves have gone bright — orange and gold and yellow — and they shake all together in the wind, like hundreds of small hands waving.","Wave back, {name}.","Now the wind is stopping."] },
+    { art:"bedroom", text:["Inside, somebody has taken off their coat.","The room is warm. The blanket is red. There is a little frost in the corner of the window.","Out in the field the snow keeps coming down, slow and slow, covering everything up soft.","Goodnight, snow.","Goodnight, {name}."] }
+  ]},
+  { id:"B4", band:"B", title:"Butterflies", pages:[
+    { art:"butterfly", text:["Two white butterflies over the grass.","Up, down, sideways, up. They don't fly straight, butterflies. They fly like a leaf falling upward.","Underneath them the red poppies stand very still and let them pass.","Watch. Watch.","There they go."] },
+    { art:"irisfield", text:["Now the butterflies come to the iris field.","Purple and white and green, all the way to the little town — and the yellow field behind that, and the blue sky behind that.","The butterflies land.","They fold their wings up, like two hands closing."] },
+    { art:"almond", text:["When it gets dark, a butterfly finds a branch and holds on tight.","Up in the blossom, where it's pink and white and quiet, it stays all night without moving.","That's how butterflies sleep, {name}.","Hold on tight. Stay still.","Here comes the night."] }
+  ]},
+  { id:"B5", band:"B", title:"The Tall Tree and the Tall Sky", pages:[
+    { art:"mulberry", text:["This tree is old.","It has stood on these white rocks a long, long time, and every autumn it lights up gold all over, like it's having a party.","The wind pushes it. It leans, and comes back. Leans, and comes back.","Trees are good at that."] },
+    { art:"cypress", text:["Over the wheat, the clouds are enormous — great white ones, rolling and piling up over the blue hills.","And there, on the right, the dark green tree stands up like a candle flame.","Everything else moves.","That one holds still."] },
+    { art:"starry", text:["And at night the tall dark tree is still standing, right up in front of all those stars.","The sky rolls past it. The gold moon comes up at the edge.","The tree doesn't need to go anywhere. It's already home.","So are you, {name}.","Goodnight."] }
+  ]},
+  { id:"C1", band:"C", title:"The Little Bird Who Wanted to See the Sea", pages:[
+    { art:"greenwheat", text:["The little yellow bird had lived in the green field its whole life.","It was a good field. The wheat moved like water when the wind came through, and there were seeds, and there was a low stone wall to sit on.","But one morning the bird heard something far away. A sound like wind, only slower.","*Hush… hush… hush…*","“What’s that?” said the little bird.","“That’s the sea,” said the wheat.","So the little bird went to see it."] },
+    { art:"boats", text:["It flew a long way.","Over the hills, over a road, over a town with a bell — and then the ground turned into sand, and the sand turned into water, and the water went all the way out to the end of the sky.","Four little boats were pulled up on the beach. Red, and blue, and green, with their sails rolled and their masts crossed like fingers.","*Hush,* said the sea. *Hush. Hush.*","The little bird sat on the red boat and watched the water come in and go out, come in and go out, all afternoon — until its eyes went heavy."] },
+    { art:"rhone", text:["When the little bird woke up, the sky had gone dark blue and the lamps had come on along the shore.","Each lamp put a long gold ribbon down into the water, and the water rocked them, slow and slow.","The little bird thought about the green field, far away, with the low stone wall.","It could go home tomorrow.","Tonight it would stay right here, on the warm red boat, under all those stars.","*Hush,* said the sea. *Hush. Hush.*","Goodnight, little bird.","Goodnight, {name}."] }
+  ]},
+  { id:"C2", band:"C", title:"The Last Sunflower", pages:[
+    { art:"sunflower", text:["There were fourteen sunflowers in the yellow pot on the table.","By evening, thirteen of them had begun to close. They folded their petals in, one by one — the way you fold a blanket — and let their heads go heavy.","But the one at the top stayed wide open.","“Aren’t you tired?” asked the others.","“Not yet,” said the last sunflower. “I want to see what happens.”"] },
+    { art:"harvest", text:["Out the window, the last sunflower watched the whole day finish.","It watched the wheat go gold. It watched the little blue cart stand still, and the ladder lean against the haystack with nobody on it. It watched a man walk home along the edge of the field with his hands in his pockets. It watched the blue hills go soft at the edges.","It watched all the way until there was nothing left to watch.","“Oh,” said the last sunflower. “*That’s* what happens.”"] },
+    { art:"bedroom", text:["In the little yellow room, the day was finished too.","The chairs had stopped. The shoes were under the bed. The window was open a crack, and the night came in cool and quiet and sat down on the red blanket.","The last sunflower folded its petals in.","It had seen the whole day, right to the end.","Now it could sleep.","Goodnight, sunflowers.","Goodnight, {name}."] }
+  ]},
+  { id:"C3", band:"C", title:"The Long Way Home", pages:[
+    { art:"harvest", text:["It had been a very big day.","All morning the carts had gone back and forth across the gold field, and the ladders had gone up and down, and everybody had worked in the sun until their hats went crooked.","Now it was finished. The wheat was stacked. The blue wagon stood still with nobody in it.","And it was time to go home — but home was all the way across the field, past the hills.","“That’s very far,” said {name}.","“It is,” said the field. “Take the long way. The long way is nicer.”"] },
+    { art:"cypress", text:["So they took the long way.","Past the wheat, which had gone the color of honey. Past the olive trees, which shook a bit. Past the tall dark cypress, standing up like a candle.","And overhead — oh, the clouds. Enormous white ones, rolling and piling and turning over each other, all the way across the blue.","“Where are the clouds going?” said {name}.","“The same place you are,” said the field. “Home. Everything goes home at the end.”"] },
+    { art:"bedroom", text:["And there it was.","A small yellow room, with a bed and a red blanket, and two pillows shaped like two small hills. A jug and a bowl on the table. A towel on a hook. Two blue doors, both closed.","Shoes off. Window open a crack.","Outside, the wheat kept standing in the dark, and the clouds kept rolling, and the tall dark tree stayed exactly where it was.","You took the long way, {name}.","And you got here.","Goodnight."] }
+  ]},
+  { id:"C4", band:"C", title:"Somebody Planted This", pages:[
+    { art:"sower", text:["Very early, when the sky was still orange, a man walked across an empty field.","He had a bag over his shoulder, and as he walked he swung his arm out — *shhk* — and the seeds went flying into the dirt.","There was nothing to see. Just brown ground, and a big yellow sun coming up behind him, and one dark tree leaning sideways.","“Where did they go?” said {name}.","“Under,” said the man. “Now we wait.”"] },
+    { art:"greenwheat", text:["Waiting takes a long time. Longer than a nap. Longer than a whole day.","But if you wait long enough —","The whole field came up green.","Green wheat everywhere, moving like water, all the way to the little houses at the edge. The wind walked through it and pushed it flat, and it stood back up. Down, and up. Down, and up.","“It was under there the whole time?” said {name}.","“The whole time,” said the wheat."] },
+    { art:"bedroom", text:["That night the little yellow room was very quiet.","The blanket was turned down. The window was open a crack.","Outside, the green field went on doing its slow work in the dark — the way it does every single night, without anybody watching.","Things grow while you're sleeping, {name}.","That's how it works.","Goodnight."] }
+  ]},
+  { id:"C5", band:"C", title:"The Night the Sky Went Round", pages:[
+    { art:"almond", text:["Some nights the sky is just the sky.","But some nights — if you are lucky, and still awake — the sky does something else.","It started with the almond tree. All day it had held its blossoms up, pink and white against the blue, perfectly still, the way trees do.","Then the wind came, and every blossom moved at once.","“Something’s happening,” said {name}."] },
+    { art:"irises", text:["Down in the garden, the irises had noticed too.","A whole crowd of them, blue and leaning, packed in close with their green leaves crossing over each other — and right in the middle, the one white iris, standing taller, looking up.","“What is it?” said the irises.","“Wait,” said the white one. “Watch the sky.”"] },
+    { art:"starry", text:["And then the sky went round.","Great slow blue curls of it, turning and turning over the sleeping town. Yellow stars, each one with a soft ring of light around it, like a candle seen through a window. A gold moon coming up at the edge.","And the tall dark tree standing in front of it all, leaning up, watching the whole thing happen.","Nobody in the town saw it. They were all asleep.","But you saw it, {name}.","Now close your eyes.","The sky will keep turning while you sleep.","Goodnight."] }
+  ]}
+  ];
+
+  /* ---- name + pronoun substitution (mirrors lib/storyText.js) ---- */
+  function renderLine(line, pr) {
+    var n = (pr.name || "").trim() || "your baby";
+    var f = pr.sex === "M" ? { they:"he", them:"him", their:"his", was:"was" }
+          : pr.sex === "F" ? { they:"she", them:"her", their:"her", was:"was" }
+          : { they:"they", them:"them", their:"their", was:"were" };
+    var cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
+    return String(line)
+      .replace(/\{name's\}/g, n + "'s").replace(/\{name\}/g, n)
+      .replace(/\{They\}/g, cap(f.they)).replace(/\{they\}/g, f.they)
+      .replace(/\{Them\}/g, cap(f.them)).replace(/\{them\}/g, f.them)
+      .replace(/\{Their\}/g, cap(f.their)).replace(/\{their\}/g, f.their)
+      .replace(/\{Was\}/g, cap(f.was)).replace(/\{was\}/g, f.was);
+  }
+  function segments(line) {
+    var out = [], re = /\*([^*]+)\*/g, last = 0, m;
+    while ((m = re.exec(line)) !== null) {
+      if (m.index > last) out.push({ t: line.slice(last, m.index), em: false });
+      out.push({ t: m[1], em: true });
+      last = m.index + m[0].length;
+    }
+    if (last < line.length) out.push({ t: line.slice(last), em: false });
+    return out.length ? out : [{ t: line, em: false }];
+  }
+
+  /* ---- placeholder art ---- */
+  function seeded(seed) {
+    var s = 0;
+    for (var i = 0; i < seed.length; i++) s = (s * 31 + seed.charCodeAt(i)) >>> 0;
+    return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  }
+
+  function paint(canvas, key) {
+    var art = P[key]; if (!canvas || !art) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = canvas.clientWidth || 300, h = canvas.clientHeight || 300;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    var g = canvas.getContext("2d"); if (!g) return;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var r = seeded(key), pal = art.p, i, n;
+    var pick = function () { return pal[Math.floor(r() * pal.length)]; };
+    g.fillStyle = pal[0]; g.fillRect(0, 0, w, h);
+
+    function stroke(x, y, len, ang, wid, col, alpha) {
+      g.save(); g.globalAlpha = alpha; g.strokeStyle = col; g.lineWidth = wid; g.lineCap = "round";
+      g.beginPath(); g.moveTo(x, y);
+      g.quadraticCurveTo(x + Math.cos(ang) * len * .5 + (r() - .5) * 12,
+        y + Math.sin(ang) * len * .5 + (r() - .5) * 12,
+        x + Math.cos(ang) * len, y + Math.sin(ang) * len);
+      g.stroke(); g.restore();
+    }
+
+    if (art.m === "swirl") {
+      g.fillStyle = pal[1]; g.fillRect(0, 0, w, h * .78);
+      for (i = 0; i < 5; i++) {
+        var cx = r() * w, cy = r() * h * .6, rad = 22 + r() * h * .22;
+        for (n = 0; n < 34; n++) {
+          var a = n / 34 * Math.PI * 4, fd = 1 - n / 60;
+          stroke(cx + Math.cos(a) * rad * fd, cy + Math.sin(a) * rad * .6 * fd,
+            16 + r() * 16, a + 1.5, 3 + r() * 4, n % 3 ? pal[4] : pal[1], .5);
+        }
+      }
+      for (i = 0; i < 11; i++) {
+        var sx = r() * w, sy = r() * h * .55, sr = 5 + r() * 11;
+        var gd = g.createRadialGradient(sx, sy, 0, sx, sy, sr * 2.6);
+        gd.addColorStop(0, pal[2]); gd.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = gd; g.beginPath(); g.arc(sx, sy, sr * 2.6, 0, 6.3); g.fill();
+      }
+      g.fillStyle = pal[3]; g.beginPath(); g.moveTo(0, h);
+      for (i = 0; i <= 10; i++) g.lineTo(w * i / 10, h * (.74 + Math.sin(i) * .04));
+      g.lineTo(w, h); g.closePath(); g.fill();
+    } else if (art.m === "field") {
+      for (i = 0; i < 5; i++) { g.globalAlpha = .9; g.fillStyle = pal[i % pal.length]; g.fillRect(0, h * (i / 5) * 1.05, w, h / 4); }
+      g.globalAlpha = 1;
+      for (i = 0; i < 420; i++) stroke(r() * w, h * .28 + r() * h * .72, 8 + r() * 16, Math.PI / 2 + (r() - .5) * .7, 1.5 + r() * 3, pick(), .45);
+    } else if (art.m === "blossom") {
+      var bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, pal[1]); bg.addColorStop(1, pal[0]);
+      g.fillStyle = bg; g.fillRect(0, 0, w, h);
+      for (i = 0; i < 9; i++) stroke(r() * w, h, h * (.5 + r() * .5), -Math.PI / 2 + (r() - .5) * 1.4, 4 + r() * 7, pal[4], .75);
+      for (i = 0; i < 190; i++) {
+        g.globalAlpha = .55 + r() * .4; g.fillStyle = r() > .4 ? pal[2] : pal[3];
+        g.beginPath(); g.ellipse(r() * w, r() * h, 3 + r() * 8, 2 + r() * 5, r() * 6, 0, 6.3); g.fill();
+      }
+      g.globalAlpha = 1;
+    } else if (art.m === "flowers") {
+      g.fillStyle = pal[4]; g.fillRect(0, 0, w, h);
+      g.fillStyle = pal[0]; g.fillRect(0, h * .62, w, h * .38);
+      for (i = 0; i < 30; i++) {
+        var fx = w * .1 + r() * w * .8, fy = h * .12 + r() * h * .55;
+        stroke(fx, fy, 30 + r() * 40, Math.PI / 2, 3, pal[3], .6);
+        for (n = 0; n < 9; n++) {
+          g.globalAlpha = .85; g.fillStyle = n % 2 ? pal[1] : pal[2];
+          g.beginPath(); g.ellipse(fx + Math.cos(n) * 11, fy + Math.sin(n) * 11, 8, 4, n, 0, 6.3); g.fill();
+        }
+      }
+      g.globalAlpha = 1;
+    } else if (art.m === "sea") {
+      var sg = g.createLinearGradient(0, 0, 0, h);
+      sg.addColorStop(0, pal[0]); sg.addColorStop(.55, pal[3]); sg.addColorStop(1, pal[1]);
+      g.fillStyle = sg; g.fillRect(0, 0, w, h);
+      for (i = 0; i < 200; i++) stroke(r() * w, h * .1 + r() * h * .5, 14 + r() * 26, (r() - .5) * .3, 2 + r() * 3, r() > .5 ? pal[0] : pal[4], .4);
+      for (i = 0; i < 4; i++) {
+        var bx = w * (.12 + i * .24), by = h * (.62 + r() * .2);
+        g.fillStyle = [pal[2], pal[3], pal[0], pal[4]][i];
+        g.beginPath(); g.moveTo(bx - 26, by); g.lineTo(bx + 26, by); g.lineTo(bx + 16, by + 13); g.lineTo(bx - 16, by + 13); g.closePath(); g.fill();
+        stroke(bx, by, 46, -Math.PI / 2 - .15, 3, pal[4], .85);
+      }
+    } else if (art.m === "interior") {
+      g.fillStyle = pal[0]; g.fillRect(0, 0, w, h);
+      g.fillStyle = pal[4]; g.fillRect(0, h * .58, w, h * .42);
+      g.fillStyle = pal[3]; g.fillRect(w * .06, h * .16, w * .16, h * .4); g.fillRect(w * .78, h * .16, w * .16, h * .4);
+      g.fillStyle = pal[2]; g.beginPath();
+      g.moveTo(w * .22, h * .62); g.lineTo(w * .88, h * .55); g.lineTo(w * .92, h * .86); g.lineTo(w * .18, h * .95);
+      g.closePath(); g.fill();
+      g.fillStyle = pal[1]; g.beginPath(); g.ellipse(w * .34, h * .6, w * .09, h * .05, -.1, 0, 6.3); g.fill();
+      for (i = 0; i < 220; i++) stroke(r() * w, r() * h, 8 + r() * 14, (r() - .5) * .6, 1.5 + r() * 2, pick(), .16);
+    } else if (art.m === "nightstreet") {
+      g.fillStyle = pal[1]; g.fillRect(0, 0, w, h);
+      var lg = g.createRadialGradient(w * .34, h * .34, 6, w * .34, h * .34, w * .66);
+      lg.addColorStop(0, pal[0]); lg.addColorStop(.45, pal[3]); lg.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = lg; g.fillRect(0, 0, w, h);
+      g.fillStyle = pal[2]; g.beginPath();
+      g.moveTo(0, h); g.lineTo(w, h); g.lineTo(w, h * .62); g.lineTo(0, h * .78); g.closePath(); g.fill();
+      for (i = 0; i < 16; i++) {
+        var tx = r() * w, ty = r() * h * .35;
+        var sd = g.createRadialGradient(tx, ty, 0, tx, ty, 9);
+        sd.addColorStop(0, pal[3]); sd.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = sd; g.beginPath(); g.arc(tx, ty, 9, 0, 6.3); g.fill();
+      }
+    } else if (art.m === "snow") {
+      g.fillStyle = pal[3]; g.fillRect(0, 0, w, h * .34);
+      g.fillStyle = pal[0]; g.fillRect(0, h * .3, w, h * .7);
+      for (i = 0; i < 240; i++) stroke(r() * w, h * .34 + r() * h * .66, 12 + r() * 30, (r() - .5) * .4, 1.5 + r() * 3, r() > .7 ? pal[4] : pal[1], .4);
+      g.fillStyle = pal[2]; g.beginPath();
+      g.moveTo(w * .56, h * .44); g.lineTo(w * .86, h * .4); g.lineTo(w * .88, h * .5); g.lineTo(w * .56, h * .53);
+      g.closePath(); g.fill();
+    } else if (art.m === "tree") {
+      var tg = g.createLinearGradient(0, 0, 0, h); tg.addColorStop(0, pal[3]); tg.addColorStop(1, pal[4]);
+      g.fillStyle = tg; g.fillRect(0, 0, w, h);
+      g.fillStyle = pal[2]; g.fillRect(w * .46, h * .55, w * .08, h * .45);
+      for (i = 0; i < 340; i++) {
+        var ta = r() * 6.3, td = r() * Math.min(w, h) * .4;
+        g.globalAlpha = .55 + r() * .4; g.fillStyle = r() > .45 ? pal[0] : pal[1];
+        g.beginPath(); g.ellipse(w * .5 + Math.cos(ta) * td, h * .42 + Math.sin(ta) * td * .72, 4 + r() * 7, 3 + r() * 5, ta, 0, 6.3); g.fill();
+      }
+      g.globalAlpha = 1;
+    }
+
+    g.globalAlpha = .05;
+    for (i = 0; i < 900; i++) { g.fillStyle = i % 2 ? "#fff" : "#000"; g.fillRect(r() * w, r() * h, 1.4, 1.4); }
+    g.globalAlpha = 1;
+  }
+
+  /* ---- state ---- */
+  var nm = document.getElementById("nm"),
+      sx = document.getElementById("sx"),
+      ag = document.getElementById("ag"),
+      bodyEl = document.getElementById("body"),
+      subEl = document.getElementById("sub");
+
+  var read = [];
+  function pr() { return { name: nm.value, sex: sx.value }; }
+  function bandFor(m) {
+    for (var i = 0; i < BANDS.length; i++) if (m >= BANDS[i].min && m <= BANDS[i].max) return BANDS[i];
+    return BANDS[BANDS.length - 1];
+  }
+  function hash(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function pickTonight(age) {
+    var pool = S.filter(function (s) { return s.band === bandFor(age).id; });
+    if (!pool.length) return null;
+    var unread = pool.filter(function (s) { return read.indexOf(s.id) === -1; });
+    var c = unread.length ? unread : pool;
+    return c[hash(todayKey() + ":" + nm.value) % c.length];
+  }
+
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+
+  function buildShelf() {
+    var age = parseInt(ag.value, 10);
+    var band = bandFor(age);
+    var baby = (nm.value || "").trim() || "your baby";
+    subEl.textContent = "Bedtime stories for " + baby + ", told through paintings";
+
+    bodyEl.textContent = "";
+
+    var tonight = pickTonight(age);
+    if (tonight) {
+      bodyEl.appendChild(el("div", "sect", "Tonight"));
+      var hero = el("button", "tonight");
+      hero.type = "button";
+      var frame = el("div", "frame");
+      var hc = document.createElement("canvas");
+      frame.appendChild(hc);
+      frame.appendChild(el("div", "veil"));
+      frame.appendChild(el("div", "cap",
+        '<div class="eyebrow">Tonight’s story</div><div class="name">' + tonight.title + "</div>"));
+      hero.appendChild(frame);
+      hero.addEventListener("click", function () { open(tonight); });
+      bodyEl.appendChild(hero);
+      requestAnimationFrame(function () { paint(hc, tonight.pages[0].art); });
+    }
+
+    var mine = S.filter(function (s) { return s.band === band.id; });
+    var rest = S.filter(function (s) { return s.band !== band.id; });
+
+    bodyEl.appendChild(el("div", "sect",
+      "For " + baby + ' <span class="soft">· ' + band.age + "</span>"));
+    bodyEl.appendChild(rows(mine, false));
+
+    bodyEl.appendChild(el("div", "sect", "The rest of the shelf"));
+    bodyEl.appendChild(el("p", "note", "Written for other ages — read them whenever you like."));
+    bodyEl.appendChild(rows(rest, true));
+  }
+
+  function rows(list, dim) {
+    var box = el("div", "rows");
+    list.forEach(function (s) {
+      var b = el("button", "row" + (dim ? " dim" : ""));
+      b.type = "button";
+      var c = document.createElement("canvas");
+      var meta = el("div", null,
+        '<div class="t">' + s.title + '</div><div class="m">' +
+        (read.indexOf(s.id) !== -1 ? '<span class="read">Read · </span>' : "") +
+        P[s.pages[0].art].t + "</div>");
+      b.appendChild(c); b.appendChild(meta);
+      b.addEventListener("click", function () { open(s); });
+      box.appendChild(b);
+      requestAnimationFrame(function () { paint(c, s.pages[0].art); });
+    });
+    return box;
+  }
+
+  /* ---- reader ---- */
+  var reader = document.getElementById("reader"),
+      rArt = document.getElementById("rArt"),
+      rWall = document.getElementById("rWall"),
+      rText = document.getElementById("rText"),
+      rDots = document.getElementById("rDots"),
+      rNext = document.getElementById("rNext"),
+      rHint = document.getElementById("rHint");
+
+  var cur = null, page = 0, hinted = false;
+
+  function open(story) {
+    cur = story; page = 0;
+    reader.classList.add("on");
+    document.body.style.overflow = "hidden";
+    if (!hinted) {
+      rHint.classList.remove("gone");
+      setTimeout(function () { rHint.classList.add("gone"); }, 3200);
+      hinted = true;
+    } else { rHint.classList.add("gone"); }
+    draw();
+  }
+
+  function close() {
+    reader.classList.remove("on");
+    document.body.style.overflow = "";
+    cur = null;
+    buildShelf();
+  }
+
+  function draw() {
+    if (!cur) return;
+    var pg = cur.pages[page], art = P[pg.art], profile = pr();
+    paint(rArt, pg.art);
+    rWall.innerHTML = art.t + ", " + art.y + " &nbsp;·&nbsp; <span>" + art.c + "</span>";
+
+    rText.textContent = "";
+    pg.text.forEach(function (line) {
+      var p = document.createElement("p");
+      segments(renderLine(line, profile)).forEach(function (sg) {
+        var node = sg.em ? document.createElement("em") : document.createElement("span");
+        node.textContent = sg.t;
+        p.appendChild(node);
+      });
+      rText.appendChild(p);
+    });
+    rText.scrollTop = 0;
+    rText.classList.remove("fade"); void rText.offsetWidth; rText.classList.add("fade");
+
+    rDots.textContent = "";
+    cur.pages.forEach(function (_, i) {
+      var d = document.createElement("i");
+      if (i === page) d.className = "on";
+      rDots.appendChild(d);
+    });
+
+    var last = page === cur.pages.length - 1;
+    rNext.textContent = last ? "Goodnight" : "Next";
+    if (last && read.indexOf(cur.id) === -1) read.push(cur.id);
+  }
+
+  function next() { if (!cur) return; if (page < cur.pages.length - 1) { page++; draw(); } else close(); }
+  function prev() { if (!cur) return; if (page > 0) { page--; draw(); } else close(); }
+
+  rNext.addEventListener("click", next);
+  document.getElementById("rFwd").addEventListener("click", next);
+  document.getElementById("rPrev").addEventListener("click", prev);
+  document.getElementById("rClose").addEventListener("click", close);
+
+  document.addEventListener("keydown", function (e) {
+    if (!cur) return;
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); next(); }
+    else if (e.key === "ArrowLeft") prev();
+    else if (e.key === "Escape") close();
+  });
+
+  var tx = 0;
+  reader.addEventListener("touchstart", function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+  reader.addEventListener("touchend", function (e) {
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 55) { dx < 0 ? next() : prev(); }
+  }, { passive: true });
+
+  nm.addEventListener("input", function () { cur ? draw() : buildShelf(); });
+  sx.addEventListener("change", function () { if (cur) draw(); });
+  ag.addEventListener("change", buildShelf);
+
+  var rt;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { if (cur) paint(rArt, cur.pages[page].art); }, 180);
+  });
+
+  buildShelf();
+})();
+</script>

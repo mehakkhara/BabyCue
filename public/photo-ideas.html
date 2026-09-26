@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BabyCue — Photo-powered interactivity</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    background: #f3f1fb;
+    color: #1e1b4b;
+    padding: 32px 16px 80px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; }
+  h1 { font-size: 26px; margin-bottom: 6px; }
+  .sub { color: #6b7280; font-size: 14px; margin-bottom: 36px; }
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: #7C6FF7; margin: 44px 0 16px; padding-bottom: 8px;
+    border-bottom: 2px solid #e4defc;
+  }
+  h3 { font-size: 16px; margin-bottom: 4px; }
+
+  .opt {
+    background: #fff; border-radius: 20px; padding: 22px;
+    box-shadow: 0 4px 20px rgba(100,100,180,0.09);
+    margin-bottom: 20px;
+    display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start;
+  }
+  @media (max-width: 780px) { .opt { grid-template-columns: 1fr; } }
+  .opt .meta { font-size: 12px; color: #9ca3af; margin: 6px 0 10px; }
+  .opt p.desc { font-size: 14px; color: #4b5563; }
+  .why { margin-top: 10px; font-size: 13px; color: #6b5bd6; background: #f5f3ff; border-radius: 10px; padding: 10px 12px; }
+  .why::before { content: "Why she comes back: "; font-weight: 700; }
+  .where { margin-top: 8px; font-size: 12.5px; color: #0369a1; background: #e8f6fe; border-radius: 10px; padding: 8px 12px; }
+  .where::before { content: "Where it lives: "; font-weight: 700; }
+  .pill {
+    display: inline-block; font-size: 10.5px; font-weight: 700; padding: 3px 10px;
+    border-radius: 12px; margin-right: 6px; letter-spacing: 0.04em;
+  }
+  .pill.rec { background: #7C6FF7; color: #fff; }
+  .pill.free { background: #dcfce7; color: #15803d; }
+  .pill.easy { background: #e0f2fe; color: #0369a1; }
+
+  .demo {
+    background: #faf9ff; border: 1.5px solid #ece9f6; border-radius: 20px;
+    padding: 16px;
+  }
+  .demo .label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #c4b5fd; margin-bottom: 10px; text-align: center; }
+
+  .btn {
+    border: none; border-radius: 10px; padding: 10px 16px; font-size: 13px;
+    font-weight: 600; cursor: pointer; font-family: inherit;
+    background: linear-gradient(135deg, #7C6FF7, #a78bfa); color: #fff;
+    transition: transform 0.1s ease;
+  }
+  .btn:active { transform: scale(0.94); }
+  .btn.ghost { background: #f5f3ff; color: #7C6FF7; }
+
+  /* placeholder "photos" — gradients standing in for real journal photos */
+  .ph {
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #fbcfe8, #ddd6fe);
+    color: rgba(30,27,75,0.55); overflow: hidden; position: relative;
+  }
+  .ph.p2 { background: linear-gradient(135deg, #bfdbfe, #ddd6fe); }
+  .ph.p3 { background: linear-gradient(135deg, #fde68a, #fbcfe8); }
+  .ph.p4 { background: linear-gradient(135deg, #bbf7d0, #bfdbfe); }
+  .ph.p5 { background: linear-gradient(135deg, #ddd6fe, #fde68a); }
+
+  /* ---- A: then vs now slider ---- */
+  .baSlider { position: relative; border-radius: 16px; overflow: hidden; height: 220px; user-select: none; }
+  .baSlider .ph { position: absolute; inset: 0; }
+  .baTop { clip-path: inset(0 calc(100% - var(--cut, 50%)) 0 0); }
+  .baBar {
+    position: absolute; top: 0; bottom: 0; left: var(--cut, 50%); width: 3px;
+    background: #fff; box-shadow: 0 0 8px rgba(0,0,0,0.3); pointer-events: none;
+  }
+  .baHandle {
+    position: absolute; top: 50%; left: var(--cut, 50%); transform: translate(-50%,-50%);
+    width: 34px; height: 34px; border-radius: 50%; background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25); pointer-events: none;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; color: #7C6FF7;
+  }
+  .baTag {
+    position: absolute; bottom: 10px; font-size: 10.5px; font-weight: 700;
+    background: rgba(0,0,0,0.45); color: #fff; padding: 3px 9px; border-radius: 10px;
+    pointer-events: none;
+  }
+  .baRange {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: ew-resize; margin: 0;
+    -webkit-appearance: none; appearance: none;
+  }
+
+  /* ---- B: timelapse ---- */
+  .reel { border-radius: 16px; overflow: hidden; height: 200px; position: relative; }
+  .reel .ph { position: absolute; inset: 0; opacity: 0; transition: opacity 0.35s ease; font-size: 64px; }
+  .reel .ph.show { opacity: 1; }
+  .reelCap {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 14px 10px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.6));
+    color: #fff; font-size: 13px; font-weight: 700; z-index: 2; pointer-events: none;
+  }
+  .reelDots { display: flex; gap: 5px; justify-content: center; margin: 10px 0; }
+  .reelDots span { width: 7px; height: 7px; border-radius: 50%; background: #ddd6fe; transition: all 0.2s; }
+  .reelDots span.on { background: #7C6FF7; transform: scale(1.3); }
+
+  /* ---- C: photo prompts bingo ---- */
+  .bingo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .bCell {
+    aspect-ratio: 1; border-radius: 12px; border: 1.5px dashed #ddd6fe;
+    background: #fff; cursor: pointer; padding: 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; font-family: inherit; text-align: center;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .bCell .em { font-size: 20px; }
+  .bCell .tx { font-size: 9px; font-weight: 700; color: #9ca3af; line-height: 1.2; }
+  .bCell.done { border-style: solid; border-color: #86efac; background: #f0fdf4; transform: scale(1.04); }
+  .bCell.done .tx { color: #15803d; }
+
+  /* ---- D: milestone share card ---- */
+  .shareCard {
+    border-radius: 18px; overflow: hidden; position: relative; height: 230px;
+    transition: all 0.3s ease;
+  }
+  .shareCard .ph { position: absolute; inset: 0; font-size: 70px; }
+  .shareOv {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 16px 14px;
+    color: #fff; z-index: 2;
+    background: linear-gradient(to bottom, transparent, rgba(30,27,75,0.75));
+    transition: background 0.3s;
+  }
+  .shareOv .big { font-family: Georgia, serif; font-size: 19px; line-height: 1.25; }
+  .shareOv .sm { font-size: 11px; opacity: 0.9; margin-top: 3px; }
+  .shareOv .brand { position: absolute; top: -218px; right: 12px; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(255,255,255,0.85); color: #7C6FF7; padding: 3px 8px; border-radius: 10px; }
+  .themes { display: flex; gap: 8px; justify-content: center; margin: 10px 0; }
+  .themes button { width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid transparent; cursor: pointer; }
+  .themes button.on { border-color: #1e1b4b; }
+  .t1 { background: linear-gradient(135deg, #7C6FF7, #a78bfa); }
+  .t2 { background: linear-gradient(135deg, #f472b6, #fbbf24); }
+  .t3 { background: linear-gradient(135deg, #1e1b4b, #443a78); }
+
+  /* ---- E: collage ---- */
+  .collage { display: grid; gap: 6px; height: 230px; transition: all 0.3s; }
+  .collage .ph { border-radius: 12px; font-size: 26px; }
+  .lay1 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+  .lay1 .c1 { grid-row: span 2; font-size: 44px; }
+  .lay1 .c4 { grid-column: span 2; }
+  .lay2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+  .lay2 .c1 { grid-column: span 2; font-size: 44px; }
+  .lay3 { grid-template-columns: 1fr 2fr; grid-template-rows: 1fr 1fr 1fr; }
+  .lay3 .c2 { grid-row: span 2; font-size: 44px; }
+  .lay3 .c5 { grid-column: span 2; }
+  .collageTitle {
+    position: absolute; font-family: Georgia, serif; font-size: 13px; color: #fff;
+    background: rgba(30,27,75,0.6); padding: 4px 12px; border-radius: 12px;
+    bottom: 10px; left: 50%; transform: translateX(-50%); pointer-events: none; white-space: nowrap;
+  }
+
+  .verdict {
+    background: #fff; border-radius: 20px; padding: 22px;
+    box-shadow: 0 4px 20px rgba(100,100,180,0.09); border-left: 4px solid #22c55e;
+  }
+  .verdict ol { margin: 10px 0 0 20px; font-size: 14px; color: #4b5563; }
+  .verdict li { margin-bottom: 8px; }
+  .note { font-size: 12.5px; color: #6b7280; background: #fff; border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 10px rgba(100,100,180,0.06); margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Photo-powered interactivity 📸</h1>
+  <p class="sub">Five ways to turn the journal photos she's already saving into moments she plays with, not just scrolls past. Placeholder gradients stand in for real photos — every demo is tappable/draggable.</p>
+
+  <div class="note">💡 <b>Why photos are the right lever:</b> they're already on-device in IndexedDB, so every feature here is $0 — no uploads, no processing costs, no APIs. And each feature quietly rewards adding <i>more</i> photos, which feeds the flashback card and the journal itself. It's a flywheel.</div>
+
+  <!-- ============ A: THEN vs NOW ============ -->
+  <div class="opt">
+    <div>
+      <span class="pill rec">RECOMMENDED</span><span class="pill free">$0</span><span class="pill easy">~1 day</span>
+      <h3>A · Then ↔ Now slider</h3>
+      <p class="meta">Picks the oldest + newest journal photo automatically · pure CSS clip-path</p>
+      <p class="desc">A draggable comparison of the earliest photo in the journal against the latest. Babies transform so fast that this is genuinely astonishing to a parent — and dragging the handle back and forth is the kind of tactile play that makes an app feel alive. Smarter pairing later: same-pose matching by month ("Month 1 vs Month 4").</p>
+      <div class="why">every new photo she adds updates "Now" — the comparison literally grows with the baby, so it's never the same twice.</div>
+      <div class="where">Journal header, and on Home the day after a new photo is added ("See how far Aria's come").</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — drag the handle</div>
+      <div class="baSlider" id="ba" style="--cut: 50%">
+        <div class="ph p2" style="font-size:80px">👶</div>
+        <div class="ph baTop" style="font-size:44px">🐣</div>
+        <div class="baBar"></div>
+        <div class="baHandle">⟷</div>
+        <span class="baTag" style="left:10px">Month 1</span>
+        <span class="baTag" style="right:10px">Month 4</span>
+        <input class="baRange" type="range" min="5" max="95" value="50" id="baRange" aria-label="Compare then and now">
+      </div>
+      <p style="text-align:center; font-size:11.5px; color:#9ca3af; margin-top:10px">“3 months and 4 lbs between these two photos 💜”</p>
+    </div>
+  </div>
+
+  <!-- ============ B: TIMELAPSE REEL ============ -->
+  <div class="opt">
+    <div>
+      <span class="pill free">$0</span><span class="pill easy">~1 day</span>
+      <h3>B · "Watch her grow" timelapse reel</h3>
+      <p class="meta">One hero photo per month (you already compute heroes in the Journal) · CSS crossfade</p>
+      <p class="desc">A 10-second auto-playing reel that flips through one photo per month with the age captioned. The Journal already picks a hero per month group — this just plays them in sequence. Later (still free): render frames to a canvas and export a real video via MediaRecorder for sharing.</p>
+      <div class="why">it gets better every single month, and month-birthdays ("Aria turns 5 months today 🎂") are the natural moment to resurface it on Home — a built-in monthly comeback event.</div>
+      <div class="where">Journal header ("▶ Play her story") + Home on monthly birthdays.</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — press play</div>
+      <div class="reel" id="reel">
+        <div class="ph show">🐣</div>
+        <div class="ph p2">👶</div>
+        <div class="ph p3">🍼</div>
+        <div class="ph p4">😄</div>
+        <div class="reelCap" id="reelCap">Newborn · June</div>
+      </div>
+      <div class="reelDots" id="reelDots"><span class="on"></span><span></span><span></span><span></span></div>
+      <div style="display:flex; gap:8px">
+        <button class="btn" style="flex:1" id="reelPlay">▶ Play her story</button>
+        <button class="btn ghost" style="flex:1" onclick="this.textContent='📤 Native share sheet'">Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ C: PHOTO PROMPTS ============ -->
+  <div class="opt">
+    <div>
+      <span class="pill rec">RECOMMENDED</span><span class="pill free">$0</span><span class="pill easy">~1–2 days</span>
+      <h3>C · Monthly photo hunt</h3>
+      <p class="meta">9 age-aware prompts per month · a curated list per age band, like your tips</p>
+      <p class="desc">A 3×3 card of tiny photo missions for this month — "tiny toes", "mid-yawn", "bath time", "with grandma". Tapping a cell opens the camera/uploader; the photo fills the cell and saves to the journal (tagged with the prompt as its note). Prompts rotate with the baby's age: month 6 gets "first taste of solids", month 10 gets "standing up".</p>
+      <div class="why">this is the strongest photo retention loop — an unfinished grid is a gentle open-ended quest that spans the whole month, and it directly solves "what should I even photograph?" It also feeds every other feature here with better, more varied photos.</div>
+      <div class="where">Its own card on Home below the memory book; completed grids archive into the Journal as a monthly keepsake.</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — tap cells to “capture” them</div>
+      <div class="bingo" id="bingo"></div>
+      <p style="text-align:center; font-size:11.5px; color:#9ca3af; margin-top:10px" id="bingoMsg">0 of 9 captured this month</p>
+    </div>
+  </div>
+
+  <!-- ============ D: MILESTONE SHARE CARD ============ -->
+  <div class="opt">
+    <div>
+      <span class="pill free">$0</span><span class="pill easy">~1 day</span>
+      <h3>D · Milestone keepsake cards</h3>
+      <p class="meta">Canvas-composed from the milestone photo you already attach · Web Share API</p>
+      <p class="desc">You already let her attach a photo to a milestone — this turns that pair into a designed keepsake: photo + "Aria rolled over!" + age + date, in a couple of selectable themes. Composed on a canvas, shared or saved via the native sheet. It upgrades the milestone "Yes!" tap from a checkbox into a small ceremony.</p>
+      <div class="why">grandparents. Every milestone becomes a share moment, and every share puts BabyCue's name in a family group chat — free distribution.</div>
+      <div class="where">Appears right after marking a milestone "Yes!" when a photo is attached (or prompts to add one).</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — try the themes</div>
+      <div class="shareCard" id="shareCard">
+        <div class="ph p3">🎉</div>
+        <div class="shareOv" id="shareOv">
+          <span class="brand">✦ BabyCue</span>
+          <div class="big">Aria rolled over — both ways!</div>
+          <div class="sm">4 months, 1 week · September 7</div>
+        </div>
+      </div>
+      <div class="themes">
+        <button class="t1 on" data-t="1" aria-label="Lavender theme"></button>
+        <button class="t2" data-t="2" aria-label="Sunset theme"></button>
+        <button class="t3" data-t="3" aria-label="Midnight theme"></button>
+      </div>
+      <button class="btn" style="width:100%" onclick="this.textContent='📤 Native share sheet'">Share the moment</button>
+    </div>
+  </div>
+
+  <!-- ============ E: MONTHLY COLLAGE ============ -->
+  <div class="opt">
+    <div>
+      <span class="pill free">$0</span><span class="pill easy">~1–2 days</span>
+      <h3>E · Month-end collage poster</h3>
+      <p class="meta">Auto-composed from the month's photos on a canvas · downloadable image</p>
+      <p class="desc">On the last days of each month, BabyCue lays the month's photos into a titled poster — "Aria · Month 4" — with a few layouts to flip through. One tap downloads it (or shares it) as a single image: a ready-made recap for the family and a keepsake for her camera roll.</p>
+      <div class="why">a month-end ritual that pairs naturally with the Sunday recap — and knowing the poster is coming nudges her to add photos all month so it looks full.</div>
+      <div class="where">Journal, pinned at the top during the last 3 days of each month; archived posters stay in the album.</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — flip layouts</div>
+      <div style="position:relative">
+        <div class="collage lay1" id="collage">
+          <div class="ph c1">😄</div>
+          <div class="ph p2 c2">🍼</div>
+          <div class="ph p3 c3">🛁</div>
+          <div class="ph p4 c4">🧸</div>
+          <div class="ph p5 c5">🌙</div>
+        </div>
+        <div class="collageTitle">Aria · Month 4</div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px">
+        <button class="btn ghost" style="flex:1" id="layBtn">↻ Next layout</button>
+        <button class="btn" style="flex:1" onclick="this.textContent='💾 Saved to camera roll'">Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ VERDICT ============ -->
+  <h2>What I'd build first</h2>
+  <div class="verdict">
+    <b>Suggested order:</b>
+    <ol>
+      <li><b>Then ↔ Now slider (A)</b> — smallest build, biggest emotional hit, works as soon as she has 2 photos.</li>
+      <li><b>Monthly photo hunt (C)</b> — the retention engine. It generates the photo supply that makes A, B, and E shine.</li>
+      <li><b>Milestone keepsake cards (D)</b> — rides on the existing milestone-photo feature; adds the share loop.</li>
+      <li><b>Timelapse reel (B)</b> — needs 3+ months of photos to feel magical; ship when the library has depth.</li>
+      <li><b>Collage poster (E)</b> — month-end companion to the weekly recap; nice-to-have once the rest lands.</li>
+    </ol>
+    <p style="margin-top:12px; font-size:13px; color:#6b7280">All five read from the journal's IndexedDB store — no new storage, no server, no cost. One shared bit of plumbing helps all of them: a tiny helper that indexes photos by baby-age-month (you already have <code>groupByMonth</code> — extract it from JournalScreen into a lib).</p>
+  </div>
+
+</div>
+
+<script>
+  // ---- A: then vs now ----
+  const ba = document.getElementById('ba');
+  document.getElementById('baRange').addEventListener('input', e => {
+    ba.style.setProperty('--cut', e.target.value + '%');
+  });
+
+  // ---- B: timelapse ----
+  const reel = document.getElementById('reel');
+  const frames = reel.querySelectorAll('.ph');
+  const dots = document.getElementById('reelDots').querySelectorAll('span');
+  const caps = ['Newborn · June', '1 month · July', '2 months · August', '4 months · today 💜'];
+  let playing = false;
+  document.getElementById('reelPlay').addEventListener('click', function () {
+    if (playing) return;
+    playing = true;
+    this.textContent = '▶ Playing…';
+    let i = 0;
+    const step = () => {
+      frames.forEach((f, j) => f.classList.toggle('show', j === i));
+      dots.forEach((d, j) => d.classList.toggle('on', j === i));
+      document.getElementById('reelCap').textContent = caps[i];
+      i++;
+      if (i < frames.length) setTimeout(step, 900);
+      else { playing = false; this.textContent = '↻ Play again'; }
+    };
+    step();
+  });
+
+  // ---- C: bingo ----
+  const prompts = [
+    ['🦶','Tiny toes'], ['🥱','Mid-yawn'], ['🛁','Bath time'],
+    ['👵','With grandma'], ['😴','Fast asleep'], ['🤭','Big laugh'],
+    ['🧦','Lost sock'], ['🪞','Mirror friend'], ['🌳','First park trip'],
+  ];
+  const bingo = document.getElementById('bingo');
+  let captured = 0;
+  prompts.forEach(([em, tx]) => {
+    const b = document.createElement('button');
+    b.className = 'bCell';
+    b.innerHTML = `<span class="em">${em}</span><span class="tx">${tx}</span>`;
+    b.addEventListener('click', () => {
+      if (b.classList.contains('done')) return;
+      b.classList.add('done');
+      b.querySelector('.em').textContent = '📷';
+      captured++;
+      document.getElementById('bingoMsg').textContent =
+        captured === 9 ? 'All 9! Grid saved to the journal 🎉' : `${captured} of 9 captured this month`;
+    });
+    bingo.appendChild(b);
+  });
+
+  // ---- D: themes ----
+  const ov = document.getElementById('shareOv');
+  const themeGrads = {
+    1: 'linear-gradient(to bottom, transparent, rgba(30,27,75,0.75))',
+    2: 'linear-gradient(to bottom, transparent, rgba(190,24,93,0.7))',
+    3: 'linear-gradient(to bottom, transparent, rgba(5,5,20,0.85))',
+  };
+  document.querySelectorAll('.themes button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.themes button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      ov.style.background = themeGrads[btn.dataset.t];
+    });
+  });
+
+  // ---- E: collage layouts ----
+  const layouts = ['lay1', 'lay2', 'lay3'];
+  let li = 0;
+  document.getElementById('layBtn').addEventListener('click', () => {
+    li = (li + 1) % layouts.length;
+    document.getElementById('collage').className = 'collage ' + layouts[li];
+  });
+</script>
+</body>
+</html>

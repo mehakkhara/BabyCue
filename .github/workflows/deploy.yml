@@ -1,0 +1,49 @@
+name: Deploy to GitHub Pages
+
+# Auto-deploys the app whenever code lands on main (e.g. a merged PR).
+# Also runnable on demand from the Actions tab via "Run workflow".
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Let the job push the built site to the gh-pages branch.
+permissions:
+  contents: write
+
+# Never run two deploys at once; a newer push supersedes an in-flight one.
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # VITE_SERVER_URL comes from the committed .env.production automatically.
+      # The Supabase vars live only in .gitignored .env.local locally, so CI
+      # must supply them from repo secrets or the deployed build loses auth/DB.
+      - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
