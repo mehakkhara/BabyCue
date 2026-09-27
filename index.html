@@ -47,8 +47,81 @@
         50%  { transform: scale(1.4) rotate(-8deg); }
         100% { transform: scale(1); }
       }
+      /* Story art: one scene-specific motion when a page appears, then still.
+         Sizes are relative to the picture so the effect reads on a phone. */
+      .story-art { position: relative; width: 100%; height: 100%; overflow: hidden; }
+      .story-art > canvas, .story-art > img { animation: storyArtEnter .45s ease-out both; transform-origin: 50% 100%; }
+      @keyframes storyArtEnter { from { opacity: .5; } to { opacity: 1; } }
+      /* Windy scenes: the picture itself leans and settles. */
+      .story-art--sway > canvas, .story-art--sway > img { animation: storyArtEnter .45s ease-out both, storySway 2.2s ease-in-out both; }
+      .story-art--gust > canvas, .story-art--gust > img { animation: storyArtEnter .45s ease-out both, storyGust 2.2s ease-in-out both; }
+      @keyframes storySway { 0% { transform: none; } 30% { transform: rotate(-1.6deg) scale(1.05); } 70% { transform: rotate(1.1deg) scale(1.03); } 100% { transform: none; } }
+      @keyframes storyGust { 0% { transform: none; } 25% { transform: rotate(-2.4deg) scale(1.08) translateX(-1.5%); } 60% { transform: rotate(1.4deg) scale(1.04) translateX(1%); } 100% { transform: none; } }
+      /* The moment layer sits above the reader's darkening gradient. */
+      .story-art__moment { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+
+      /* Falling things: leaves (apple tree), petals (meadow, burrow), grain (harvest, cypresses). */
+      .story-art__leaf { position: absolute; width: 5%; aspect-ratio: 3 / 2; border-radius: 100% 0 100% 0; background: #8fd35b; opacity: 0; animation: storyLeaf 2.4s ease-in both; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+      .story-art__leaf--0 { left: 40%; top: 6%; } .story-art__leaf--1 { left: 56%; top: 14%; animation-delay: 200ms; }
+      .story-art__leaf--2 { left: 66%; top: 24%; animation-delay: 400ms; } .story-art__leaf--3 { left: 30%; top: 22%; animation-delay: 300ms; }
+      .story-art__leaf--4 { left: 50%; top: 0%; animation-delay: 100ms; } .story-art__leaf--5 { left: 22%; top: 10%; animation-delay: 500ms; }
+      .story-art__leaf--6 { left: 74%; top: 4%; animation-delay: 650ms; } .story-art__leaf--7 { left: 46%; top: 30%; animation-delay: 750ms; }
+      .story-art--petals .story-art__leaf { background: #ffc9dc; width: 4%; aspect-ratio: 1; border-radius: 100% 0 100% 100%; }
+      .story-art--grain .story-art__leaf { background: #ffd970; width: 2.2%; aspect-ratio: 1; border-radius: 50%; box-shadow: 0 0 8px #ffd970; }
+      @keyframes storyLeaf {
+        0% { opacity: 0; transform: translate(0, 0) rotate(-30deg); }
+        12% { opacity: 1; }
+        50% { transform: translate(-40%, 180%) rotate(60deg); }
+        85% { opacity: 1; }
+        100% { opacity: 0; transform: translate(120%, 420%) rotate(200deg); }
+      }
+
+      /* A seedling pushes up out of the soil (the little seed). */
+      .story-art__sprout { position: absolute; left: 50%; top: 46%; width: 12%; aspect-ratio: 3 / 5; margin-left: -6%; transform-origin: 50% 100%; opacity: 0; animation: storySprout 1.8s cubic-bezier(.3,.9,.4,1.15) both; }
+      .story-art__sprout i { position: absolute; left: 50%; bottom: 0; width: 8%; height: 60%; margin-left: -4%; background: #6fbf4a; border-radius: 4px; }
+      .story-art__sprout::before, .story-art__sprout::after { content: ''; position: absolute; bottom: 45%; width: 55%; height: 32%; background: #8fd35b; border-radius: 100% 0 100% 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+      .story-art__sprout::before { left: -8%; transform: rotate(-35deg); } .story-art__sprout::after { right: -8%; transform: rotate(35deg) scaleX(-1); }
+      @keyframes storySprout { 0% { opacity: 0; transform: translateY(40%) scale(.2); } 30% { opacity: 1; } 75% { transform: translateY(0) scale(1.08); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+      /* Ripples spread on the water (pond, stream). */
+      .story-art__ripple { position: absolute; left: 50%; top: 62%; width: 24%; aspect-ratio: 3 / 1; border: 2px solid rgba(240,250,255,.95); border-radius: 50%; opacity: 0; animation: storyRipple 2s ease-out both; box-shadow: 0 0 12px rgba(180,230,255,.6), inset 0 0 12px rgba(180,230,255,.4); }
+      .story-art__ripple--1 { animation-delay: 300ms; } .story-art__ripple--2 { animation-delay: 600ms; }
+      @keyframes storyRipple { 0% { opacity: 1; transform: translate(-50%, -50%) scale(.3); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(3.4); } }
+
+      /* Bubbles float up (bath time). */
+      .story-art__bubble { position: absolute; bottom: 10%; width: 6%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,.9); background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.7), rgba(255,255,255,.08) 60%); opacity: 0; animation: storyBubble 2.4s ease-out both; }
+      .story-art__bubble--0 { left: 30%; } .story-art__bubble--1 { left: 44%; width: 4%; animation-delay: 250ms; } .story-art__bubble--2 { left: 58%; width: 8%; animation-delay: 450ms; }
+      .story-art__bubble--3 { left: 70%; width: 5%; animation-delay: 150ms; } .story-art__bubble--4 { left: 20%; width: 3.5%; animation-delay: 600ms; } .story-art__bubble--5 { left: 50%; width: 5%; animation-delay: 800ms; }
+      @keyframes storyBubble { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 1; } 50% { transform: translate(-40%, -220%); } 100% { opacity: 0; transform: translate(30%, -520%); } }
+
+      /* Stars twinkle (night skies). */
+      .story-art__star { position: absolute; color: #ffe37a; font-size: clamp(22px, 8vw, 44px); line-height: 1; opacity: 0; animation: storyTwinkle 1.8s ease-out both; text-shadow: 0 0 16px #ffe37a, 0 0 34px #ffb347; }
+      .story-art__star--0 { left: 14%; top: 18%; } .story-art__star--1 { left: 64%; top: 8%; animation-delay: 200ms; } .story-art__star--2 { left: 78%; top: 36%; animation-delay: 400ms; }
+      .story-art__star--3 { left: 36%; top: 30%; animation-delay: 600ms; } .story-art__star--4 { left: 50%; top: 4%; animation-delay: 800ms; } .story-art__star--5 { left: 26%; top: 44%; animation-delay: 1000ms; }
+      @keyframes storyTwinkle { 0% { opacity: 0; transform: scale(.2) rotate(-30deg); } 35% { opacity: 1; transform: scale(1.5) rotate(10deg); } 70% { opacity: .9; transform: scale(1) rotate(20deg); } 100% { opacity: 0; transform: scale(.6) rotate(30deg); } }
+
+      /* A lamp warms the room (bedrooms, café). */
+      .story-art__glow { position: absolute; left: 50%; top: 42%; width: 90%; aspect-ratio: 1; margin: -45% 0 0 -45%; border-radius: 50%; background: radial-gradient(circle, rgba(255,214,120,.7), rgba(255,190,90,.3) 40%, transparent 68%); mix-blend-mode: screen; animation: storyGlow 2.2s ease-out both; }
+      @keyframes storyGlow { from { opacity: 0; transform: scale(.3); } 45% { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.4); } }
+
+      /* The sun comes up (morning on the farm). */
+      .story-art__sunrise { position: absolute; left: 50%; bottom: -20%; width: 120%; aspect-ratio: 1; margin-left: -60%; border-radius: 50%; background: radial-gradient(circle, rgba(255,230,140,.85), rgba(255,170,90,.4) 35%, transparent 62%); mix-blend-mode: screen; animation: storySunrise 2.4s ease-out both; }
+      @keyframes storySunrise { from { opacity: 0; transform: translateY(35%) scale(.6); } 40% { opacity: 1; } to { opacity: 0; transform: translateY(-10%) scale(1.15); } }
+
+      /* A bird flies across (robin). */
+      .story-art__bird { position: absolute; top: 22%; left: -14%; width: 12%; aspect-ratio: 2 / 1; opacity: 0; animation: storyBird 2.2s ease-in-out both; }
+      .story-art__bird::before, .story-art__bird::after { content: ''; position: absolute; bottom: 0; width: 50%; height: 100%; border-top: 3px solid #3b2f2a; border-radius: 100% 100% 0 0 / 100% 100% 0 0; animation: storyFlap .28s ease-in-out infinite alternate; transform-origin: 100% 100%; }
+      .story-art__bird::after { left: 50%; transform-origin: 0 100%; }
+      @keyframes storyBird { 0% { opacity: 0; transform: translate(0, 0); } 12% { opacity: 1; } 50% { transform: translate(480%, -60%); } 88% { opacity: 1; } 100% { opacity: 0; transform: translate(960%, 30%); } }
+      @keyframes storyFlap { from { transform: scaleY(1); } to { transform: scaleY(.35); } }
+
+      /* A cloud drifts across the moon. */
+      .story-art__cloud { position: absolute; top: 14%; left: 50%; width: 48%; height: 22%; border-radius: 999px; background: rgba(235,241,255,.6); filter: blur(7px); animation: storyCloud 2.4s ease-in-out both; }
+      @keyframes storyCloud { from { opacity: 0; transform: translateX(60%); } 30% { opacity: 1; } 70% { opacity: 1; } to { opacity: 0; transform: translateX(-80%); } }
+
+      @media (prefers-reduced-motion: reduce) { .story-art > canvas, .story-art > img, .story-art__moment, .story-art__moment * { animation: none !important; } }
     </style>
-    <script type="module" crossorigin src="/BabyCue/assets/index-CcP2e_Bn.js"></script>
+    <script type="module" crossorigin src="/BabyCue/assets/index-C8LRThFy.js"></script>
   <script id="vite-plugin-pwa:register-sw" src="/BabyCue/registerSW.js"></script></head>
   <body>
     <div id="root"></div>
