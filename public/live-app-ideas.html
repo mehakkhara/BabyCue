@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BabyCue — Making it feel alive</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    background: #f3f1fb;
+    color: #1e1b4b;
+    padding: 32px 16px 80px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; }
+  h1 { font-size: 26px; margin-bottom: 6px; }
+  .sub { color: #6b7280; font-size: 14px; margin-bottom: 36px; }
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: #7C6FF7; margin: 44px 0 16px; padding-bottom: 8px;
+    border-bottom: 2px solid #e4defc;
+  }
+  h3 { font-size: 16px; margin-bottom: 4px; }
+
+  /* ---------- feedback cards ---------- */
+  .fb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .fb {
+    background: #fff; border-radius: 16px; padding: 16px 18px;
+    box-shadow: 0 3px 14px rgba(100,100,180,0.08);
+    border-left: 4px solid #f6c76f;
+  }
+  .fb.design { border-left-color: #f290b5; }
+  .fb .tag {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+    text-transform: uppercase; color: #b45309; background: #fef3c7;
+    border-radius: 8px; padding: 2px 8px; margin-bottom: 8px;
+  }
+  .fb.design .tag { color: #be185d; background: #fce7f3; }
+  .fb p { font-size: 13px; color: #4b5563; }
+  .fb b { color: #1e1b4b; }
+  .fix { margin-top: 8px; font-size: 12.5px; color: #15803d; }
+  .fix::before { content: "Fix → "; font-weight: 700; }
+
+  /* ---------- option cards with live demos ---------- */
+  .opt {
+    background: #fff; border-radius: 20px; padding: 22px;
+    box-shadow: 0 4px 20px rgba(100,100,180,0.09);
+    margin-bottom: 20px;
+    display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start;
+  }
+  @media (max-width: 760px) { .opt { grid-template-columns: 1fr; } }
+  .opt .meta { font-size: 12px; color: #9ca3af; margin: 6px 0 10px; }
+  .opt .meta b { color: #15803d; }
+  .opt p.desc { font-size: 14px; color: #4b5563; }
+  .why { margin-top: 10px; font-size: 13px; color: #6b5bd6; background: #f5f3ff; border-radius: 10px; padding: 10px 12px; }
+  .why::before { content: "Why she comes back: "; font-weight: 700; }
+  .pill {
+    display: inline-block; font-size: 10.5px; font-weight: 700; padding: 3px 10px;
+    border-radius: 12px; margin-right: 6px; letter-spacing: 0.04em;
+  }
+  .pill.rec { background: #7C6FF7; color: #fff; }
+  .pill.free { background: #dcfce7; color: #15803d; }
+  .pill.easy { background: #e0f2fe; color: #0369a1; }
+
+  /* phone demo frame */
+  .demo {
+    background: #faf9ff; border: 1.5px solid #ece9f6; border-radius: 20px;
+    padding: 16px; min-height: 120px;
+  }
+  .demo .label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #c4b5fd; margin-bottom: 10px; text-align: center; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 16px;
+    box-shadow: 0 3px 14px rgba(100,100,180,0.08); border-left: 4px solid #7C6FF7;
+  }
+  .btn {
+    border: none; border-radius: 10px; padding: 10px 16px; font-size: 13px;
+    font-weight: 600; cursor: pointer; font-family: inherit;
+    background: linear-gradient(135deg, #7C6FF7, #a78bfa); color: #fff;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+  }
+  .btn:active { transform: scale(0.94); }
+  .btn.ghost { background: #f5f3ff; color: #7C6FF7; }
+
+  /* ---- streak demo ---- */
+  .days { display: flex; gap: 6px; justify-content: center; margin: 12px 0; }
+  .day {
+    width: 34px; height: 40px; border-radius: 10px; background: #f0eefb;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 9px; color: #9ca3af; font-weight: 700; gap: 2px;
+    transition: all 0.25s ease;
+  }
+  .day .dot { width: 14px; height: 14px; border-radius: 50%; background: #ddd6fe; transition: all 0.3s ease; }
+  .day.lit { background: #ede9fe; }
+  .day.lit .dot { background: #7C6FF7; transform: scale(1.15); }
+  .day.today { outline: 2px solid #c4b5fd; outline-offset: 1px; }
+  .streakNum { font-size: 26px; font-weight: 800; text-align: center; }
+  .streakNum span { display: inline-block; }
+  @keyframes pop { 0% { transform: scale(1);} 50% { transform: scale(1.5) rotate(-8deg);} 100% { transform: scale(1);} }
+  .pop { animation: pop 0.45s ease; }
+
+  /* ---- heart burst ---- */
+  .heartWrap { position: relative; display: inline-block; }
+  .burst {
+    position: absolute; left: 50%; top: 50%; pointer-events: none;
+    font-size: 14px; opacity: 0; transform: translate(-50%, -50%);
+  }
+  @keyframes fly {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.3); }
+  }
+
+  /* ---- confetti ---- */
+  .confettiZone { position: relative; overflow: hidden; }
+  .cfx {
+    position: absolute; width: 7px; height: 10px; top: -12px; opacity: 0.9;
+    border-radius: 2px; pointer-events: none;
+    animation: fall 1.3s ease-in forwards;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(190px) rotate(320deg); opacity: 0; }
+  }
+  .ms-check {
+    display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
+    background: #f0f0f5; align-items: center; justify-content: center;
+    color: transparent; font-size: 13px; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .ms-check.on { background: #22c55e; color: #fff; transform: scale(1.15); }
+
+  /* ---- time-aware demo ---- */
+  .homeDemo { border-radius: 16px; padding: 16px; transition: all 0.5s ease; }
+  .homeDemo.morning { background: linear-gradient(160deg, #fff7e8, #ffffff); }
+  .homeDemo.evening { background: linear-gradient(160deg, #191c2e, #2a2547); }
+  .homeDemo.evening .hTitle { color: #f3e6c8; }
+  .homeDemo.evening .hSub { color: #a79fd6; }
+  .hTitle { font-weight: 700; font-size: 15px; transition: color 0.4s; }
+  .hSub { font-size: 12px; color: #9ca3af; transition: color 0.4s; }
+  .storyCard {
+    margin-top: 10px; border-radius: 12px; padding: 12px 14px; display: none;
+    background: linear-gradient(135deg, #2c2650, #443a78); color: #f3e6c8; font-size: 13px;
+  }
+  .homeDemo.evening .storyCard { display: block; }
+  .tipMini { margin-top: 10px; background: #fff; border-radius: 12px; padding: 12px 14px; font-size: 12.5px; color: #4b5563; box-shadow: 0 2px 10px rgba(100,100,180,0.08); }
+  .homeDemo.evening .tipMini { display: none; }
+  .seg { display: flex; gap: 4px; background: #ece9f6; border-radius: 10px; padding: 3px; margin-bottom: 12px; }
+  .seg button { flex: 1; border: none; border-radius: 8px; padding: 6px; font-size: 12px; font-weight: 600; cursor: pointer; background: transparent; color: #6b7280; font-family: inherit; }
+  .seg button.on { background: #fff; color: #1e1b4b; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+
+  /* ---- flashback ---- */
+  .flash { display: flex; gap: 12px; align-items: center; }
+  .flash .ph {
+    width: 74px; height: 74px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, #fbcfe8, #ddd6fe);
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+  }
+  .flash small { color: #a78bfa; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ---- recap ---- */
+  .recap { background: linear-gradient(150deg, #7C6FF7, #a78bfa); border-radius: 16px; color: #fff; padding: 18px; }
+  .recap h4 { font-size: 15px; margin-bottom: 10px; }
+  .rstats { display: flex; gap: 8px; margin-bottom: 12px; }
+  .rstat { flex: 1; background: rgba(255,255,255,0.16); border-radius: 12px; padding: 10px 6px; text-align: center; }
+  .rstat b { display: block; font-size: 19px; }
+  .rstat span { font-size: 9.5px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ---- tip flip ---- */
+  .flipScene { perspective: 900px; }
+  .flipCard { position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1); }
+  .flipCard.flipped { transform: rotateY(180deg); }
+  .face { backface-visibility: hidden; }
+  .face.back { position: absolute; inset: 0; transform: rotateY(180deg); }
+
+  .order { display: flex; flex-direction: column; gap: 6px; }
+  .order div { background: #fff; border-radius: 10px; padding: 8px 12px; font-size: 12.5px; box-shadow: 0 2px 8px rgba(100,100,180,0.07); }
+  .order .move { border-left: 3px solid #22c55e; }
+  .order .out { opacity: 0.5; text-decoration: line-through; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .cols .colTitle { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+
+  .verdict {
+    background: #fff; border-radius: 20px; padding: 22px;
+    box-shadow: 0 4px 20px rgba(100,100,180,0.09); border-left: 4px solid #22c55e;
+  }
+  .verdict ol { margin: 10px 0 0 20px; font-size: 14px; color: #4b5563; }
+  .verdict li { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Making BabyCue feel alive 🌱</h1>
+  <p class="sub">UX feedback on the current app + five zero-cost features that make it interactive and give her a reason to come back. Every demo below is tappable — try them.</p>
+
+  <!-- ================= UX FEEDBACK ================= -->
+  <h2>1 · What doesn't flow well today</h2>
+  <div class="fb-grid">
+
+    <div class="fb">
+      <span class="tag">Flow</span>
+      <h3>Home is doing five jobs</h3>
+      <p>Today's scroll: greeting → month navigator → stats → tip → topic chips → feelings chips → memory book → more memories → saved tips → nudge toggle → <b>change password / sign out</b>. Content, journaling, and account settings all share one page — the calm "one thing at a time" feel gets lost by the third scroll.</p>
+      <p class="fix">Move nudge toggle, password, sign-out into a small profile sheet (tap the "Hi Mehak" header). Home ends after the memory book.</p>
+    </div>
+
+    <div class="fb">
+      <span class="tag">Flow</span>
+      <h3>Topic chips change the card <i>above</i> them</h3>
+      <p>"Explore by Topic" sits <b>below</b> the Tip of the Day, but tapping a chip swaps the tip above it. The effect happens off-screen in the wrong direction, and "Explore" promises a list — you only ever get one card.</p>
+      <p class="fix">Either chips go back above the tip, or a chip tap opens a scrollable list of that topic's tips (bottom sheet, like Saved tips).</p>
+    </div>
+
+    <div class="fb">
+      <span class="tag">Flow</span>
+      <h3>"Tip of the Day" while time-traveling</h3>
+      <p>When she browses month 9 (baby is 4 months), the hero still says "Tip of the Day." A daily tip for a month her baby isn't in is conceptually odd, and the daily-rotation logic quietly applies to the wrong pool.</p>
+      <p class="fix">When browsing another month, relabel to "What month 9 looks like" and hide Save/Got-it — browsing mode is preview, not today's ritual.</p>
+    </div>
+
+    <div class="fb">
+      <span class="tag">Flow</span>
+      <h3>"Got it" has no payoff</h3>
+      <p>Tapping ✓ Got it flips to "Done!" and… nothing. It isn't stored, counted, or ever mentioned again — this breaks your own payoff-first rule (no silent logging, and equally: no hollow buttons).</p>
+      <p class="fix">Persist it and pay it off: it becomes the check-in that feeds the streak + weekly recap (Option A below). One tap, visible consequence.</p>
+    </div>
+
+    <div class="fb">
+      <span class="tag">Flow</span>
+      <h3>Two different "add a photo" flows</h3>
+      <p>The Home memory book uploader and the Journal's Add form are separate implementations with different styling, labels, and error handling. Same job, two behaviors.</p>
+      <p class="fix">Extract one AddMemory component used by both. Fewer bugs, one muscle memory for her.</p>
+    </div>
+
+    <div class="fb design">
+      <span class="tag">Design</span>
+      <h3>Two visual languages in one app</h3>
+      <p>Home / Milestones / Growth: lavender <b>#7C6FF7</b>, floating cards, 20–24px radii, card-style header. Stories / Journal: flat white header bar, gray <b>#FAFAFA</b> page, violet <b>#7C3AED</b>, serif titles. Switching tabs feels like switching apps.</p>
+      <p class="fix">Pick one purple (keep #7C6FF7), one header pattern, one background. Serif is lovely — but reserve it for story titles only, as an intentional "storybook" accent.</p>
+    </div>
+
+    <div class="fb design">
+      <span class="tag">Design</span>
+      <h3>Native confirm() / alert() dialogs</h3>
+      <p>Deleting a memory or milestone pops the browser's system dialog — jarring against the soft rounded UI, and it looks broken in an installed PWA.</p>
+      <p class="fix">Reuse your bottom-sheet pattern for confirmations ("Delete this memory? It can't be undone.").</p>
+    </div>
+
+    <div class="fb design">
+      <span class="tag">Design</span>
+      <h3>Mixed units in Growth</h3>
+      <p>Weight in <b>lbs</b>, length in <b>cm</b> on the same form and chart. Whichever country she's in, one of these is wrong.</p>
+      <p class="fix">One unit system with a lbs/kg + in/cm toggle stored on the profile.</p>
+    </div>
+
+    <div class="fb design">
+      <span class="tag">Design</span>
+      <h3>Tiny, low-contrast text</h3>
+      <p>10px captions and #c4c4d4-on-white footnotes ("Based on AAP guidance", the milestone disclaimer) fail contrast guidelines — and she's often reading one-handed at 3am.</p>
+      <p class="fix">Floor of 12px; captions at #9ca3af or darker.</p>
+    </div>
+
+  </div>
+
+  <!-- ================= LIVE OPTIONS ================= -->
+  <h2>2 · Five zero-cost ways to make it live (tap the demos)</h2>
+  <p class="sub" style="margin-bottom:18px">All of these are localStorage + CSS/JS only — no new API calls, no server, no push infrastructure. $0/month.</p>
+
+  <!-- Option A -->
+  <div class="opt">
+    <div>
+      <span class="pill rec">RECOMMENDED</span><span class="pill free">$0</span><span class="pill easy">~1 day</span>
+      <h3>A · Daily check-in streak</h3>
+      <p class="meta">localStorage only · reuses the existing "Got it" button</p>
+      <p class="desc">One tap a day — reading the tip and hitting "Got it" (or answering "How's baby feeling?") stamps today. A gentle 7-day tracker sits under the greeting. Miss a day? It softens ("streaks rest too 💜") instead of guilt-tripping — this is a tired mom, not Duolingo.</p>
+      <div class="why">the streak turns the daily tip from content into a ritual. It's the single highest-leverage retention loop you can ship, and you already built half of it (daily tip + Got it button).</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — tap "Got it"</div>
+      <div class="card">
+        <div class="streakNum"><span id="flame">🔥</span> <span id="snum">3</span>-day streak</div>
+        <div class="days" id="days"></div>
+        <div style="text-align:center">
+          <button class="btn" id="checkin">✓ Got it</button>
+        </div>
+        <p id="smsg" style="text-align:center; font-size:11.5px; color:#9ca3af; margin-top:8px">Today's tip counts as your check-in</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="opt">
+    <div>
+      <span class="pill free">$0</span><span class="pill easy">~half day</span>
+      <h3>B · "One month ago today" flashback</h3>
+      <p class="meta">Reads photos you already store in IndexedDB</p>
+      <p class="desc">When the journal has a photo from ~1 month ago (±3 days), Home opens with it: "Look how much Aria has grown." Babies change so fast that a 4-week-old photo is genuinely emotional — and it makes the app feel like it <i>knows</i> her, using data she already gave it.</p>
+      <div class="why">it's a surprise she can't predict — the classic "open the app just to see" mechanic (this is Timehop/BeReal's entire product). It also quietly rewards adding photos: more memories now = more flashbacks later.</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — appears on Home</div>
+      <div class="card" style="border-left-color:#f472b6">
+        <div class="flash">
+          <div class="ph">👶</div>
+          <div>
+            <small>📆 One month ago today</small>
+            <p style="font-size:13.5px; font-weight:600; margin-top:2px">First time holding her own bottle!</p>
+            <p style="font-size:11.5px; color:#9ca3af">Aria at 3 months · Aug 7</p>
+          </div>
+        </div>
+        <button class="btn ghost" style="width:100%; margin-top:12px" onclick="this.textContent='💜 Saved to favorites'">💜 I remember this</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="opt">
+    <div>
+      <span class="pill free">$0</span><span class="pill easy">~1 day</span>
+      <h3>C · Time-aware home: morning brief, evening wind-down</h3>
+      <p class="meta">Just <code>new Date().getHours()</code> + CSS</p>
+      <p class="desc">Before ~5pm the app greets with "Good morning ☀️" and leads with the tip + stats. After 7pm it dims to a dusk palette and leads with <b>Tonight's story</b> — pulling your Stories tab (your most charming feature, currently buried) into the moment it's actually used. The app stops being one static page and starts having a rhythm.</p>
+      <div class="why">it creates a second daily visit — the bedtime open — anchored to a real routine she already has. Stories become the evening ritual, tips the morning one.</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo — toggle the time of day</div>
+      <div class="seg">
+        <button class="on" id="segM">☀️ 9 AM</button>
+        <button id="segE">🌙 7:30 PM</button>
+      </div>
+      <div class="homeDemo morning" id="homeDemo">
+        <div class="hTitle" id="hGreet">Good morning, Mehak ☀️</div>
+        <div class="hSub" id="hSub">Aria is 4 months, 1 week</div>
+        <div class="tipMini">💡 <b>Tip of the day</b> — Wake windows at this age are 1.5–2 hours…</div>
+        <div class="storyCard">🌙 <b>Tonight's story</b> — <span style="font-family:Georgia,serif; font-style:italic">The Moon Who Lost Her Slippers</span><br><span style="opacity:0.75; font-size:11.5px">3 pages · ready when Aria is</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option D -->
+  <div class="opt">
+    <div>
+      <span class="pill free">$0</span><span class="pill easy">~1 day</span>
+      <h3>D · Sunday recap: "Your week with Aria"</h3>
+      <p class="meta">Computed from data already on-device · Web Share API is free</p>
+      <p class="desc">Every Sunday, Home shows one card summarizing the week from local data: check-ins, memories added, milestones marked, stories read, latest growth entry. A Share button (native share sheet) lets her send it to a partner or grandparents — your only free growth channel.</p>
+      <div class="why">it's the payoff for every small action taken during the week — the reason logging feels worth it. And shared recaps recruit the next user for free.</div>
+    </div>
+    <div class="demo">
+      <div class="label">Live demo</div>
+      <div class="recap">
+        <h4>Aria's week 🌸 <span style="font-weight:400; font-size:11px; opacity:0.8">Sep 1–7</span></h4>
+        <div class="rstats">
+          <div class="rstat"><b id="r1">0</b><span>check-ins</span></div>
+          <div class="rstat"><b id="r2">0</b><span>memories</span></div>
+          <div class="rstat"><b id="r3">0</b><span>milestones</span></div>
+        </div>
+        <div style="font-size:12.5px; opacity:0.95; margin-bottom:12px">✨ Biggest moment: rolled over both ways!</div>
+        <button class="btn" style="width:100%; background:rgba(255,255,255,0.22)" onclick="this.textContent='📤 Opens native share sheet'">Share with family</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option E -->
+  <div class="opt">
+    <div>
+      <span class="pill free">$0</span><span class="pill easy">~1–2 days, spread anywhere</span>
+      <h3>E · Micro-interaction pass (the "feels alive" layer)</h3>
+      <p class="meta">Pure CSS animations · no logic changes</p>
+      <p class="desc">The app currently swaps state instantly — that's the #1 reason it reads as static. Add: press-scale on every button, a confetti burst when a milestone is marked "Yes!", hearts when saving a tip, a 3D flip on "show me a different tip", and slide transitions between tabs. Zero new features; the existing ones just start to <i>respond</i>.</p>
+      <div class="why">delight compounds. Marking a milestone should feel like the moment it represents.</div>
+    </div>
+    <div class="demo confettiZone" id="confettiZone">
+      <div class="label">Live demos — tap all three</div>
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span style="font-size:13px; font-weight:600">Rolls over both ways</span>
+          <span class="ms-check" id="msCheck">✓</span>
+        </div>
+        <button class="btn" style="width:100%; margin-top:10px" id="msBtn">Yes! 🎉</button>
+      </div>
+      <div class="card" style="margin-bottom:10px; display:flex; gap:8px">
+        <span class="heartWrap" style="flex:1">
+          <button class="btn ghost" style="width:100%" id="saveBtn">🔖 Save tip</button>
+          <span class="burst" id="b1">💜</span><span class="burst" id="b2">💜</span><span class="burst" id="b3">💜</span>
+        </span>
+      </div>
+      <div class="flipScene">
+        <div class="flipCard" id="flipCard">
+          <div class="card face" style="min-height:86px">
+            <p style="font-size:12.5px; color:#4b5563"><b>💡 Tummy time</b><br>Aim for 15–30 min across the day…</p>
+            <button class="btn ghost" style="margin-top:8px; padding:6px 12px" id="flipBtn">↻ Different tip</button>
+          </div>
+          <div class="card face back" style="min-height:86px; border-left-color:#a78bfa">
+            <p style="font-size:12.5px; color:#4b5563"><b>💡 Mirror play</b><br>Babies this age love faces — try a mirror during tummy time…</p>
+            <button class="btn ghost" style="margin-top:8px; padding:6px 12px" id="flipBack">↻ Different tip</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HOME REORDER ================= -->
+  <h2>3 · Suggested home screen order</h2>
+  <div class="cols" style="margin-bottom:8px">
+    <div>
+      <div class="colTitle">Today</div>
+      <div class="order">
+        <div>Hi Mehak · Aria is 4 months <span style="color:#9ca3af">(tap → profile & settings sheet)</span></div>
+        <div>Month navigator + typical stats</div>
+        <div>Tip of the Day</div>
+        <div>Topic chips (below tip, changes card above ⚠️)</div>
+        <div>How's Aria feeling chips</div>
+        <div>Memory book + uploader</div>
+        <div>More memories strip</div>
+        <div>Saved tips row</div>
+        <div class="out">Daily nudge toggle</div>
+        <div class="out">Edit profile · Change password · Sign out</div>
+      </div>
+    </div>
+    <div>
+      <div class="colTitle">Proposed</div>
+      <div class="order">
+        <div class="move">Greeting (time-aware) + streak row ← new</div>
+        <div class="move">Flashback card, when one exists ← new</div>
+        <div>Tip of the Day (chips open a tip list sheet)</div>
+        <div>How's Aria feeling chips</div>
+        <div>Typical-for-this-age stats (month browsing lives here)</div>
+        <div>Memory book (single shared uploader)</div>
+        <div class="move">Sunday: weekly recap card ← new</div>
+        <div style="color:#9ca3af">Settings sheet: saved tips · nudges · profile · password · sign out</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VERDICT ================= -->
+  <h2>4 · What I'd build first</h2>
+  <div class="verdict">
+    <b>Order of attack — each step ships on its own:</b>
+    <ol>
+      <li><b>Micro-interaction pass (E)</b> — one focused day, and the whole app immediately stops feeling static. Do this first; it upgrades every other feature.</li>
+      <li><b>Check-in streak (A)</b> — the retention loop. Wire "Got it" + the feelings responder to it so existing buttons finally pay off.</li>
+      <li><b>Flashback (B)</b> — small, emotional, uses stored photos. Pairs perfectly with the streak ("come back tomorrow" + "look what's waiting").</li>
+      <li><b>Time-aware home (C)</b> — gives Stories its evening moment.</li>
+      <li><b>Weekly recap (D)</b> — needs 1–2 weeks of streak/check-in data to feel full, so ship it last.</li>
+    </ol>
+    <p style="margin-top:12px; font-size:13px; color:#6b7280">Alongside: unify the two purples + header styles, move settings off Home, and replace confirm()/alert() with your bottom sheet. Those three fixes make the app feel like one product.</p>
+  </div>
+
+</div>
+
+<script>
+  // ---- streak demo ----
+  const daysEl = document.getElementById('days');
+  const labels = ['M','T','W','T','F','S','S'];
+  let lit = [true, true, true, false, false, false, false];
+  let todayIdx = 3, streak = 3;
+  function renderDays() {
+    daysEl.innerHTML = '';
+    labels.forEach((l, i) => {
+      const d = document.createElement('div');
+      d.className = 'day' + (lit[i] ? ' lit' : '') + (i === todayIdx ? ' today' : '');
+      d.innerHTML = '<span class="dot"></span>' + l;
+      daysEl.appendChild(d);
+    });
+  }
+  renderDays();
+  document.getElementById('checkin').addEventListener('click', function () {
+    if (lit[todayIdx]) return;
+    lit[todayIdx] = true; streak++;
+    renderDays();
+    const s = document.getElementById('snum'), f = document.getElementById('flame');
+    s.textContent = streak;
+    f.classList.remove('pop'); void f.offsetWidth; f.classList.add('pop');
+    this.textContent = '✓ Done!';
+    this.style.background = '#dcfce7'; this.style.color = '#15803d';
+    document.getElementById('smsg').textContent = "4 days in a row — you're really showing up 💜";
+  });
+
+  // ---- time-aware demo ----
+  const home = document.getElementById('homeDemo');
+  const segM = document.getElementById('segM'), segE = document.getElementById('segE');
+  segM.onclick = () => {
+    home.className = 'homeDemo morning';
+    document.getElementById('hGreet').textContent = 'Good morning, Mehak ☀️';
+    segM.classList.add('on'); segE.classList.remove('on');
+  };
+  segE.onclick = () => {
+    home.className = 'homeDemo evening';
+    document.getElementById('hGreet').textContent = 'Winding down, Mehak 🌙';
+    segE.classList.add('on'); segM.classList.remove('on');
+  };
+
+  // ---- recap count-up ----
+  function countUp(id, target) {
+    const el = document.getElementById(id);
+    let v = 0;
+    const t = setInterval(() => {
+      v++; el.textContent = v;
+      if (v >= target) clearInterval(t);
+    }, 120);
+  }
+  const recapSeen = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      countUp('r1', 6); countUp('r2', 4); countUp('r3', 2);
+      recapSeen.disconnect();
+    }
+  }, { threshold: 0.4 });
+  recapSeen.observe(document.querySelector('.recap'));
+
+  // ---- confetti milestone ----
+  const zone = document.getElementById('confettiZone');
+  const cfxColors = ['#7C6FF7','#f472b6','#fbbf24','#34d399','#a78bfa'];
+  document.getElementById('msBtn').addEventListener('click', function () {
+    document.getElementById('msCheck').classList.add('on');
+    this.textContent = '✓ Marked!'; this.style.background = '#dcfce7'; this.style.color = '#15803d';
+    for (let i = 0; i < 22; i++) {
+      const c = document.createElement('div');
+      c.className = 'cfx';
+      c.style.left = (8 + Math.random() * 84) + '%';
+      c.style.background = cfxColors[i % cfxColors.length];
+      c.style.animationDelay = (Math.random() * 0.35) + 's';
+      zone.appendChild(c);
+      setTimeout(() => c.remove(), 1800);
+    }
+    setTimeout(() => {
+      this.textContent = 'Yes! 🎉'; this.style.background = ''; this.style.color = '';
+      document.getElementById('msCheck').classList.remove('on');
+    }, 2200);
+  });
+
+  // ---- heart burst save ----
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    const vecs = [[-34,-40],[0,-52],[34,-40]];
+    ['b1','b2','b3'].forEach((id, i) => {
+      const b = document.getElementById(id);
+      b.style.setProperty('--dx', vecs[i][0] + 'px');
+      b.style.setProperty('--dy', vecs[i][1] + 'px');
+      b.style.animation = 'none'; void b.offsetWidth;
+      b.style.animation = 'fly 0.7s ease-out forwards';
+    });
+    this.textContent = '🔖 Saved';
+  });
+
+  // ---- tip flip ----
+  const flip = document.getElementById('flipCard');
+  document.getElementById('flipBtn').onclick = () => flip.classList.add('flipped');
+  document.getElementById('flipBack').onclick = () => flip.classList.remove('flipped');
+</script>
+</body>
+</html>
