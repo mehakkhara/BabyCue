@@ -1,21 +1,18 @@
 // Which checklist items are ticked, and which checklists the parent has
-// hidden from Today. localStorage for now (per device), Supabase later.
+// hidden from Today. Synced across devices through syncedStore.
 //   { items: { [checklistId]: { [itemId]: true } }, hidden: { [checklistId]: true } }
 import { itemCount } from '../data/checklists'
+import { readState, writeState } from './syncedStore'
 
 const KEY = 'checklistProgress'
 
 function load() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(KEY) || '{}')
-    return { items: raw.items || {}, hidden: raw.hidden || {} }
-  } catch {
-    return { items: {}, hidden: {} }
-  }
+  const raw = readState(KEY, {})
+  return { items: raw.items || {}, hidden: raw.hidden || {} }
 }
 
 function save(state) {
-  try { localStorage.setItem(KEY, JSON.stringify(state)) } catch { /* storage full or blocked */ }
+  writeState(KEY, state)
   return state
 }
 

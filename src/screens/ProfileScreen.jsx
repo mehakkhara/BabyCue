@@ -206,6 +206,6 @@ function backupLine(sync) {
   if (sync.running) return sync.pending > 0 ? `Uploading… ${sync.pending} left` : 'Checking…'
   if (sync.lastError) return sync.lastError
   if (sync.pending > 0) return `${sync.pending} ${sync.pending === 1 ? 'memory' : 'memories'} waiting to upload · tap to retry`
-  if (sync.lastSyncAt) return `All memories backed up · ${new Date(sync.lastSyncAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+  if (sync.lastSyncAt) return `Everything backed up · ${new Date(sync.lastSyncAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
   return 'All memories backed up'
 }

@@ -8,24 +8,17 @@
 // the screen renders them through the same path and the existing Yes/Not-yet
 // status map in milestoneProgress.js works on them unchanged. Ids are prefixed
 // 'c-' so they can never collide with a curated 'm4-1'.
+import { readState, writeState } from './syncedStore'
 
 const KEY = 'customMilestones'
 
 export function loadCustom() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(KEY) || '[]')
-    return Array.isArray(raw) ? raw : []
-  } catch {
-    return []
-  }
+  const raw = readState(KEY, [])
+  return Array.isArray(raw) ? raw : []
 }
 
 function persist(list) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(list))
-  } catch {
-    // Quota or private mode — the milestone just doesn't survive a reload.
-  }
+  writeState(KEY, list)
   return list
 }
 

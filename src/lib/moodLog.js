@@ -1,17 +1,18 @@
 // "How is baby today?" — one entry per day, several states allowed.
-// localStorage-backed like the streak; Supabase sync comes with the rest.
+// Synced like the streak, through syncedStore.
 // The log is used to (1) show today's pick on Today and (2) lean the day's
 // tip toward the matching topic. It is not a tracker: no history screens.
 import { dayKey } from './streak'
+import { readState, writeState } from './syncedStore'
 
 const KEY = 'moodLog'
 
 function load() {
-  try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch { return {} }
+  return readState(KEY, {})
 }
 
 function save(log) {
-  try { localStorage.setItem(KEY, JSON.stringify(log)) } catch { /* quota */ }
+  writeState(KEY, log)
 }
 
 export function getTodayMoods() {

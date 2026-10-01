@@ -2,24 +2,17 @@
 // When the parent marks a cause as the thing that helped, we tally it per
 // state+cause. Over time this reveals *this* baby's patterns ("evenings are
 // usually overtired") and can feed personalization / the briefing agent.
-// localStorage-backed; no raw activity logs.
+// Backed by the synced small-store wrapper; no raw activity logs.
+import { readState, writeState } from './syncedStore'
 
 const KEY = 'babyPatterns'
 
 export function loadPatterns() {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || '{}')
-  } catch {
-    return {}
-  }
+  return readState(KEY, {})
 }
 
 function save(p) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(p))
-  } catch {
-    /* quota — non-critical */
-  }
+  writeState(KEY, p)
 }
 
 const id = (state, cause) => `${state}:${cause}`

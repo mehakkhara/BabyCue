@@ -1,10 +1,12 @@
 // Check-in streak store — one row per local calendar day, localStorage-backed
-// so it works offline and on the static build (mirror to Supabase later).
+// so it works offline, and mirrored to Supabase through syncedStore.
 // A "check-in" is any small daily act of showing up: tapping Got it on the
 // tip, marking a cause that helped in the feelings responder, or capturing a
 // photo-hunt prompt. Framing is encouragement-only: the streak counts runs
 // ending today OR yesterday, so mid-day it reads as alive-and-continuable,
 // never as already broken. (Logic adapted from the retired engagement.js.)
+
+import { readState, writeState } from './syncedStore'
 
 const KEY = 'checkIns'
 
@@ -23,19 +25,11 @@ function addDays(key, delta) {
 }
 
 export function loadCheckIns() {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || '{}')
-  } catch {
-    return {}
-  }
+  return readState(KEY, {})
 }
 
 function save(all) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(all))
-  } catch {
-    /* quota — non-critical */
-  }
+  writeState(KEY, all)
 }
 
 // Record today's check-in (first action of the day wins; later ones are

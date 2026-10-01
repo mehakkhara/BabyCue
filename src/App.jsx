@@ -76,6 +76,15 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   // Detail pages (tip, activity, mood, profile, story) sit on top of the tabs.
   const { view, push, pop, replace } = useViewStack()
+
+  // Bumps when a pull changes moods, streak, checklists, etc. from another
+  // device; the active tab remounts and re-reads its stores.
+  const [stateVersion, setStateVersion] = useState(0)
+  useEffect(() => {
+    const onPulled = () => setStateVersion(v => v + 1)
+    window.addEventListener('userState:pulled', onPulled)
+    return () => window.removeEventListener('userState:pulled', onPulled)
+  }, [])
   const [photoVersion, setPhotoVersion] = useState(0)
 
   // Each tab opens at its top, like a native app. Tapping the tab you're
@@ -206,7 +215,7 @@ export default function App() {
 
   return (
     <div style={{ maxWidth: '480px', margin: '0 auto', position: 'relative', minHeight: '100vh' }}>
-      <div key={activeTab} style={{ paddingBottom: '72px', animation: 'fadeIn 0.22s ease' }}>
+      <div key={`${activeTab}:${stateVersion}`} style={{ paddingBottom: '72px', animation: 'fadeIn 0.22s ease' }}>
         {activeTab === 'home'    && <HomeScreen profile={profile} onOpen={push} onOpenJournal={() => goToTab('journal')} photoVersion={photoVersion} />}
         {activeTab === 'stories' && <StoriesScreen profile={profile} />}
         {activeTab === 'stats'   && <GrowthScreen profile={profile} onProfileChange={handleProfileChange} onOpen={push} />}
