@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useRef } from 'react'
 import { getEntries, deleteEntry, updateEntry, isVideoType, isAudioType, isKeepsake, isPhotoHunt } from '../data/journalStore'
 import { groupByMonth, pickHero, nameAndAgeAt } from '../lib/babyAge'
 import ThenNow, { pickThenNow, thenNowPhotos, rememberThenNow } from '../components/ThenNow'
@@ -394,7 +393,6 @@ export default function JournalScreen({ profile, onOpen }) {
   const [formFiles, setFormFiles] = useState([])            // photos picked from the prompt card
   const [formNote, setFormNote] = useState(false)           // "Write a note" opens with the note focused
   const [huntVersion, setHuntVersion] = useState(0)
-  const photoInputRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [opened, setOpened] = useState(null)
@@ -456,18 +454,16 @@ export default function JournalScreen({ profile, onOpen }) {
     setOpened(o => (o && o.id === id ? { ...o, ...next, photoBlob: o.photoBlob } : o))
   }
 
-  function pickPhotos(e) {
-    const files = Array.from(e.target.files || [])
-    e.target.value = ''
-    if (files.length === 0) return
-    setFormFiles(files)
-    setFormNote(false)
-    setAdding(true)
-  }
-
   function openNote() {
     setFormFiles([])
     setFormNote(true)
+    setAdding(true)
+  }
+
+  // Opens the form empty so she can choose the camera or the library there.
+  function openPhotos() {
+    setFormFiles([])
+    setFormNote(false)
     setAdding(true)
   }
 
@@ -525,7 +521,7 @@ export default function JournalScreen({ profile, onOpen }) {
         <p style={{ ...type.small, marginTop: '6px' }}>Add a photo, write a note, or just a few words. It all counts.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '12px' }}>
           {[
-            { emoji: '📷', label: 'Add a photo', onClick: () => photoInputRef.current?.click() },
+            { emoji: '📷', label: 'Add photos', onClick: openPhotos },
             { emoji: '🎙️', label: 'Record a moment', onClick: () => setRecording(true) },
             { emoji: '✏️', label: 'Write a note', onClick: openNote },
           ].map(a => (
@@ -538,7 +534,6 @@ export default function JournalScreen({ profile, onOpen }) {
             </button>
           ))}
         </div>
-        <input ref={photoInputRef} type="file" accept="image/*,video/*" multiple onChange={pickPhotos} style={{ display: 'none' }} />
       </Card>
 
       <div style={{ marginTop: '14px' }}>

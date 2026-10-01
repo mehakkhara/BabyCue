@@ -95,6 +95,25 @@ export default function MemoryForm({ profile, onClose, onSaved, initialFiles = [
     }
   }
 
+  // Every pick adds to what she already has, so she can take one photo,
+  // then another, then a few from the library. Clearing the input lets the
+  // same file be picked again after a remove.
+  function addFiles(e) {
+    const picked = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (picked.length) setFiles(prev => [...prev, ...picked])
+  }
+
+  function removeFile(index) {
+    setFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const pickBtn = {
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
+    padding: '11px 8px', borderRadius: '10px', background: '#ede9fe', color: '#6d28d9',
+    fontSize: '13px', fontWeight: 600, cursor: 'pointer', textAlign: 'center',
+  }
+
   const field = {
     width: '100%', padding: '11px 12px', borderRadius: '10px', border: '1.5px solid #E5E7EB',
     fontSize: '14px', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', background: '#fff',
@@ -137,47 +156,61 @@ export default function MemoryForm({ profile, onClose, onSaved, initialFiles = [
           </button>
         </div>
 
-        {/* Media */}
+        {/* Media: photos from the camera one at a time, or several from the library. */}
         {files.length > 1 ? (
           <div style={{ marginBottom: '6px' }}>
-            <MediaStrip files={files} />
+            <MediaStrip files={files} onRemove={removeFile} />
             <p style={{ margin: '4px 0 0', fontSize: '11px', color: '#9ca3af' }}>
               {files.length} photos — each saves as its own memory with this note.
             </p>
           </div>
         ) : previewUrl ? (
           // Outside the label so a drag doesn't reopen the file picker.
-          <div style={{ borderRadius: '12px', overflow: 'hidden', marginBottom: '6px', background: '#fff' }}>
+          <div style={{ borderRadius: '12px', overflow: 'hidden', marginBottom: '6px', background: '#fff', position: 'relative' }}>
             {isVideo
               ? <video src={previewUrl} controls playsInline style={{ width: '100%', maxHeight: '300px', display: 'block', background: '#000' }} />
               // Tiles are 4:5 — drag to choose what they show.
               : <CropFrame url={previewUrl} ratio={TILE_RATIO} position={position} onChange={setPosition} />}
+            <button
+              onClick={() => removeFile(0)}
+              aria-label="Remove this photo"
+              style={{
+                position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px',
+                borderRadius: '50%', border: 'none', background: 'rgba(30,27,75,0.6)', color: '#fff',
+                fontSize: '16px', lineHeight: 1, cursor: 'pointer',
+              }}
+            >
+              ×
+            </button>
           </div>
-        ) : (
-          <label
-            htmlFor="memory-form-input"
-            style={{
-              display: 'block', border: '1.5px dashed #c4b5fd', borderRadius: '12px',
-              padding: '26px 16px', textAlign: 'center', cursor: 'pointer', marginBottom: '12px', background: '#fff',
-            }}
-          >
-            <span style={{ color: '#7c3aed', fontSize: '13px', fontWeight: 600 }}>📷 Tap to add photos or a video</span>
+        ) : null}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px',
+          ...(files.length === 0 ? { border: '1.5px dashed #c4b5fd', borderRadius: '12px', padding: '14px', background: '#fff' } : {}),
+        }}>
+          <label htmlFor="memory-form-camera" style={pickBtn}>
+            📷 {files.length ? 'Take another' : 'Take a photo'}
           </label>
-        )}
-        {files.length > 0 && (
-          <label
-            htmlFor="memory-form-input"
-            style={{ display: 'block', marginBottom: '12px', fontSize: '12px', fontWeight: 600, color: '#7C3AED', cursor: 'pointer', textAlign: 'center' }}
-          >
-            {files.length > 1 ? 'Choose different photos' : 'Choose a different photo'}
+          <label htmlFor="memory-form-library" style={pickBtn}>
+            🖼️ {files.length ? 'Add from library' : 'Choose from library'}
           </label>
-        )}
+        </div>
+        {/* capture="environment" opens the rear camera directly on phones
+            (desktop ignores it and shows the normal picker). */}
         <input
-          id="memory-form-input"
+          id="memory-form-camera"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={addFiles}
+          style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+        />
+        <input
+          id="memory-form-library"
           type="file"
           accept="image/*,video/*"
           multiple
-          onChange={e => setFiles(Array.from(e.target.files || []))}
+          onChange={addFiles}
           style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
         />
 
