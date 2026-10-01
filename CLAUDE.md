@@ -43,3 +43,10 @@ A personalized mom assistant app that delivers age-specific, evidence-based guid
 2. **Evidence-based** — every content item should cite a source (AAP, WHO, peer-reviewed study)
 3. **Style-aware** — a gentle parenting mom should never see advice that conflicts with her philosophy without context
 4. **Reduces overwhelm** — the UI/UX should feel calm, not information-dense
+
+## How Changes Reach the Live Site
+
+- Always open a PR into `main`; never push to `main` directly.
+- The Build check workflow runs lint + build on every PR and is a required status, so a PR that does not build cannot be merged.
+- Merging does **not** publish. To deploy, open the Actions tab → "Deploy to GitHub Pages" → "Run workflow" on `main`. Check the change on the dev server (phone on Wi-Fi, port 5173) before deploying.
+- Prod is https://mehakkhara.github.io/BabyCue/ (built into the `gh-pages` branch).

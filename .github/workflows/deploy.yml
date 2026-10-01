@@ -1,10 +1,11 @@
 name: Deploy to GitHub Pages
 
-# Auto-deploys the app whenever code lands on main (e.g. a merged PR).
-# Also runnable on demand from the Actions tab via "Run workflow".
+# Publishes main to GitHub Pages on demand: Actions tab → "Deploy to GitHub
+# Pages" → "Run workflow". Merging a PR no longer deploys by itself, so main
+# can take several merges and go live only once they've been checked on the
+# dev server. (Automatic deploys on push were removed on 2026-10-01 after a
+# bad merge went straight to the live site.)
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 # Let the job push the built site to the gh-pages branch.
