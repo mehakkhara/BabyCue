@@ -1,29 +1,20 @@
 // Which stories have been read, and which are favourites.
 //
-// localStorage only for now. When journal + chat move to Supabase (see
-// FINAL_PLAN.md §4), this is a small, low-risk table to bring along:
-// story_progress(user_id, story_id, read_count, favourite, last_read_at).
+// Read list and favourites sync through syncedStore; the last-read date is
+// only used to seed tonight's pick, so it stays on the device.
+import { readState, writeState } from './syncedStore'
 
 const READ_KEY = 'storyReadIds'
 const FAV_KEY = 'storyFavourites'
 const LAST_KEY = 'storyLastReadDate'
 
 function load(key) {
-  try {
-    const raw = JSON.parse(localStorage.getItem(key) || '[]')
-    return Array.isArray(raw) ? raw : []
-  } catch {
-    return []
-  }
+  const raw = readState(key, [])
+  return Array.isArray(raw) ? raw : []
 }
 
 function save(key, list) {
-  try {
-    localStorage.setItem(key, JSON.stringify(list))
-  } catch {
-    // Storage full or blocked (Safari private mode). Reading a story still
-    // works; we just lose the "already read" mark.
-  }
+  writeState(key, list)
 }
 
 export function getReadIds() {

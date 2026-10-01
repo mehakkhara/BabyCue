@@ -1,9 +1,11 @@
 // "Did you try this?" — one rating per activity, kept locally. Feeds the
 // activity picker later (loved ones come back, "not today" ones rest).
+import { readState, writeState } from './syncedStore'
+
 const KEY = 'activityFeedback'
 
 function load() {
-  try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch { return {} }
+  return readState(KEY, {})
 }
 
 export function getRating(id) {
@@ -13,7 +15,7 @@ export function getRating(id) {
 export function setRating(id, rating) {
   const all = load()
   all[String(id)] = { rating, at: Date.now() }
-  try { localStorage.setItem(KEY, JSON.stringify(all)) } catch { /* quota */ }
+  writeState(KEY, all)
   return rating
 }
 

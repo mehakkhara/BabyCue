@@ -5,6 +5,7 @@
 // the more the app is hers.
 
 import { tips } from '../data/tips'
+import { readState, writeState } from './syncedStore'
 
 const KEY = 'savedTips'
 
@@ -15,12 +16,7 @@ const curatedById = new Map(tips.map(t => [t.id, t]))
 // resolved to full tips; legacy AI IDs (`ai:<date>`) can't be recovered — the
 // text was never stored — so they're dropped.
 export function loadSaved() {
-  let raw
-  try {
-    raw = JSON.parse(localStorage.getItem(KEY) || '[]')
-  } catch {
-    return []
-  }
+  const raw = readState(KEY, [])
   if (!Array.isArray(raw)) return []
   if (raw.length === 0) return []
   // New format: array of objects.
@@ -39,11 +35,7 @@ export function loadSaved() {
 }
 
 function save(list) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(list))
-  } catch {
-    /* quota — non-critical */
-  }
+  writeState(KEY, list)
 }
 
 export function isSaved(id, list = loadSaved()) {

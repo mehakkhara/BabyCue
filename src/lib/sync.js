@@ -1,11 +1,15 @@
-// Journal sync, push side (sync-scope.md, Phase A / PR 1).
+// Sync between this device and Supabase (sync-scope.md).
 //
 // The phone is the replica, Supabase is the primary. journalStore writes
 // locally and drops a job in the outbox; this module drains the outbox when
-// there is a session and a network. Pull (server → phone) is PR 2.
+// there is a session and a network, then pulls what other devices added.
+// The small stores (moods, streak, checklists, …) ride along through
+// syncedStore: dirty keys go up as rows of `user_state`, and every row comes
+// back down and merges in.
 //
 // Status is observable so Profile can show "12 waiting to upload".
 import { supabase, isSupabaseConfigured } from './supabase'
+import { backfillUnstamped, dirtyKeys, clearDirty, rowsFor, applyRemote } from './syncedStore'
 import {
   listOutbox, removeJob, updateJob, getEntryByClientId, markSynced, unsyncedClientIds, enqueue,
   upsertFromRemote, deleteByClientId, attachMedia, entriesMissingMedia,
@@ -13,6 +17,7 @@ import {
 
 const BUCKET = 'baby-photos'
 const TABLE = 'journal_entries'
+const STATE_TABLE = 'user_state'
 const LAST_SYNC_KEY = 'journalSync:lastAt'
 const LAST_PULL_KEY = 'journalSync:lastPull:'   // + user id
 const PAGE = 200
@@ -204,6 +209,40 @@ async function downloadMedia() {
   return got
 }
 
+// Small stores → server. Keys written since the last push, plus everything
+// on a device that has never pushed (first sign-in).
+async function pushUserState(uid) {
+  backfillUnstamped()
+  const keys = dirtyKeys()
+  if (keys.length === 0) return 0
+  const rows = rowsFor(keys, uid)
+  if (rows.length) {
+    const { error } = await supabase.from(STATE_TABLE).upsert(rows, { onConflict: 'user_id,key' })
+    if (error) throw error
+  }
+  clearDirty(keys)
+  return rows.length
+}
+
+// Server → small stores. All rows every time: there are a dozen or so and
+// they're tiny, and the merge makes a repeat harmless.
+async function pullUserState(uid) {
+  const { data, error } = await supabase.from(STATE_TABLE).select('key, value, updated_at').eq('user_id', uid)
+  if (error) throw error
+  let changed = 0
+  let needPush = false
+  for (const row of data || []) {
+    const result = applyRemote(row.key, row.value, row.updated_at)
+    if (result !== 'kept') changed++
+    if (result === 'merged') needPush = true
+  }
+  if (changed > 0) {
+    try { window.dispatchEvent(new Event('userState:pulled')) } catch { /* not in a browser */ }
+  }
+  if (needPush) await pushUserState(uid)
+  return changed
+}
+
 // Drain the outbox. Safe to call often; concurrent calls share one run.
 export function runSync(reason = 'manual') {
   if (inFlight) return inFlight
@@ -246,6 +285,13 @@ export function runSync(reason = 'manual') {
       } catch (err) {
         state.lastError = isTransient(err) ? 'Waiting for a connection' : friendly(err)
       }
+      // The small stores, both directions. A failure here never blocks the journal.
+      try {
+        await pushUserState(uid)
+        await pullUserState(uid)
+      } catch (err) {
+        state.lastError = isTransient(err) ? 'Waiting for a connection' : friendly(err)
+      }
       if (done > 0 || state.pending === 0) { state.lastSyncAt = Date.now(); writeLastSyncAt(state.lastSyncAt) }
     } finally {
       state.running = false
@@ -258,7 +304,7 @@ export function runSync(reason = 'manual') {
 
 function friendly(err) {
   const msg = String(err?.message || err || '')
-  if (/column .* does not exist|client_id/i.test(msg)) return 'The database needs the sync update (run schema.sql)'
+  if (/column .* does not exist|client_id|user_state/i.test(msg)) return 'The database needs the sync update (run schema.sql)'
   if (/bucket/i.test(msg)) return 'Photo storage is not set up yet'
   if (/row-level security|policy/i.test(msg)) return 'Not allowed to save here (sign out and back in)'
   return msg.slice(0, 120) || 'Could not back up'
@@ -274,5 +320,6 @@ export function startSync() {
   window.addEventListener('online', () => kick('online'))
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') kick('visible') })
   window.addEventListener('journal:changed', () => kick('write'))
+  window.addEventListener('userState:changed', () => kick('write'))
   kick('start')
 }

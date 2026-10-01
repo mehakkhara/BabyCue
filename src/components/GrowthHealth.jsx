@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { WHO, getPercentile, ordinal, monthsBetween } from '../data/whoStandards'
+import { readState, writeState } from '../lib/syncedStore'
 
 const MONTHS25 = Array.from({ length: 25 }, (_, i) => i)
 
@@ -97,7 +98,7 @@ function GrowthChart({ entries, sex, metric }) {
 }
 
 function loadEntries() {
-  try { return JSON.parse(localStorage.getItem('growthEntries') || '[]') } catch { return [] }
+  return readState('growthEntries', [])
 }
 
 // Health segment of the Growth screen: WHO percentiles, the chart, and the
@@ -133,7 +134,7 @@ export default function GrowthHealth({ profile, onProfileChange }) {
     if (!formDate || (weight == null && height == null)) return
     const next = [...entries, { date: formDate, weight, height }]
     setEntries(next)
-    localStorage.setItem('growthEntries', JSON.stringify(next))
+    writeState('growthEntries', next)
     setFormWeight('')
     setFormHeight('')
     setShowForm(false)
@@ -145,7 +146,7 @@ export default function GrowthHealth({ profile, onProfileChange }) {
       return entries.indexOf(sorted[idx]) !== i
     })
     setEntries(next)
-    localStorage.setItem('growthEntries', JSON.stringify(next))
+    writeState('growthEntries', next)
   }
 
   const btnBase = {

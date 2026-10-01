@@ -162,3 +162,25 @@ alter table public.journal_entries
   add column if not exists deleted_at  timestamptz;
 create unique index if not exists journal_client_id on public.journal_entries (client_id);
 create index if not exists journal_user_updated on public.journal_entries (user_id, updated_at);
+
+-- =============================================================
+-- Small stores (2026-10-01, sync-scope.md Phase B)
+-- One row per (user, store): moods, check-in streak, checklist ticks, saved
+-- tips, story progress, milestones, growth measurements, photo-hunt months.
+-- The app merges by updated_at, so re-running this is safe.
+-- =============================================================
+create table if not exists public.user_state (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  key        text not null,
+  value      jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, key)
+);
+
+alter table public.user_state enable row level security;
+
+drop policy if exists "user_state_owner_all" on public.user_state;
+create policy "user_state_owner_all"
+  on public.user_state for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
