@@ -13,9 +13,9 @@ import { Screen, IconButton, Pill, PrimaryButton, SecondaryButton, InfoRow, Sect
 import Burst from '../components/Burst'
 import { color, shadow, type } from '../theme'
 
-const KICKER = { tip: "Today's tip", activity: "Today's activity", saved: 'Saved tip', related: 'Related tip', browse: 'From the library' }
+const KICKER = { tip: "Today's tip", activity: "Today's activity", saved: 'Saved tip', related: 'Related tip', browse: 'From the library', personal: 'For {baby}' }
 
-export default function TipDetail({ tip, kind = 'tip', profile, onBack, onOpenTip }) {
+export default function TipDetail({ tip, kind = 'tip', because = [], profile, onBack, onOpenTip }) {
   const [saved, setSaved] = useState(() => isSaved(tip.id, loadSaved()))
   const [gotIt, setGotIt] = useState(false)
   const [hearts, setHearts] = useState(false)
@@ -59,9 +59,12 @@ export default function TipDetail({ tip, kind = 'tip', profile, onBack, onOpenTi
       ]}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <p style={type.kicker}>{KICKER[kind] || KICKER.tip}</p>
+        <p style={type.kicker}>{(KICKER[kind] || KICKER.tip).replace('{baby}', babyName)}</p>
         <Pill>{clampMonth(ageInMonths)} months</Pill>
       </div>
+      {kind === 'personal' && because.length > 0 && (
+        <p style={{ ...type.small, color: color.inkSoft, marginBottom: '10px' }}>Picked because {because.join(' and ').toLowerCase()}. The app notices patterns in what you log; it never diagnoses.</p>
+      )}
 
       <h1 style={{ ...type.h1, fontSize: '28px', marginBottom: '10px' }}>{title}</h1>
       <p style={{ ...type.body, fontSize: '15px', color: color.text, marginBottom: '18px' }}>{body}</p>
