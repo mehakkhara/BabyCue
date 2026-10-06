@@ -181,7 +181,7 @@ export default function App() {
     const { name, params, key } = view
     const openTip = (tip, kind = 'related') => replace('tip', { tip, kind })
     let page = null
-    if (name === 'tip') page = <TipDetail tip={params.tip} kind={params.kind} profile={profile} onBack={pop} onOpenTip={openTip} />
+    if (name === 'tip') page = <TipDetail tip={params.tip} kind={params.kind} because={params.because} profile={profile} onBack={pop} onOpenTip={openTip} />
     else if (name === 'mood') page = <MoodScreen profile={profile} onBack={pop} />
     else if (name === 'profile') page = (
       <ProfileScreen

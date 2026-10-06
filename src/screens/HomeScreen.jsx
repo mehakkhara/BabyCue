@@ -8,7 +8,9 @@ import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
 import { dueChecklists, itemCount } from '../data/checklists'
 import { loadProgress, doneCount, isComplete, isHidden } from '../lib/checklistProgress'
 import { overviewForMonth } from '../data/monthOverview'
-import { getTodayMoods, topicForMoods } from '../lib/moodLog'
+import { getTodayMoods } from '../lib/moodLog'
+import { pickPersonalTip } from '../lib/tipRanking'
+import { TOPIC_EMOJI, TOPIC_HUE } from '../lib/dailyTip'
 import { BABY_STATES } from '../data/babyStates'
 import { getBabyPhoto, latestJournalPhotoUrl } from '../lib/babyPhoto'
 import { greetingForHour, isBedtimeHour } from '../lib/timeOfDay'
@@ -19,7 +21,7 @@ import Flashback from '../components/Flashback'
 import MemoryForm from '../components/MemoryForm'
 import { markCheckIn } from '../lib/streak'
 import { hasSeenTipToday, markTipSeenToday } from '../lib/tipCard'
-import { Screen, Card, ListRow, Avatar, SectionHeader, Chevron, PrimaryButton, SecondaryButton } from '../components/ui'
+import { Screen, Card, ListRow, Avatar, SectionHeader, Chevron, PrimaryButton, SecondaryButton, IconTile } from '../components/ui'
 import { color, shadow, type } from '../theme'
 
 // Warm, non-clinical lines under the photo. Not advice — just a breath.
@@ -87,8 +89,13 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
     return () => { cancelled = true }
   }, [savedNote])
 
-  const moodTopic = topicForMoods(moods)
-  const tip = useMemo(() => pickDailyTip(month, { topic: moodTopic }), [month, moodTopic])
+  // Tip of the day rotates through every tip for the month. The "For {baby}"
+  // pick below is where this baby's patterns (mood log + what helped) show up.
+  const tip = useMemo(() => pickDailyTip(month), [month])
+  // Re-ranked whenever today's moods change (check-in or resume); the summary
+  // reads the synced stores directly.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- moods is the deliberate recompute trigger
+  const personal = useMemo(() => pickPersonalTip(month, { excludeId: tip?.id }), [month, tip?.id, moods])
   const activity = useMemo(() => pickDailyActivity(month), [month])
   const overview = overviewForMonth(month)
   // To-dos: checklists due for this age that aren't finished or hidden.
@@ -155,6 +162,21 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
           <p style={{ margin: '2px 0 0', fontSize: '11px', opacity: 0.85 }}>{dateLabel}</p>
         </div>
       </button>
+      {/* Mood check-in: first thing under the photo, so it gets logged before the tips. */}
+      <Card onClick={() => onOpen('mood')} style={{ marginTop: '14px' }} padding="14px 18px">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={type.bodyStrong}>How is {babyName} today?</p>
+            <p style={{ ...type.small, marginTop: '2px' }}>
+              {pickedStates.length === 0
+                ? `Tap to check in — it helps the app get to know ${babyName}`
+                : pickedStates.map(s => `${s.emoji} ${s.label}`).join(' · ')}
+            </p>
+          </div>
+          <Chevron />
+        </div>
+      </Card>
+
       {/* Today's tip: in full, straight under the baby, until she taps a button; back tomorrow. */}
       {showTipCard && tip && (
         <Card padding="18px" style={{ marginTop: '14px', background: color.paper, border: '1px solid #eee7db' }}>
@@ -165,6 +187,21 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
           <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
             <SecondaryButton onClick={tipCardReadMore} style={{ flex: 1 }}>Read more</SecondaryButton>
             <PrimaryButton onClick={tipCardGotIt} style={{ flex: 1, padding: '12px' }}>✓ Got it</PrimaryButton>
+          </div>
+        </Card>
+      )}
+
+      {/* For {baby}: a tip this baby's recent patterns point to, with the reason shown. Hidden until there is enough logged. */}
+      {personal && (
+        <Card onClick={() => onOpen('tip', { tip: personal.tip, kind: 'personal', because: personal.because })} style={{ marginTop: '14px' }} padding="14px 18px">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <IconTile emoji={TOPIC_EMOJI[personal.tip.topic] || '💛'} hue={TOPIC_HUE[personal.tip.topic] || 'peach'} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={type.kicker}>💛 For {babyName}</p>
+              <p style={{ ...type.bodyStrong, marginTop: '4px' }}>{personalize(personal.tip.title, profile)}</p>
+              <p style={{ ...type.small, marginTop: '2px', color: color.inkSoft }}>Because {personal.because.join(' · ').toLowerCase()}</p>
+            </div>
+            <Chevron />
           </div>
         </Card>
       )}
@@ -227,21 +264,6 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
           </Card>
         </>
       )}
-
-      {/* Mood check-in */}
-      <Card onClick={() => onOpen('mood')} style={{ marginTop: '14px' }} padding="14px 18px">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={type.bodyStrong}>How is {babyName} today?</p>
-            <p style={{ ...type.small, marginTop: '2px' }}>
-              {pickedStates.length === 0
-                ? 'Tap to check in — it shapes today’s tip'
-                : pickedStates.map(s => `${s.emoji} ${s.label}`).join(' · ')}
-            </p>
-          </div>
-          <Chevron />
-        </div>
-      </Card>
 
       {/* A memory resurfaced from ~N months ago, when one exists */}
       <div style={{ marginTop: '14px' }}>

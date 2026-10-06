@@ -31,7 +31,7 @@ export function saveTodayMoods(states) {
 
 // Which tip topic each concern leans toward. Positive states leave the
 // rotation alone.
-const MOOD_TOPIC = {
+export const MOOD_TOPIC = {
   sleep: 'sleep',
   sleepy: 'sleep',
   feeding: 'feeding',
