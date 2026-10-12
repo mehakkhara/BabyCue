@@ -2,8 +2,12 @@
 // pool so Today (for the row subtitle) and the detail page agree.
 import { tips, funActivities, getTipsForProfile } from '../data/tips'
 
-export function dayIndex(now = Date.now()) {
-  return Math.floor(now / 86400000)
+// Days counted from local midnight, so the tip changes when the parent's day
+// does (a UTC count flipped it at 8pm in New York, hours before the "seen
+// today" flag reset).
+export function dayIndex(now = new Date()) {
+  const d = new Date(now)
+  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000)
 }
 
 export function clampMonth(m) {
