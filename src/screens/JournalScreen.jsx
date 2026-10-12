@@ -11,6 +11,7 @@ import { shareKeepsake } from '../lib/keepsakeCard'
 import PhotoHuntCard from '../components/PhotoHuntCard'
 import DateStrip from '../components/DateStrip'
 import VoiceMemo from '../components/VoiceMemo'
+import QuickCamera from '../components/QuickCamera'
 import AudioPlayer from '../components/AudioPlayer'
 import { markCheckIn, dayKey } from '../lib/streak'
 import { getSyncStatus, onSyncChange } from '../lib/sync'
@@ -191,12 +192,12 @@ function MonthSection({ group, urls, profile, onOpen }) {
 
 /* ---------------- opened memory ---------------- */
 
-function EntrySheet({ entry, url, profile, onClose, onDelete, onUpdate, onMakeKeepsake, onShareCard }) {
+function EntrySheet({ entry, url, profile, onClose, onDelete, onUpdate, onMakeKeepsake, onShareCard, editOnOpen = false }) {
   const card = isKeepsake(entry)
   const canMakeCard = Boolean(url) && !card && !isVideoType(entry.photoType) && !isAudioType(entry.photoType)
 
   // Edit in place: the date and the note become fields; Save writes them back.
-  const [editing, setEditing] = useState(false)
+  const [editing, setEditing] = useState(editOnOpen)
   const [draftNote, setDraftNote] = useState(entry.note || '')
   const [draftDate, setDraftDate] = useState(toDateInput(entry.createdAt))
   const [savingEdit, setSavingEdit] = useState(false)
@@ -399,6 +400,8 @@ export default function JournalScreen({ profile, onOpen }) {
   const [keepsakeFrom, setKeepsakeFrom] = useState(null)   // entry a card is being made from
   const [justSaved, setJustSaved] = useState(null)         // { url, title, ts, position } after a save here
   const [pickVersion, setPickVersion] = useState(0)        // bumps when she swaps a Then↔Now side
+  const [quickSaved, setQuickSaved] = useState(null)       // { id, url } after a one-tap camera save
+  const [openEditing, setOpenEditing] = useState(false)    // open the entry sheet with the note field ready
 
   const urls = useObjectUrls(entries)
   useEffect(() => () => { urls.forEach(u => URL.revokeObjectURL(u)) }, [urls])
@@ -407,6 +410,13 @@ export default function JournalScreen({ profile, onOpen }) {
     if (!justSaved) return
     return () => URL.revokeObjectURL(justSaved.url)
   }, [justSaved])
+
+  // The "saved" toast after a one-tap photo: lingers a few seconds, then goes.
+  useEffect(() => {
+    if (!quickSaved) return
+    const t = setTimeout(() => setQuickSaved(null), 7000)
+    return () => { clearTimeout(t); URL.revokeObjectURL(quickSaved.url) }
+  }, [quickSaved])
 
   const months = useMemo(
     () => groupByMonth(entries, profile?.dateOfBirth),
@@ -471,6 +481,23 @@ export default function JournalScreen({ profile, onOpen }) {
     setAdding(false)
     setFormFiles([])
     setFormNote(false)
+  }
+
+  // One-tap camera: already saved; count it, reload, offer a note.
+  async function handleQuickSaved(saved) {
+    markCheckIn('photo')
+    setSelectedDay(null)
+    setQuery('')
+    await refresh()
+    setQuickSaved({ id: saved.id, url: URL.createObjectURL(saved.blob) })
+  }
+
+  async function addNoteTo(id) {
+    setQuickSaved(null)
+    const entry = (await getEntries()).find(e => e.id === id)
+    if (!entry) return
+    setOpenEditing(true)
+    setOpened(entry)
   }
 
   function handleMemorySaved(first) {
@@ -620,8 +647,9 @@ export default function JournalScreen({ profile, onOpen }) {
           entry={opened}
           url={urls.get(opened.id)}
           profile={profile}
-          onClose={() => setOpened(null)}
+          onClose={() => { setOpened(null); setOpenEditing(false) }}
           onDelete={handleDelete}
+          editOnOpen={openEditing}
           onUpdate={handleUpdate}
           onMakeKeepsake={setKeepsakeFrom}
           onShareCard={e => shareKeepsake(e.photoBlob, e.note)}
@@ -646,6 +674,36 @@ export default function JournalScreen({ profile, onOpen }) {
 
       {recording && (
         <VoiceMemo profile={profile} onClose={() => setRecording(false)} onSaved={() => { setRecording(false); markCheckIn('photo'); refresh() }} />
+      )}
+
+      <QuickCamera onSaved={handleQuickSaved} hidden={adding || recording || Boolean(opened) || Boolean(keepsakeFrom)} />
+
+      {quickSaved && !opened && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed', zIndex: 95,
+            bottom: 'calc(72px + 14px + env(safe-area-inset-bottom))',
+            left: 'max(16px, calc(50% - 240px + 16px))',
+            right: 'max(90px, calc(50% - 240px + 90px))',
+            background: '#fff', borderRadius: '16px', padding: '10px 12px',
+            boxShadow: '0 10px 30px rgba(30,27,75,0.18)',
+            display: 'flex', alignItems: 'center', gap: '10px',
+            animation: 'fadeIn 0.22s ease',
+          }}
+        >
+          <img src={quickSaved.url} alt="" style={{ width: '42px', height: '42px', borderRadius: '10px', objectFit: 'cover', flex: '0 0 auto' }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ ...type.bodyStrong, fontSize: '13px' }}>Saved to today ✓</p>
+            <p style={{ ...type.small, marginTop: '1px' }}>Want to add a note?</p>
+          </div>
+          <button
+            onClick={() => addNoteTo(quickSaved.id)}
+            style={{ border: 'none', borderRadius: '10px', background: '#7C3AED', color: '#fff', fontSize: '12px', fontWeight: 700, padding: '8px 10px', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
+          >
+            Add note
+          </button>
+        </div>
       )}
 
     </Screen>
