@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { pickTonight, STORIES } from '../data/stories'
 import { getReadIds, todayKey as storyDayKey } from '../lib/storyProgress'
-import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
+import { pickDailyTip, pickDailyActivity, clampMonth, dayIndex } from '../lib/dailyTip'
 import { dueChecklists, itemCount } from '../data/checklists'
 import { loadProgress, doneCount, isComplete, isHidden } from '../lib/checklistProgress'
 import { overviewForMonth } from '../data/monthOverview'
@@ -19,7 +19,7 @@ import { getEntries } from '../data/journalStore'
 import { pickFlashback } from '../components/Flashback'
 import Flashback from '../components/Flashback'
 import MemoryForm from '../components/MemoryForm'
-import { markCheckIn } from '../lib/streak'
+import { markCheckIn, dayKey } from '../lib/streak'
 import { hasSeenTipToday, markTipSeenToday } from '../lib/tipCard'
 import { Screen, Card, ListRow, Avatar, SectionHeader, Chevron, PrimaryButton, SecondaryButton, IconTile } from '../components/ui'
 import { color, shadow, type } from '../theme'
@@ -58,10 +58,21 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   // First open ever on this device: surface today's tip in full, once, so the
   // very first visit teaches something instead of landing on a quiet list.
   const [showTipCard, setShowTipCard] = useState(() => !hasSeenTipToday())
+  // The local calendar day; everything "of the day" re-picks when it changes.
+  const [today, setToday] = useState(() => dayKey())
 
   // Re-read the clock and today's mood on resume so the screen follows the day.
   useEffect(() => {
-    function refresh() { setHour(new Date().getHours()); setMoods(getTodayMoods()) }
+    function refresh() {
+      setHour(new Date().getHours())
+      setMoods(getTodayMoods())
+      // Past midnight since last look: new day, new tip, shown in full again.
+      setToday(prev => {
+        const next = dayKey()
+        if (next !== prev) setShowTipCard(!hasSeenTipToday())
+        return next
+      })
+    }
     const timer = setInterval(refresh, 10 * 60 * 1000)
     document.addEventListener('visibilitychange', refresh)
     window.addEventListener('focus', refresh)
@@ -91,12 +102,14 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
 
   // Tip of the day rotates through every tip for the month. The "For {baby}"
   // pick below is where this baby's patterns (mood log + what helped) show up.
-  const tip = useMemo(() => pickDailyTip(month), [month])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `today` re-picks at midnight
+  const tip = useMemo(() => pickDailyTip(month), [month, today])
   // Re-ranked whenever today's moods change (check-in or resume); the summary
   // reads the synced stores directly.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- moods is the deliberate recompute trigger
-  const personal = useMemo(() => pickPersonalTip(month, { excludeId: tip?.id }), [month, tip?.id, moods])
-  const activity = useMemo(() => pickDailyActivity(month), [month])
+  const personal = useMemo(() => pickPersonalTip(month, { excludeId: tip?.id }), [month, tip?.id, moods, today])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `today` re-picks at midnight
+  const activity = useMemo(() => pickDailyActivity(month), [month, today])
   const overview = overviewForMonth(month)
   // To-dos: checklists due for this age that aren't finished or hidden.
   const todos = useMemo(() => {
@@ -107,7 +120,7 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
     () => pickTonight(ageInMonths, { seed: `${storyDayKey()}:${babyName || ''}`, readIds: getReadIds() }),
     [ageInMonths, babyName],
   )
-  const quote = personalize(QUOTES[Math.floor(Date.now() / 86400000) % QUOTES.length], profile)
+  const quote = personalize(QUOTES[dayIndex() % QUOTES.length], profile)
   const dateLabel = new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
   const pickedStates = BABY_STATES.filter(s => moods.includes(s.key))
 
@@ -177,8 +190,9 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
         </div>
       </Card>
 
-      {/* Today's tip: in full, straight under the baby, until she taps a button; back tomorrow. */}
-      {showTipCard && tip && (
+      {/* Today's tip: in full, straight under the baby, until she taps a button; then a one-line
+          row for the rest of the day so the tip stays one tap away. Back in full tomorrow. */}
+      {tip && (showTipCard ? (
         <Card padding="18px" style={{ marginTop: '14px', background: color.paper, border: '1px solid #eee7db' }}>
           <p style={type.kicker}>💡 Today's tip</p>
           <p style={{ ...type.bodyStrong, fontSize: '17px', marginTop: '8px' }}>{personalize(tip.title, profile)}</p>
@@ -189,7 +203,18 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
             <PrimaryButton onClick={tipCardGotIt} style={{ flex: 1, padding: '12px' }}>✓ Got it</PrimaryButton>
           </div>
         </Card>
-      )}
+      ) : (
+        <Card onClick={() => onOpen('tip', { tip, kind: 'tip' })} style={{ marginTop: '14px' }} padding="14px 18px">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <IconTile emoji="💡" hue="amber" />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={type.kicker}>💡 Today's tip</p>
+              <p style={{ ...type.bodyStrong, marginTop: '4px' }}>{personalize(tip.title, profile)}</p>
+            </div>
+            <Chevron />
+          </div>
+        </Card>
+      ))}
 
       {/* For {baby}: a tip this baby's recent patterns point to, with the reason shown. Hidden until there is enough logged. */}
       {personal && (
@@ -211,11 +236,6 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
       {/* Today for you */}
       <SectionHeader title="Today for you" action="Browse by month" onAction={() => onOpen('browse')} style={{ marginTop: '18px' }} />
       <Card padding="4px 14px">
-        <ListRow
-          emoji="💡" hue="amber" title="Learn"
-          subtitle={tip ? personalize(tip.title, profile) : 'A quick tip for today'}
-          onClick={() => tip && onOpen('tip', { tip, kind: 'tip' })}
-        />
         <ListRow
           emoji="🎯" hue="rose" title="Do"
           subtitle={activity ? personalize(activity.title, profile) : 'A 5-minute activity'}
