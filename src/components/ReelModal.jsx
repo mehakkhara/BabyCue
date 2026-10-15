@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { reelMonths, buildScene, drawPreview, makeReel, shareReel, reelDurationMs, canMakeReel, MIN_PHOTOS } from '../lib/reel'
+import { isAudioType, isVideoType } from '../data/journalStore'
 import { CropFrame } from './PhotoShape'
 
-// Month reel: pick a month, tap any photo to edit its caption, framing or
-// place in the order (or leave it out), choose whether your voice memos
-// narrate it, then record. Edits live only in the reel; the journal entry
+// Reel: starts as one month's photos; add more from any other month with the
+// + tile. Tap any photo to edit its caption, framing or place in the order
+// (or leave it out), choose whether your voice memos narrate it, then record. Edits live only in the reel; the journal entry
 // is untouched. The canvas is the live preview
 // while it records; the finished video plays back in its place.
 //   entries — the journal, as JournalScreen already has it (with photoBlob)
@@ -17,6 +18,8 @@ export default function ReelModal({ entries, profile, urls, initialMonth, onClos
   const [excluded, setExcluded] = useState(() => new Set())
   const [edits, setEdits] = useState(() => new Map())   // id → { note?, position? }, reel-only
   const [order, setOrder] = useState(null)              // ids in reel order; null = the month's own order
+  const [added, setAdded] = useState([])                // ids pulled in from other months
+  const [picking, setPicking] = useState(false)         // the add-photos sheet
   const [editing, setEditing] = useState(null)          // entry id open in the edit sheet
   const [previewIndex, setPreviewIndex] = useState(0)
   const [voice, setVoice] = useState(true)
@@ -30,14 +33,20 @@ export default function ReelModal({ entries, profile, urls, initialMonth, onClos
   const abortRef = useRef(null)
 
   const month = months.find(m => m.key === monthKey) || null
-  // Every photo of the month in reel order, with her edits laid over the entry.
+  const allPhotos = useMemo(
+    () => entries.filter(e => e.photoBlob && !isAudioType(e.photoType) && !isVideoType(e.photoType)),
+    [entries],
+  )
+  // The month's photos plus any she pulled in, in reel order, with her edits laid over each entry.
   const ordered = useMemo(() => {
     if (!month) return []
     const byId = new Map(month.photos.map(p => [p.id, p]))
+    for (const id of added) { const e = allPhotos.find(x => x.id === id); if (e) byId.set(id, e) }
     const ids = order ? order.filter(id => byId.has(id)) : month.photos.map(p => p.id)
-    for (const p of month.photos) if (!ids.includes(p.id)) ids.push(p.id)
+    for (const id of byId.keys()) if (!ids.includes(id)) ids.push(id)
     return ids.map(id => ({ ...byId.get(id), ...(edits.get(id) || {}) }))
-  }, [month, order, edits])
+  }, [month, order, edits, added, allPhotos])
+  const inReel = useMemo(() => new Set(ordered.map(p => p.id)), [ordered])
   const photos = useMemo(() => ordered.filter(p => !excluded.has(p.id)), [ordered, excluded])
   const memos = month?.memos || []
   const seconds = Math.round(reelDurationMs(photos.length) / 1000)
@@ -93,6 +102,10 @@ export default function ReelModal({ entries, profile, urls, initialMonth, onClos
     ids.splice(j, 0, id)
     setOrder(ids)
   }
+  function toggleAdded(id) {
+    setAdded(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]))
+    setExcluded(prev => { const n = new Set(prev); n.delete(id); return n })
+  }
   function openEdit(id) {
     setEditing(id)
     const k = photos.findIndex(p => p.id === id)
@@ -104,6 +117,7 @@ export default function ReelModal({ entries, profile, urls, initialMonth, onClos
     setExcluded(new Set())
     setEdits(new Map())
     setOrder(null)
+    setAdded([])
     setPreviewIndex(0)
     setResult(null)
     setOutcome('')
@@ -164,7 +178,7 @@ export default function ReelModal({ entries, profile, urls, initialMonth, onClos
       <div style={{ maxWidth: '480px', margin: '0 auto', padding: 'calc(14px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom))' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 700 }}>Month reel</h2>
+            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 700 }}>Reel</h2>
             {month && (
               <p style={{ margin: '3px 0 0', fontSize: '12.5px', color: '#9d9bb5' }}>
                 {photos.length} photos{memos.length ? ` · ${memos.length} voice ${memos.length === 1 ? 'memo' : 'memos'}` : ''} · about {seconds}s
@@ -224,8 +238,9 @@ export default function ReelModal({ entries, profile, urls, initialMonth, onClos
                       </button>
                     )
                   })}
+                  <button onClick={() => setPicking(true)} aria-label="Add photos from other months" style={{ flex: 'none', width: '54px', height: '72px', borderRadius: '8px', border: '1.5px dashed rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '22px', cursor: 'pointer', display: 'grid', placeItems: 'center' }}>+</button>
                 </div>
-                <p style={{ margin: '0 0 12px', fontSize: '11px', color: '#7d7b96', textAlign: 'center' }}>Tap a photo to change its caption, framing or order, or leave it out.</p>
+                <p style={{ margin: '0 0 12px', fontSize: '11px', color: '#7d7b96', textAlign: 'center' }}>Tap a photo to change its caption, framing or order, or leave it out. + adds photos from other months.</p>
               </>
             )}
 
@@ -256,6 +271,35 @@ export default function ReelModal({ entries, profile, urls, initialMonth, onClos
           </>
         )}
       </div>
+      {picking && (
+        <div onClick={() => setPicking(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 160, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '480px', maxHeight: '80vh', overflowY: 'auto', background: '#1a1830', borderRadius: '24px 24px 0 0', padding: '18px 18px calc(16px + env(safe-area-inset-bottom))', boxShadow: '0 -8px 40px rgba(0,0,0,0.5)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700 }}>Add photos</h3>
+                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#9d9bb5' }}>From any month. They go on the end; move them after.</p>
+              </div>
+              <button onClick={() => setPicking(false)} style={{ ...btn, flex: 'none', padding: '9px 14px', background: 'linear-gradient(135deg,#8b7cf6,#7C3AED)', color: '#fff' }}>Done</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '6px' }}>
+              {allPhotos.filter(p => !month.photos.some(q => q.id === p.id)).map(p => {
+                const on = inReel.has(p.id)
+                return (
+                  <button key={p.id} onClick={() => toggleAdded(p.id)} aria-label={on ? 'Remove from reel' : 'Add to reel'} style={{ aspectRatio: '3 / 4', borderRadius: '10px', overflow: 'hidden', position: 'relative', border: on ? '2.5px solid #a78bfa' : '2px solid transparent', padding: 0, background: '#000', cursor: 'pointer' }}>
+                    <img src={urls.get(p.id)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: p.position || 'center', display: 'block', opacity: on ? 1 : 0.85 }} />
+                    <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '10px 4px 4px', background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.6))', color: '#fff', fontSize: '9px', fontWeight: 700 }}>
+                      {new Date(p.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </span>
+                    {on && <span style={{ position: 'absolute', top: '4px', right: '4px', width: '18px', height: '18px', borderRadius: '50%', background: '#7C3AED', color: '#fff', fontSize: '11px', display: 'grid', placeItems: 'center' }}>✓</span>}
+                  </button>
+                )
+              })}
+            </div>
+            {allPhotos.length <= month.photos.length && <p style={{ color: '#9d9bb5', fontSize: '13px', textAlign: 'center', margin: '10px 0 0' }}>Every photo in the journal is already in this month.</p>}
+          </div>
+        </div>
+      )}
+
       {editing && (() => {
         const p = ordered.find(x => x.id === editing)
         if (!p) return null

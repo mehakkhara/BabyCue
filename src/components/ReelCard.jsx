@@ -5,7 +5,8 @@ import { color, type } from '../theme'
 
 // The reel's front door. Lives at the bottom of the Journal and appears on
 // its own once a month has enough photos: a strip from the newest such month,
-// what the reel would be, and one button. Other months are a tap away inside.
+// what the reel would be, and one button. Other months, and photos from any
+// month, are a tap away inside.
 //   entries — the journal, as JournalScreen has it
 //   urls    — the Journal's object URLs by entry id
 //   onOpen  — (monthKey) → open the maker on that month
@@ -21,7 +22,7 @@ export default function ReelCard({ entries, profile, urls, onOpen }) {
     <section style={{ marginBottom: '26px' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '9px', margin: '0 2px 10px' }}>
         <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#7C3AED' }}>
-          Month reel
+          Reel
         </span>
         <span style={{ flex: 1, height: '1px', backgroundColor: 'rgba(0,0,0,0.09)' }} />
         <span style={{ fontSize: '11px', color: '#aaa' }}>{months.length > 1 ? `${months.length} months ready` : 'ready'}</span>
