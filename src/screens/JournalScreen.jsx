@@ -569,7 +569,7 @@ export default function JournalScreen({ profile, onOpen }) {
       </Card>
 
       <div style={{ marginTop: '14px' }}>
-        <PhotoHuntCard profile={profile} version={huntVersion} onOpen={() => onOpen?.('photoHunt')} />
+        <PhotoHuntCard profile={profile} version={huntVersion} onOpen={() => onOpen?.('photoHunt')} onCaptured={async () => { await refresh(); setHuntVersion(v => v + 1); markCheckIn('photo') }} />
       </div>
 
       <div style={{ paddingTop: '18px' }}>

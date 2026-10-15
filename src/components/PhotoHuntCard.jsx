@@ -1,18 +1,24 @@
 // The compact photo-hunt card on the Journal: title, progress, three cells
-// and an Add tile. "All 9" and every tap open the full hunt page.
-import { useEffect, useState } from 'react'
-import { getEntries } from '../data/journalStore'
+// and a camera tile. The camera tile opens the phone's camera straight away
+// and files the shot under the next empty prompt, so catching a moment is one
+// tap from here. Everything else on the card opens the full hunt page.
+//   onCaptured — a shot was saved; the parent refreshes the journal
+import { useEffect, useRef, useState } from 'react'
+import { getEntries, addEntry, compressImage, imageDimensions, PHOTO_HUNT_SOURCE } from '../data/journalStore'
+import { autoCropPosition } from '../lib/autoCrop'
 import { getBabyAgeInMonths } from '../data/tips'
 import { promptsForAge } from '../data/photoPrompts'
-import { loadHunt } from '../lib/photoHunt'
+import { loadHunt, recordCapture } from '../lib/photoHunt'
 import { Card, IconTile } from '../components/ui'
 import { color, type } from '../theme'
 
-export default function PhotoHuntCard({ profile, onOpen, version = 0 }) {
+export default function PhotoHuntCard({ profile, onOpen, onCaptured, version = 0 }) {
   const ageInMonths = getBabyAgeInMonths(profile.dateOfBirth)
   const prompts = promptsForAge(ageInMonths)
   const [captures, setCaptures] = useState(() => loadHunt())
   const [thumbs, setThumbs] = useState({})
+  const [saving, setSaving] = useState(false)
+  const cameraRef = useRef(null)
 
   useEffect(() => { setCaptures(loadHunt()) }, [version])
 
@@ -35,6 +41,37 @@ export default function PhotoHuntCard({ profile, onOpen, version = 0 }) {
     })()
     return () => { cancelled = true; urls.forEach(u => URL.revokeObjectURL(u)) }
   }, [captures])
+
+  const nextOpen = prompts.find(p => !captures[p.id]) || null
+
+  function openCamera(e) {
+    e.stopPropagation()   // the card itself opens the hunt page
+    if (!nextOpen || saving) return
+    cameraRef.current?.click()
+  }
+
+  // Straight from the camera to the journal, under the next empty prompt.
+  // Same save as the hunt page's own cells, minus the crop step: the subject
+  // is guessed and she can drag it later from the photo's own sheet.
+  async function handleShot(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !nextOpen || saving) return
+    setSaving(true)
+    try {
+      const blob = await compressImage(file)
+      const [size, position] = await Promise.all([imageDimensions(blob), autoCropPosition(file, 1).catch(() => '50% 50%')])
+      const entryId = await addEntry({
+        note: nextOpen.label, source: PHOTO_HUNT_SOURCE, photoBlob: blob, photoType: 'image/jpeg',
+        width: size?.width, height: size?.height, fit: 'cover', position, createdAt: Date.now(),
+      })
+      recordCapture(nextOpen.id, entryId, { fit: 'cover', position })
+      setCaptures(loadHunt())
+      onCaptured?.(entryId)
+    } catch { /* the hunt page shows any error on its own */ } finally {
+      setSaving(false)
+    }
+  }
 
   const month = new Date().toLocaleDateString(undefined, { month: 'long' })
   const done = prompts.filter(p => captures[p.id]).length
@@ -67,14 +104,24 @@ export default function PhotoHuntCard({ profile, onOpen, version = 0 }) {
             )}
           </div>
         ))}
-        <div style={{
-          aspectRatio: '1', borderRadius: '12px', border: `1.5px dashed ${color.lavender}`, background: color.surface,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: color.primary,
-        }}>
-          <span style={{ fontSize: '20px', lineHeight: 1 }}>+</span>
-          <span style={{ fontSize: '10px', fontWeight: 700 }}>Add</span>
-        </div>
+        <button
+          onClick={openCamera}
+          disabled={!nextOpen || saving}
+          aria-label={nextOpen ? `Take a photo for “${nextOpen.label}”` : 'All caught'}
+          style={{
+            aspectRatio: '1', borderRadius: '12px', border: 'none', padding: '4px', cursor: nextOpen ? 'pointer' : 'default', fontFamily: 'inherit',
+            background: nextOpen ? 'linear-gradient(135deg,#8b7cf6,#7C3AED)' : color.tintLight, color: nextOpen ? '#fff' : color.faint,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px',
+            boxShadow: nextOpen ? '0 3px 10px rgba(124,111,247,0.35)' : 'none', opacity: saving ? 0.6 : 1,
+          }}
+        >
+          <span style={{ fontSize: '20px', lineHeight: 1 }}>📷</span>
+          <span style={{ fontSize: '8.5px', fontWeight: 700, textAlign: 'center', lineHeight: 1.15 }}>
+            {saving ? 'Saving…' : nextOpen ? nextOpen.label : 'All caught'}
+          </span>
+        </button>
       </div>
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleShot} onClick={e => e.stopPropagation()} style={{ display: 'none' }} />
     </Card>
   )
 }
