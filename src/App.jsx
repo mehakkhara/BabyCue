@@ -86,6 +86,11 @@ export default function App() {
     return () => window.removeEventListener('userState:pulled', onPulled)
   }, [])
   const [photoVersion, setPhotoVersion] = useState(0)
+  useEffect(() => {
+    const bump = () => setPhotoVersion(v => v + 1)
+    window.addEventListener('babyPhoto:changed', bump)
+    return () => window.removeEventListener('babyPhoto:changed', bump)
+  }, [])
 
   // Each tab opens at its top, like a native app. Tapping the tab you're
   // already on also scrolls to the top (the iOS convention).
