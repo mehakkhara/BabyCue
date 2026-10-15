@@ -10,6 +10,7 @@
 // Status is observable so Profile can show "12 waiting to upload".
 import { supabase, isSupabaseConfigured } from './supabase'
 import { backfillUnstamped, dirtyKeys, clearDirty, rowsFor, applyRemote } from './syncedStore'
+import { babyPhotoMeta, babyPhotoBlob, markBabyPhotoSynced, applyRemoteBabyPhoto, REMOTE_NAME as HERO_NAME } from './babyPhoto'
 import {
   listOutbox, removeJob, updateJob, getEntryByClientId, markSynced, unsyncedClientIds, enqueue,
   upsertFromRemote, deleteByClientId, attachMedia, entriesMissingMedia,
@@ -18,6 +19,7 @@ import {
 const BUCKET = 'baby-photos'
 const TABLE = 'journal_entries'
 const STATE_TABLE = 'user_state'
+const HERO_KEY = 'babyPhoto'   // user_state row: { path: string | null }
 const LAST_SYNC_KEY = 'journalSync:lastAt'
 const LAST_PULL_KEY = 'journalSync:lastPull:'   // + user id
 const PAGE = 200
@@ -232,6 +234,7 @@ async function pullUserState(uid) {
   let changed = 0
   let needPush = false
   for (const row of data || []) {
+    if (row.key === HERO_KEY) { if (await pullHeroPhoto(row)) changed++; continue }
     const result = applyRemote(row.key, row.value, row.updated_at)
     if (result !== 'kept') changed++
     if (result === 'merged') needPush = true
@@ -241,6 +244,45 @@ async function pullUserState(uid) {
   }
   if (needPush) await pushUserState(uid)
   return changed
+}
+
+// Hero photo → server (sync-scope.md Phase C). The file goes to storage
+// first, then a tiny user_state row says where it is, so another device never
+// sees the pointer before the bytes.
+async function pushHeroPhoto(uid) {
+  const meta = babyPhotoMeta()
+  if (!meta.dirty) return false
+  const path = `${uid}/${HERO_NAME}`
+  const blob = await babyPhotoBlob()
+  if (blob) {
+    const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
+      upsert: true, contentType: 'image/jpeg', cacheControl: '0',
+    })
+    if (error) throw error
+  } else {
+    const { error } = await supabase.storage.from(BUCKET).remove([path])
+    if (error && !/not found/i.test(error.message || '')) throw error
+  }
+  const updatedAt = meta.updatedAt || new Date().toISOString()
+  const { error } = await supabase.from(STATE_TABLE)
+    .upsert({ user_id: uid, key: HERO_KEY, value: { path: blob ? path : null }, updated_at: updatedAt }, { onConflict: 'user_id,key' })
+  if (error) throw error
+  markBabyPhotoSynced(updatedAt)
+  return true
+}
+
+// Server → hero photo. Only when the server's copy is newer than ours and we
+// have nothing of our own waiting to go up.
+async function pullHeroPhoto(row) {
+  const meta = babyPhotoMeta()
+  if (meta.dirty) return false
+  if (meta.updatedAt && Date.parse(row.updated_at) <= Date.parse(meta.updatedAt)) return false
+  const path = row.value?.path || null
+  if (!path) { await applyRemoteBabyPhoto(null, row.updated_at); return true }
+  const { data, error } = await supabase.storage.from(BUCKET).download(path)
+  if (error) throw error
+  await applyRemoteBabyPhoto(data, row.updated_at)
+  return true
 }
 
 // Drain the outbox. Safe to call often; concurrent calls share one run.
@@ -287,6 +329,7 @@ export function runSync(reason = 'manual') {
       }
       // The small stores, both directions. A failure here never blocks the journal.
       try {
+        await pushHeroPhoto(uid)
         await pushUserState(uid)
         await pullUserState(uid)
       } catch (err) {
@@ -321,5 +364,6 @@ export function startSync() {
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') kick('visible') })
   window.addEventListener('journal:changed', () => kick('write'))
   window.addEventListener('userState:changed', () => kick('write'))
+  window.addEventListener('babyPhoto:changed', () => kick('write'))
   kick('start')
 }
