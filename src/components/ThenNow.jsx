@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { parsePosition, formatPosition } from './PhotoShape'
 import { isVideoType, isAudioType, isKeepsake } from '../data/journalStore'
 import { nameAndAgeAt } from '../lib/babyAge'
 
@@ -12,10 +13,24 @@ function loadPick() {
   try { return JSON.parse(localStorage.getItem(PICK_KEY) || 'null') || {} } catch { return {} }
 }
 
+function savePick(next) {
+  try { localStorage.setItem(PICK_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+}
+
 // Remember which photo she chose for a side; null clears it.
 export function rememberThenNow(side, id) {
-  const next = { ...loadPick(), [side]: id }
-  try { localStorage.setItem(PICK_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  savePick({ ...loadPick(), [side]: id })
+}
+
+// How a photo is framed in the comparison: { position, zoom }. Kept here, not
+// on the journal entry, because lining two faces up is a Then ↔ now concern
+// and the journal tile should not move with it.
+function frameFor(id) {
+  return loadPick().frame?.[id] || { position: '50% 50%', zoom: 1 }
+}
+function rememberFrame(id, frame) {
+  const pick = loadPick()
+  savePick({ ...pick, frame: { ...(pick.frame || {}), [id]: frame } })
 }
 
 // The oldest and newest photo (not video, not keepsake card) in the journal,
@@ -42,18 +57,137 @@ function shortDate(ts) {
 }
 
 // Draggable then/now comparison: the newest photo underneath, the oldest
-// clipped on top, split at the handle. The range input is a full-size
-// invisible overlay so dragging works with touch, mouse, and keyboard.
-// Tap a date tag to swap that side for another photo.
+// clipped on top, split at the handle. Drag the handle to compare. Drag a
+// photo to move it and pinch (or scroll) to zoom it, so the two faces can be
+// lined up across the split; the framing saves itself on release. Tap a date
+// tag to swap that side for another photo.
 //   photos  — all candidate photos (for the swap picker)
 //   onSwap  — (side: 'oldest' | 'newest', entryId) → parent re-picks the pair
 export default function ThenNow({ pair, urls, profile, photos = [], onSwap }) {
   const [cut, setCut] = useState(50)
   const [choosing, setChoosing] = useState(null)   // 'oldest' | 'newest'
+  const [live, setLive] = useState(null)           // { side, position, zoom } mid-gesture
+  const [frameVersion, setFrameVersion] = useState(0)
+  const frameRef = useRef(null)
+  const natural = useRef({})                 // entry id → { w, h } once loaded
+  const pointers = useRef(new Map())         // active pointers (one = drag, two = pinch)
+  const gesture = useRef(null)               // { side, x, y, zoom, dist, startX, startY }
+  const liveRef = useRef(null)
+  liveRef.current = live
+  const cutRef = useRef(cut)
+  cutRef.current = cut
   const { oldest, newest } = pair
   const thenUrl = urls.get(oldest.id)
   const nowUrl = urls.get(newest.id)
+
+  // Scroll-to-zoom has to be a non-passive listener, or the page scrolls instead.
+  useEffect(() => {
+    const el = frameRef.current
+    if (!el) return
+    const onWheel = e => {
+      const box = el.getBoundingClientRect()
+      const side = (e.clientX - box.left) / box.width * 100 < cutRef.current ? 'oldest' : 'newest'
+      const entry = side === 'oldest' ? oldest : newest
+      const cur = liveRef.current?.side === side ? liveRef.current : { side, ...frameFor(entry.id) }
+      const zoom = Math.max(1, Math.min(3, cur.zoom * (e.deltaY < 0 ? 1.04 : 0.96)))
+      e.preventDefault()
+      rememberFrame(entry.id, { position: cur.position, zoom })
+      setLive({ side, position: cur.position, zoom })
+      setFrameVersion(v => v + 1)
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [oldest, newest])
+
   if (!thenUrl || !nowUrl) return null
+  void frameVersion
+
+  const HANDLE_W = 28   // px either side of the split that drags the handle rather than a photo
+  function entryFor(side) { return side === 'oldest' ? oldest : newest }
+  function frameStyle(side) {
+    const f = live?.side === side ? live : frameFor(entryFor(side).id)
+    return { objectPosition: f.position, transform: f.zoom !== 1 ? `scale(${f.zoom})` : undefined, transformOrigin: f.position }
+  }
+  function overflow(side, zoom) {
+    const nat = natural.current[entryFor(side).id]
+    const box = frameRef.current?.getBoundingClientRect()
+    if (!nat || !box) return { x: 0, y: 0 }
+    const scale = Math.max(box.width / nat.w, box.height / nat.h) * zoom
+    return { x: Math.max(0, nat.w * scale - box.width), y: Math.max(0, nat.h * scale - box.height) }
+  }
+  const clamp01 = n => Math.max(0, Math.min(100, n))
+  function pinchDist() {
+    const [a, b] = [...pointers.current.values()]
+    return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0
+  }
+  function beginGesture(side, startX, startY) {
+    const cur = liveRef.current?.side === side ? liveRef.current : { side, ...frameFor(entryFor(side).id) }
+    const pos = parsePosition(cur.position)
+    gesture.current = { side, x: pos.x, y: pos.y, zoom: cur.zoom, dist: pinchDist(), startX, startY }
+    setLive({ side, position: cur.position, zoom: cur.zoom })
+  }
+  function cutFromX(clientX) {
+    const box = frameRef.current.getBoundingClientRect()
+    return Math.max(4, Math.min(96, ((clientX - box.left) / box.width) * 100))
+  }
+  function onPointerDown(e) {
+    if (e.target.tagName === 'BUTTON') return
+    const box = frameRef.current.getBoundingClientRect()
+    const xPct = ((e.clientX - box.left) / box.width) * 100
+    // Near the split: this drag moves the handle, not a photo.
+    if (!gesture.current && Math.abs(xPct - cut) * box.width / 100 <= HANDLE_W) {
+      e.currentTarget.setPointerCapture?.(e.pointerId)
+      pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      gesture.current = { kind: 'slider' }
+      return
+    }
+    const side = xPct < cut ? 'oldest' : 'newest'
+    if (gesture.current && gesture.current.side !== side && pointers.current.size) return   // second finger on the other half: ignore
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    beginGesture(side, e.clientX, e.clientY)
+  }
+  function onPointerMove(e) {
+    const g = gesture.current
+    if (!g || !pointers.current.has(e.pointerId)) return
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (g.kind === 'slider') { setCut(cutFromX(e.clientX)); return }
+    if (pointers.current.size >= 2 && g.dist > 0) {
+      const zoom = Math.max(1, Math.min(3, g.zoom * (pinchDist() / g.dist)))
+      setLive(l => ({ ...l, zoom }))
+      return
+    }
+    const zoom = liveRef.current?.zoom ?? g.zoom
+    const over = overflow(g.side, zoom)
+    // Finger right reveals more of the left edge, so the percentage falls.
+    const nx = over.x > 0 ? g.x - ((e.clientX - g.startX) / over.x) * 100 : g.x
+    const ny = over.y > 0 ? g.y - ((e.clientY - g.startY) / over.y) * 100 : g.y
+    setLive(l => ({ ...l, position: formatPosition({ x: clamp01(nx), y: clamp01(ny) }) }))
+  }
+  function onPointerUp(e) {
+    if (!pointers.current.has(e.pointerId)) return
+    pointers.current.delete(e.pointerId)
+    e.currentTarget.releasePointerCapture?.(e.pointerId)
+    if (gesture.current?.kind === 'slider') { if (!pointers.current.size) gesture.current = null; return }
+    const l = liveRef.current
+    if (!l) return
+    if (pointers.current.size) {
+      // One finger left after a pinch: carry on dragging from here.
+      const rest = [...pointers.current.values()][0]
+      const pos = parsePosition(l.position)
+      gesture.current = { side: l.side, x: pos.x, y: pos.y, zoom: l.zoom, dist: 0, startX: rest.x, startY: rest.y }
+      return
+    }
+    rememberFrame(entryFor(l.side).id, { position: l.position, zoom: l.zoom })
+    gesture.current = null
+    setLive(null)
+    setFrameVersion(v => v + 1)
+  }
+  function resetFrame(side) {
+    rememberFrame(entryFor(side).id, { position: '50% 50%', zoom: 1 })
+    setFrameVersion(v => v + 1)
+    setChoosing(null)
+  }
 
   const tag = {
     position: 'absolute',
@@ -67,7 +201,7 @@ export default function ThenNow({ pair, urls, profile, photos = [], onSwap }) {
     border: 'none',
     cursor: onSwap ? 'pointer' : 'default',
     fontFamily: 'inherit',
-    zIndex: 2,
+    zIndex: 3,
   }
 
   return (
@@ -80,25 +214,36 @@ export default function ThenNow({ pair, urls, profile, photos = [], onSwap }) {
           Then ↔ now
         </span>
         <span style={{ flex: 1, height: '1px', backgroundColor: 'rgba(0,0,0,0.09)' }} />
-        <span style={{ fontSize: '11px', color: '#aaa' }}>drag to compare · tap a date to swap</span>
+        <span style={{ fontSize: '11px', color: '#aaa' }}>tap a date to swap</span>
       </div>
 
-      <div style={{
-        position: 'relative',
-        height: '240px',
-        borderRadius: '14px',
-        overflow: 'hidden',
-        backgroundColor: '#111',
-        boxShadow: '0 2px 9px rgba(0,0,0,0.1)',
-        userSelect: 'none',
-      }}>
+      <div
+        ref={frameRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        style={{
+          position: 'relative',
+          height: '240px',
+          borderRadius: '14px',
+          overflow: 'hidden',
+          backgroundColor: '#111',
+          boxShadow: '0 2px 9px rgba(0,0,0,0.1)',
+          userSelect: 'none', WebkitUserSelect: 'none',
+          touchAction: 'none',
+          cursor: live ? 'grabbing' : 'grab',
+        }}
+      >
         <img src={nowUrl} alt="" draggable={false}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: newest.position || 'center' }} />
-        <img src={thenUrl} alt="" draggable={false}
-          style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: oldest.position || 'center',
-            clipPath: `inset(0 ${100 - cut}% 0 0)`,
-          }} />
+          onLoad={e => { natural.current[newest.id] = { w: e.target.naturalWidth, h: e.target.naturalHeight } }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', ...frameStyle('newest'), pointerEvents: 'none' }} />
+        {/* The clip lives on a wrapper so zooming the photo never moves the split. */}
+        <div style={{ position: 'absolute', inset: 0, clipPath: `inset(0 ${100 - cut}% 0 0)`, overflow: 'hidden', pointerEvents: 'none' }}>
+          <img src={thenUrl} alt="" draggable={false}
+            onLoad={e => { natural.current[oldest.id] = { w: e.target.naturalWidth, h: e.target.naturalHeight } }}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', ...frameStyle('oldest') }} />
+        </div>
         <div style={{
           position: 'absolute', top: 0, bottom: 0, left: `${cut}%`, width: '3px',
           background: '#fff', boxShadow: '0 0 8px rgba(0,0,0,0.35)', pointerEvents: 'none',
@@ -112,19 +257,37 @@ export default function ThenNow({ pair, urls, profile, photos = [], onSwap }) {
         }}>
           ⟷
         </div>
-        <input
-          type="range"
-          min="4"
-          max="96"
-          value={cut}
-          onChange={e => setCut(Number(e.target.value))}
+        {/* Keyboard access to the split; pointer drags are handled on the card. */}
+        <div
+          role="slider"
+          tabIndex={0}
           aria-label="Compare then and now photos"
+          aria-valuemin={4}
+          aria-valuemax={96}
+          aria-valuenow={Math.round(cut)}
+          onKeyDown={e => {
+            if (e.key === 'ArrowLeft') setCut(c => Math.max(4, c - 2))
+            if (e.key === 'ArrowRight') setCut(c => Math.min(96, c + 2))
+          }}
           style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            opacity: 0, cursor: 'ew-resize', margin: 0,
-            WebkitAppearance: 'none', appearance: 'none',
+            position: 'absolute', top: '50%', left: `${cut}%`, transform: 'translate(-50%,-50%)',
+            width: '34px', height: '34px', borderRadius: '50%', outline: 'none', zIndex: 2, cursor: 'ew-resize',
           }}
         />
+        {!live && (
+          <span style={{
+            position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)',
+            fontSize: '10px', fontWeight: 700, color: '#fff', background: 'rgba(0,0,0,0.45)',
+            borderRadius: '999px', padding: '3px 9px', pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 3,
+          }}>
+            Drag a photo to line it up · pinch to zoom
+          </span>
+        )}
+        {live && (
+          <span style={{ ...tag, bottom: 'auto', top: '10px', left: '50%', transform: 'translateX(-50%)', cursor: 'default' }}>
+            {live.zoom.toFixed(1)}×
+          </span>
+        )}
         <button onClick={() => onSwap && setChoosing('oldest')} aria-label="Change the then photo" style={{ ...tag, left: '10px' }}>
           {shortDate(oldest.createdAt)}{onSwap ? ' ▾' : ''}
         </button>
@@ -168,6 +331,15 @@ export default function ThenNow({ pair, urls, profile, photos = [], onSwap }) {
                 ×
               </button>
             </div>
+            <button
+              onClick={() => resetFrame(choosing)}
+              style={{
+                width: '100%', marginBottom: '12px', padding: '11px 12px', borderRadius: '12px', border: '1.5px dashed #c4b5fd',
+                background: '#f5f3ff', color: '#6d28d9', fontSize: '13px', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+              }}
+            >
+              Reset this photo's framing
+            </button>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '7px' }}>
               {photos.map(p => {
                 const current = p.id === (choosing === 'oldest' ? oldest.id : newest.id)

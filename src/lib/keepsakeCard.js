@@ -29,7 +29,7 @@ function loadImage(url) {
 
 // Greedy word-wrap for canvas text; returns at most maxLines (last line
 // ellipsized if the text overflows).
-function wrapText(ctx, text, maxWidth, maxLines) {
+export function wrapText(ctx, text, maxWidth, maxLines) {
   const words = text.split(/\s+/)
   const lines = []
   let line = ''

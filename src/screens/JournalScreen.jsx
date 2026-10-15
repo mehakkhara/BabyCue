@@ -7,6 +7,8 @@ import { toDateInput, fromDateInput } from '../lib/photoDate'
 import MemoryForm from '../components/MemoryForm'
 import KeepsakeNudge from '../components/KeepsakeNudge'
 import KeepsakeModal from '../components/KeepsakeModal'
+import ReelModal from '../components/ReelModal'
+import ReelCard from '../components/ReelCard'
 import { shareKeepsake } from '../lib/keepsakeCard'
 import PhotoHuntCard from '../components/PhotoHuntCard'
 import DateStrip from '../components/DateStrip'
@@ -402,6 +404,7 @@ export default function JournalScreen({ profile, onOpen }) {
   const [pickVersion, setPickVersion] = useState(0)        // bumps when she swaps a Then↔Now side
   const [quickSaved, setQuickSaved] = useState(null)       // { id, url } after a one-tap camera save
   const [openEditing, setOpenEditing] = useState(false)    // open the entry sheet with the note field ready
+  const [reelMonth, setReelMonth] = useState(null)         // month key open in the reel maker, or null
 
   const urls = useObjectUrls(entries)
   useEffect(() => () => { urls.forEach(u => URL.revokeObjectURL(u)) }, [urls])
@@ -527,6 +530,8 @@ export default function JournalScreen({ profile, onOpen }) {
         <IconButton label="Search" active={showSearch} onClick={() => { setShowSearch(v => !v); setQuery(''); setSelectedDay(null) }}>🔍</IconButton>
       </div>
 
+      {reelMonth && <ReelModal entries={entries} profile={profile} urls={urls} initialMonth={reelMonth} onClose={() => setReelMonth(null)} />}
+
       {showSearch && (
         <input
           autoFocus
@@ -564,7 +569,7 @@ export default function JournalScreen({ profile, onOpen }) {
       </Card>
 
       <div style={{ marginTop: '14px' }}>
-        <PhotoHuntCard profile={profile} version={huntVersion} onOpen={() => onOpen?.('photoHunt')} />
+        <PhotoHuntCard profile={profile} version={huntVersion} onOpen={() => onOpen?.('photoHunt')} onCaptured={async () => { await refresh(); setHuntVersion(v => v + 1); markCheckIn('photo') }} />
       </div>
 
       <div style={{ paddingTop: '18px' }}>
@@ -638,6 +643,7 @@ export default function JournalScreen({ profile, onOpen }) {
                 Then ↔ now appears once there are two photos{photoCount === 1 ? ' — one more to go' : ''}.
               </p>
             )}
+            <ReelCard entries={entries} profile={profile} urls={urls} onOpen={setReelMonth} />
           </>
         )}
       </div>

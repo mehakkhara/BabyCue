@@ -71,7 +71,9 @@ export function formatPosition({ x, y }) {
 //   position  — current object-position string
 //   onChange  — receives the new object-position string while dragging
 //   hint      — show the "Drag to adjust" pill (off where the caller draws its own overlay)
-export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', style, hint = true }) {
+// zoom (1 = cover-fit, >1 magnifies about the chosen point) makes a photo
+// movable on both axes even when its shape nearly matches the frame.
+export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', zoom = 1, style, hint = true }) {
   const [natural, setNatural] = useState(null)   // { w, h }
   const drag = useRef(null)                      // { startX, startY, x, y, boxW, boxH }
   const pos = parsePosition(position)
@@ -79,8 +81,8 @@ export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', s
   // How many pixels of photo overflow the frame on each axis, for a given box size.
   function overflow(boxW, boxH) {
     if (!natural) return { x: 0, y: 0 }
-    const scale = Math.max(boxW / natural.w, boxH / natural.h)
-    return { x: natural.w * scale - boxW, y: natural.h * scale - boxH }
+    const scale = Math.max(boxW / natural.w, boxH / natural.h) * zoom
+    return { x: Math.max(0, natural.w * scale - boxW), y: Math.max(0, natural.h * scale - boxH) }
   }
 
   function onPointerDown(e) {
@@ -108,7 +110,7 @@ export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', s
   const canDrag = fit === 'cover' && natural && (() => {
     // Any overflow at all on either axis?
     const r = natural.w / natural.h
-    return Math.abs(r - ratio) > 0.01
+    return zoom > 1.01 || Math.abs(r - ratio) > 0.01
   })()
 
   return (
@@ -134,6 +136,7 @@ export function CropFrame({ url, ratio = 1, position, onChange, fit = 'cover', s
           style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%',
             objectFit: fit, objectPosition: position || '50% 50%', display: 'block',
+            transform: zoom !== 1 ? `scale(${zoom})` : undefined, transformOrigin: position || '50% 50%',
             pointerEvents: 'none',
           }}
         />
