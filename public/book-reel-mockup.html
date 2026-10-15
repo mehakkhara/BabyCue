@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal Book and Reel</title>
+<style>
+  :root { --paper:#f2f1ee; --ink:#22222c; --ink-2:#6a6a78; --rule:rgba(34,34,44,.12); --accent:#7C3AED; --pink:#db2777 }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; padding:28px 20px 60px }
+  h1 { font-size:20px; margin:0 0 4px }
+  .lede { color:var(--ink-2); font-size:14px; margin:0 0 26px; max-width:760px; line-height:1.5 }
+  h2.part { font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin:40px 0 14px; display:flex; align-items:center; gap:12px }
+  h2.part::after { content:""; flex:1; height:1px; background:var(--rule) }
+  .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,320px)); gap:28px; align-items:start }
+  .concept h3 { font-size:14px; margin:0 0 2px }
+  .concept .why { font-size:12px; color:var(--ink-2); margin:0 0 12px; line-height:1.45; min-height:88px }
+  .tag { display:inline-block; font-size:10px; font-weight:700; color:#fff; background:var(--accent); border-radius:999px; padding:2px 8px; margin-right:6px; vertical-align:middle }
+  .tag.alt { background:var(--pink) }
+  .note { font-size:11.5px; color:var(--ink-2); line-height:1.5; margin:10px 0 0; max-width:300px }
+
+  /* phone */
+  .phone { width:300px; background:#FAFAFA; border-radius:26px; border:1px solid var(--rule); box-shadow:0 8px 30px rgba(0,0,0,.08); overflow:hidden; position:relative }
+  .phone.dark { background:#0f0f1a }
+  .screen { padding:14px 12px 70px; min-height:560px; position:relative }
+  .hdr { display:flex; align-items:flex-start; justify-content:space-between }
+  .hdr h4 { margin:0 0 2px; font-size:18px; font-weight:700; color:#1a1a2e }
+  .hdr p { margin:0 0 12px; font-size:11.5px; color:#888 }
+  .make { font-size:11px; font-weight:700; color:var(--accent); background:#ede9fe; border-radius:999px; padding:6px 10px; white-space:nowrap }
+  .nav { position:absolute; left:0; right:0; bottom:0; background:#fff; border-top:1px solid rgba(0,0,0,.06); display:flex; padding:8px 4px 10px }
+  .nav div { flex:1; text-align:center; font-size:9px; color:#9ca3af; font-weight:600 }
+  .nav div span { display:block; font-size:16px; margin-bottom:2px }
+  .nav div.on { color:var(--accent) } .nav div.on::after { content:""; display:block; width:16px; height:2px; background:var(--accent); margin:3px auto 0; border-radius:2px }
+  .btn { display:block; width:100%; padding:11px; border-radius:12px; text-align:center; font-size:12.5px; font-weight:700; border:none; font-family:inherit }
+  .btn.primary { background:linear-gradient(135deg,#8b7cf6,#7C3AED); color:#fff }
+  .btn.ghost { background:#f5f3ff; color:#6d28d9; border:1.5px dashed #c4b5fd }
+  .btn.light { background:rgba(255,255,255,.14); color:#fff }
+
+  /* fake photos: soft gradients with a sun so the eye reads "photo" */
+  .ph { position:relative; overflow:hidden; background:#ddd }
+  .ph::after { content:""; position:absolute; width:38%; aspect-ratio:1; border-radius:50%; right:14%; top:18%; background:rgba(255,255,255,.45) }
+  .p1 { background:linear-gradient(160deg,#f7d7c4,#e9a98f) } .p2 { background:linear-gradient(160deg,#cfe3f5,#8fb4d9) }
+  .p3 { background:linear-gradient(160deg,#e3d7f5,#b094e0) } .p4 { background:linear-gradient(160deg,#d8ecd2,#93c48c) }
+  .p5 { background:linear-gradient(160deg,#f8e2a8,#e8b86a) } .p6 { background:linear-gradient(160deg,#f5cfd9,#dd8fa6) }
+  .p7 { background:linear-gradient(160deg,#d3ecec,#7fbfbf) } .p8 { background:linear-gradient(160deg,#eadbc8,#bf9a78) }
+
+  /* ---- BOOK A: in-app chapters ---- */
+  .cover { border-radius:14px; aspect-ratio:3/4; position:relative; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.18); margin:0 auto 12px; width:200px; background:#2b2440 }
+  .cover .ph { position:absolute; inset:14px 14px 70px; border-radius:6px }
+  .cover .t { position:absolute; left:14px; right:14px; bottom:14px; color:#fff }
+  .cover .t b { display:block; font-family:Georgia,serif; font-size:17px; line-height:1.15 }
+  .cover .t small { display:block; font-size:9px; opacity:.75; margin-top:4px; letter-spacing:.05em; text-transform:uppercase }
+  .spine { position:absolute; left:0; top:0; bottom:0; width:6px; background:rgba(0,0,0,.35) }
+  .chapters { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px }
+  .chap { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.07) }
+  .chap .ph { aspect-ratio:1 }
+  .chap p { margin:0; padding:6px 7px 7px; font-size:9.5px; line-height:1.3; font-weight:600 } .chap p small { display:block; color:#aaa; font-weight:500; font-size:8.5px }
+  .chap.locked { opacity:.45 }
+
+  /* page spread (shared by A detail and B) */
+  .page { background:#fffdf8; border-radius:4px; box-shadow:0 2px 10px rgba(0,0,0,.12); padding:12px; position:relative }
+  .page .ageline { font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:#999; margin:0 0 4px }
+  .page h5 { font-family:Georgia,serif; font-size:16px; margin:0 0 8px; font-weight:700; line-height:1.15 }
+  .page .q { font-family:Georgia,serif; font-style:italic; font-size:10.5px; line-height:1.5; color:#444; margin:0 0 10px }
+  .page .pg { display:grid; grid-template-columns:2fr 1fr; grid-template-rows:1fr 1fr; gap:5px; aspect-ratio:1.25 }
+  .page .pg .ph:first-child { grid-row:1/3; border-radius:3px } .page .pg .ph { border-radius:3px }
+  .page .cap { font-size:8.5px; color:#666; margin:6px 0 0; line-height:1.4 }
+  .page .num { position:absolute; bottom:5px; right:10px; font-size:7px; color:#bbb }
+  .spread { display:grid; grid-template-columns:1fr 1fr; gap:3px; margin:0 -4px }
+  .spread .page { border-radius:0 }
+  .spread .page:first-child { border-radius:4px 0 0 4px } .spread .page:last-child { border-radius:0 4px 4px 0 }
+
+  /* ---- REEL ---- */
+  .reel { aspect-ratio:9/16; border-radius:18px; overflow:hidden; position:relative; margin:0 auto 10px; width:210px; box-shadow:0 8px 24px rgba(0,0,0,.35) }
+  .reel .ph { position:absolute; inset:0; transform:scale(1.08) }
+  .reel .ov { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.25), transparent 30%, transparent 55%, rgba(0,0,0,.7)) }
+  .reel .top { position:absolute; left:12px; right:12px; top:10px; color:#fff; font-size:8px; letter-spacing:.1em; text-transform:uppercase; opacity:.9; display:flex; justify-content:space-between }
+  .reel .t { position:absolute; left:14px; right:14px; bottom:46px; color:#fff }
+  .reel .t b { display:block; font-family:Georgia,serif; font-size:19px; line-height:1.1 }
+  .reel .t small { display:block; font-size:9.5px; opacity:.85; margin-top:4px; line-height:1.4 }
+  .reel .wave { position:absolute; left:14px; right:14px; bottom:22px; height:14px; display:flex; align-items:center; gap:2px }
+  .reel .wave i { flex:1; background:rgba(255,255,255,.8); border-radius:1px; height:var(--h) }
+  .reel .prog { position:absolute; left:0; right:0; bottom:0; height:3px; background:rgba(255,255,255,.25) } .reel .prog i { display:block; width:38%; height:100%; background:#fff }
+  .strip { display:flex; gap:4px; margin:0 0 10px }
+  .strip .ph { flex:1; aspect-ratio:3/4; border-radius:5px } .strip .ph.on { outline:2px solid var(--accent); outline-offset:1px }
+  .grid12 { position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr 1fr; grid-template-rows:repeat(4,1fr); gap:3px; padding:3px }
+  .grid12 .ph { position:relative; transform:none; border-radius:3px }
+  .grid12 .ph.hero { grid-column:1/-1; grid-row:1/3 }
+  .ctl { display:flex; gap:7px; margin:0 0 10px }
+  .ctl .chip { flex:1; text-align:center; font-size:10px; font-weight:600; padding:7px 0; border-radius:999px; background:#fff; border:1.5px solid #e5e7eb; color:#555 }
+  .ctl .chip.on { background:#ede9fe; border-color:var(--accent); color:var(--accent) }
+  .dark .ctl .chip { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.15); color:#ddd } .dark .ctl .chip.on { background:rgba(124,58,237,.35); color:#fff }
+  .dark .hdr h4 { color:#fff } .dark .hdr p { color:#999 }
+
+  /* ---- entry points ---- */
+  .card { background:#fff; border-radius:14px; padding:12px; box-shadow:0 1px 4px rgba(0,0,0,.07); margin-bottom:10px }
+  .card b { font-size:12.5px; display:block } .card small { font-size:10.5px; color:#888; line-height:1.4; display:block; margin-top:2px }
+  .recap { display:grid; grid-template-columns:64px 1fr; gap:10px; align-items:center }
+  .recap .ph { aspect-ratio:9/16; border-radius:8px }
+  .menu { position:absolute; left:0; right:0; bottom:0; background:#fff; border-radius:18px 18px 0 0; padding:14px 14px 18px; box-shadow:0 -6px 30px rgba(0,0,0,.18) }
+  .menu h5 { margin:0 0 10px; font-size:13px }
+  .opt { display:flex; gap:10px; align-items:center; padding:9px 0; border-top:1px solid var(--rule) }
+  .opt span { width:34px; height:34px; border-radius:10px; background:#ede9fe; display:grid; place-items:center; font-size:16px }
+  .opt b { font-size:12px; display:block } .opt small { font-size:10px; color:#888 }
+  .dim { position:absolute; inset:0; background:rgba(20,20,35,.45) }
+  .lock { font-size:8.5px; font-weight:800; letter-spacing:.06em; background:#fce7f3; color:var(--pink); border-radius:999px; padding:2px 7px; margin-left:6px; vertical-align:middle }
+</style>
+</head>
+<body>
+<h1>Journal → Book and Reel</h1>
+<p class="lede">Two keepsake outputs built from what is already in the Journal. Nothing new to enter. Everything composes on the phone, like the keepsake cards: no uploads, no cost. Both would sit on the paid side with Browse by month.</p>
+
+<h2 class="part">Part 1 · The Book</h2>
+<div class="row">
+
+  <div class="concept">
+    <h3><span class="tag">A</span>Chapters, read in the app</h3>
+    <p class="why">A cover plus one chapter per month. Each chapter opens with the age and the month, a line pulled from one of her notes, then the photos as laid-out pages instead of a feed. Reads like a book on the phone, and "Save as PDF" prints it. The Journal tab stays as it is: the Book is a second way in.</p>
+    <div class="phone"><div class="screen">
+      <div class="hdr"><div><h4>Kabir's first year</h4><p>6 chapters so far · updates itself</p></div><div class="make">Save PDF</div></div>
+      <div class="cover"><div class="spine"></div><div class="ph p3"></div><div class="t"><b>Kabir<br>The first year</b><small>April 2026 →</small></div></div>
+      <div class="chapters">
+        <div class="chap"><div class="ph p1"></div><p>Newborn<small>April · 14 memories</small></p></div>
+        <div class="chap"><div class="ph p2"></div><p>One month<small>May · 22</small></p></div>
+        <div class="chap"><div class="ph p4"></div><p>Two months<small>June · 18</small></p></div>
+        <div class="chap"><div class="ph p5"></div><p>Three months<small>July · 25</small></p></div>
+        <div class="chap"><div class="ph p6"></div><p>Four months<small>Aug · 19</small></p></div>
+        <div class="chap"><div class="ph p7"></div><p>Five months<small>Sept · 11</small></p></div>
+        <div class="chap locked"><div class="ph p8"></div><p>Six months<small>in progress</small></p></div>
+      </div>
+      <div class="nav"><div><span>☀️</span>Today</div><div class="on"><span>📖</span>Journal</div><div><span>🌙</span>Stories</div><div><span>📈</span>Growth</div><div><span>👤</span>Profile</div></div>
+    </div></div>
+    <p class="note">A chapter is "done" once the month ends, so the book grows one chapter a month. That monthly moment is also the natural nudge: "Chapter 6 is ready."</p>
+  </div>
+
+  <div class="concept">
+    <h3><span class="tag">A</span>Inside a chapter</h3>
+    <p class="why">The chapter opener: age line, the month as a title, one of her own notes set in italics as the epigraph. Then photo pages, two to four per page, each with its caption and the exact age. The age stamp is what turns a photo roll into a baby book.</p>
+    <div class="phone"><div class="screen" style="background:#e8e4dc">
+      <div class="page" style="margin-bottom:8px">
+        <p class="ageline">Four months · August 2026</p>
+        <h5>The month he found his feet</h5>
+        <p class="q">"Grabbed both feet in the bath and would not let go. Laughed at himself the whole time."</p>
+        <div class="pg"><div class="ph p6"></div><div class="ph p1"></div><div class="ph p4"></div></div>
+        <p class="cap"><b>Aug 3 · 4 months 1 week</b> — Bath time feet. &nbsp; <b>Aug 9</b> — First time in the high chair. &nbsp; <b>Aug 14</b> — Nana's visit.</p>
+        <span class="num">41</span>
+      </div>
+      <div class="page">
+        <div class="pg" style="grid-template-columns:1fr 1fr; grid-template-rows:1fr"><div class="ph p2" style="grid-row:auto"></div><div class="ph p5"></div></div>
+        <p class="cap"><b>Aug 20 · 4 months 3 weeks</b> — Rolled back to front, finally. &nbsp; <b>Aug 27</b> — Keepsake: First roll.</p>
+        <span class="num">42</span>
+      </div>
+      <div class="nav"><div><span>☀️</span>Today</div><div class="on"><span>📖</span>Journal</div><div><span>🌙</span>Stories</div><div><span>📈</span>Growth</div><div><span>👤</span>Profile</div></div>
+    </div></div>
+    <p class="note">Keepsake cards drop in as full-bleed pages. Voice memos become a small "🎙 Listen" mark in print and a tappable player in the app.</p>
+  </div>
+
+  <div class="concept">
+    <h3><span class="tag alt">B</span>Print-first: a PDF you order</h3>
+    <p class="why">Skip the in-app reading view. "Make my book" asks three things (which months, square or portrait, cover photo), then lays out a print-ready PDF in the browser and saves it to Files. From there she uploads it to any print service. Less to build, but the book only exists when she exports it.</p>
+    <div class="phone"><div class="screen" style="background:#e8e4dc">
+      <div class="hdr"><div><h4>Make a book</h4><p>Months 0–5 · 109 memories · 48 pages</p></div></div>
+      <div class="spread" style="margin-bottom:10px">
+        <div class="page" style="padding:9px"><p class="ageline">Two months</p><h5 style="font-size:12px">June</h5><p class="q" style="font-size:8.5px">"First real smile, at the ceiling fan of all things."</p><div class="ph p4" style="aspect-ratio:1; border-radius:3px"></div><span class="num">17</span></div>
+        <div class="page" style="padding:9px"><div class="pg" style="aspect-ratio:1"><div class="ph p2"></div><div class="ph p7"></div><div class="ph p1"></div></div><p class="cap" style="font-size:7.5px">Jun 4 · 2 mo 1 wk — Tummy time hero. Jun 11 — The fan. Jun 20 — Grandad.</p><span class="num">18</span></div>
+      </div>
+      <div class="ctl"><div class="chip on">Square 8×8</div><div class="chip">Portrait 8×10</div></div>
+      <div class="ctl"><div class="chip on">Months 0–5</div><div class="chip">Pick months</div></div>
+      <a class="btn primary">Save PDF · 48 pages</a>
+      <p class="note" style="font-size:10px; margin-top:8px">Upload the PDF to Blurb, Mixbook or Shutterfly to order a printed copy.</p>
+      <div class="nav"><div><span>☀️</span>Today</div><div class="on"><span>📖</span>Journal</div><div><span>🌙</span>Stories</div><div><span>📈</span>Growth</div><div><span>👤</span>Profile</div></div>
+    </div></div>
+    <p class="note">A and B share the same page layouts. The real difference is whether the book is a living thing in the app (A) or an export step (B). A can add B's PDF later; B cannot grow into A cheaply.</p>
+  </div>
+</div>
+
+<h2 class="part">Part 2 · The Reel</h2>
+<div class="row">
+
+  <div class="concept">
+    <h3><span class="tag">A</span>Month reel, narrated by her</h3>
+    <p class="why">All of one month's photos in about 30 seconds, vertical, each with a slow zoom and the age as a caption. The twist: her voice memos from that month play underneath. No stock music, no licensing, and it's her voice over her baby. Composed on a canvas, recorded to video on the phone, shared with the system share sheet.</p>
+    <div class="phone dark"><div class="screen">
+      <div class="hdr"><div><h4>August</h4><p>19 photos · 2 voice memos · 0:32</p></div></div>
+      <div class="reel">
+        <div class="ph p6"></div><div class="ov"></div>
+        <div class="top"><span>Kabir · 4 months</span><span>Aug 2026</span></div>
+        <div class="t"><b>Bath time feet</b><small>Aug 3 · 4 months 1 week</small></div>
+        <div class="wave"><i style="--h:30%"></i><i style="--h:60%"></i><i style="--h:90%"></i><i style="--h:50%"></i><i style="--h:70%"></i><i style="--h:100%"></i><i style="--h:40%"></i><i style="--h:65%"></i><i style="--h:35%"></i><i style="--h:80%"></i><i style="--h:55%"></i><i style="--h:25%"></i><i style="--h:60%"></i><i style="--h:45%"></i></div>
+        <div class="prog"><i></i></div>
+      </div>
+      <div class="strip"><div class="ph p1"></div><div class="ph p6 on"></div><div class="ph p4"></div><div class="ph p2"></div><div class="ph p5"></div><div class="ph p7"></div></div>
+      <div class="ctl"><div class="chip on">Her voice</div><div class="chip">Quiet</div></div>
+      <a class="btn primary">Share reel</a>
+      <div class="nav"><div><span>☀️</span>Today</div><div class="on"><span>📖</span>Journal</div><div><span>🌙</span>Stories</div><div><span>📈</span>Growth</div><div><span>👤</span>Profile</div></div>
+    </div></div>
+    <p class="note">Tap a thumbnail to drop it from the reel. Reorder is not needed: the month's order is the story.</p>
+  </div>
+
+  <div class="concept">
+    <h3><span class="tag alt">B</span>Growth reel, one photo a month</h3>
+    <p class="why">The timelapse from the plan. One photo per month, cut fast, ending on today. Three seconds a month, so a year is twelve seconds and you watch them grow in one breath. Works best when the shot is similar each month, which the Photo hunt already encourages. Runs again automatically every month with the new frame on the end.</p>
+    <div class="phone dark"><div class="screen">
+      <div class="hdr"><div><h4>0 → 5 months</h4><p>6 frames · 0:18</p></div></div>
+      <div class="reel">
+        <div class="grid12">
+          <div class="ph p3 hero"></div>
+          <div class="ph p1"></div><div class="ph p2"></div><div class="ph p4"></div>
+          <div class="ph p5"></div><div class="ph p6"></div><div class="ph p7"></div>
+        </div>
+        <div class="ov"></div>
+        <div class="top"><span>Kabir</span><span>Apr → Sept</span></div>
+        <div class="t"><b>Five months</b><small>Watching you grow</small></div>
+        <div class="prog"><i style="width:84%"></i></div>
+      </div>
+      <div class="strip"><div class="ph p1"></div><div class="ph p2"></div><div class="ph p4"></div><div class="ph p5"></div><div class="ph p6"></div><div class="ph p7 on"></div></div>
+      <div class="ctl"><div class="chip on">Fast · 3s</div><div class="chip">Slow · 5s</div></div>
+      <a class="btn primary">Share reel</a>
+      <div class="nav"><div><span>☀️</span>Today</div><div class="on"><span>📖</span>Journal</div><div><span>🌙</span>Stories</div><div><span>📈</span>Growth</div><div><span>👤</span>Profile</div></div>
+    </div></div>
+    <p class="note">Each frame defaults to that month's hunt "portrait" cell. Tap a frame to swap in any photo from that month.</p>
+  </div>
+
+  <div class="concept">
+    <h3><span class="tag">Where</span>Entry points</h3>
+    <p class="why">One "Make" button on the Journal header opens a sheet with Book, Month reel and Growth reel. And at the turn of each month, Today shows a ready-made card: "Your August reel is ready." Tap to preview and share. That card is the retention hook, and the first time the paid line is crossed.</p>
+    <div class="phone"><div class="screen">
+      <div class="card recap"><div class="ph p6"></div><div><b>Your August reel is ready ✨</b><small>19 photos, 32 seconds, with two of your voice notes. Tap to watch.</small></div></div>
+      <div class="card"><b>Chapter 5 added to the book</b><small>Four months · 19 memories. The book is 42 pages now.</small></div>
+      <div class="dim"></div>
+      <div class="menu">
+        <h5>Make something from the Journal</h5>
+        <div class="opt"><span>📘</span><div><b>The book <em class="lock">PLUS</em></b><small>Chapters by month · Save as PDF</small></div></div>
+        <div class="opt"><span>🎞️</span><div><b>Month reel <em class="lock">PLUS</em></b><small>August · 19 photos · 0:32</small></div></div>
+        <div class="opt"><span>📈</span><div><b>Growth reel <em class="lock">PLUS</em></b><small>0 → 5 months · 0:18</small></div></div>
+        <div class="opt"><span>🖼️</span><div><b>Keepsake card</b><small>One photo, one moment · free</small></div></div>
+      </div>
+      <div class="nav"><div class="on"><span>☀️</span>Today</div><div><span>📖</span>Journal</div><div><span>🌙</span>Stories</div><div><span>📈</span>Growth</div><div><span>👤</span>Profile</div></div>
+    </div></div>
+    <p class="note">PLUS marks the intended paid side. No paywall exists yet; it's a label for now, like Browse by month.</p>
+  </div>
+</div>
+</body>
+</html>
