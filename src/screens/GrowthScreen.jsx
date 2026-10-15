@@ -19,9 +19,16 @@ const SEGMENTS = [
   { value: 'health',     label: 'Health' },
 ]
 
+// A sync pull remounts the active tab (App.jsx), which would throw her back to
+// Overview mid-checklist. Remember where she was for the life of the page.
+let lastSegment = 'overview'
+let lastDomain = null
+
 export default function GrowthScreen({ profile, onProfileChange, onOpen }) {
-  const [segment, setSegment] = useState('overview')
-  const [domain, setDomain] = useState(null)
+  const [segment, setSegmentState] = useState(lastSegment)
+  const [domain, setDomainState] = useState(lastDomain)
+  const setSegment = v => { lastSegment = v; setSegmentState(v) }
+  const setDomain = v => { lastDomain = v; setDomainState(v) }
   const babyName = (profile.babyName || '').trim() || 'your baby'
   const ageInMonths = getBabyAgeInMonths(profile.dateOfBirth)
   const month = Math.max(0, Math.min(24, ageInMonths))

@@ -25,7 +25,10 @@ export function loadStatuses() {
 // to unset. Returns the updated map.
 export function setStatus(id, status) {
   const map = loadStatuses()
-  if (map[id] === status) delete map[id]
+  // Tapping the same answer again clears it. The clear is written as null,
+  // not a deleted key: the sync merge is a key-by-key union, so a missing key
+  // would come straight back from the server's copy.
+  if (map[id] === status) map[id] = null
   else map[id] = status
   writeState(KEY, map)
   return map

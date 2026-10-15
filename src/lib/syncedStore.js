@@ -161,7 +161,7 @@ export function applyRemote(key, remoteValue, remoteUpdatedAt) {
     return 'applied'
   }
 
-  const remoteNewer = !localAt || remoteUpdatedAt > localAt
+  const remoteNewer = !localAt || Date.parse(remoteUpdatedAt) > Date.parse(localAt)
   const merged = remoteNewer ? mergeValues(localValue, remoteValue) : mergeValues(remoteValue, localValue)
   const mergedJson = JSON.stringify(merged)
   if (mergedJson === JSON.stringify(localValue)) {

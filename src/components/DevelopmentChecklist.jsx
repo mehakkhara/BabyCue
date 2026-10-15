@@ -43,10 +43,11 @@ export default function DevelopmentChecklist({ profile, domain = null, onClearDo
     }
   }
 
-  function saveOwn(text) {
-    const value = (text ?? draft).trim()
+  // From a suggestion chip (with its tip) or the typed draft.
+  function saveOwn(idea) {
+    const value = (idea?.text ?? draft).trim()
     if (!value) return
-    setCustom([...addCustom({ text: value, checkpoint: activeCheckpoint })])
+    setCustom([...addCustom({ text: value, tip: idea?.tip, checkpoint: activeCheckpoint })])
     setDraft('')
   }
 
@@ -119,7 +120,7 @@ export default function DevelopmentChecklist({ profile, domain = null, onClearDo
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '13px' }}>
                 {suggestions.map(idea => (
                   <button
-                    key={idea}
+                    key={idea.text}
                     onClick={() => saveOwn(idea)}
                     style={{
                       border: '1px solid #ede9fe', background: '#fff', color: '#6b5bd6',
@@ -127,7 +128,7 @@ export default function DevelopmentChecklist({ profile, domain = null, onClearDo
                       fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit',
                     }}
                   >
-                    + {idea}
+                    + {idea.text}
                   </button>
                 ))}
               </div>
@@ -252,10 +253,12 @@ export default function DevelopmentChecklist({ profile, domain = null, onClearDo
               </button>
             </div>
 
-            {isNotYet && m.tip && (
+            {isNotYet && (
               <div style={{ marginTop: '10px', background: '#f5f3ff', borderRadius: '10px', padding: '10px 12px' }}>
                 <p style={{ margin: 0, fontSize: '12px', lineHeight: 1.6, color: '#6b5bd6' }}>
-                  <strong>💡 Try this:</strong> {m.tip}
+                  {m.tip
+                    ? <><strong>💡 Try this:</strong> {m.tip}</>
+                    : <>Not yet is fine. Every baby gets there in their own time — check back on this one next month.</>}
                 </p>
               </div>
             )}
