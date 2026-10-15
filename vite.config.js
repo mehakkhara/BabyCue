@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      injectRegister: false,   // registered by hand in src/lib/pwaUpdate.js
       manifest: false,
       includeAssets: [
         'icons/icon-192.png',
