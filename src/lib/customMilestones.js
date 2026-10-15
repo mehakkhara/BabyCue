@@ -9,12 +9,15 @@
 // status map in milestoneProgress.js works on them unchanged. Ids are prefixed
 // 'c-' so they can never collide with a curated 'm4-1'.
 import { readState, writeState } from './syncedStore'
+import { tipForIdea } from '../data/milestoneIdeas'
 
 const KEY = 'customMilestones'
 
 export function loadCustom() {
   const raw = readState(KEY, [])
-  return Array.isArray(raw) ? raw : []
+  if (!Array.isArray(raw)) return []
+  // Entries added before ideas carried tips: look the tip up by text.
+  return raw.map(m => (m.tip || !m.text ? m : { ...m, tip: tipForIdea(m.text) || undefined }))
 }
 
 function persist(list) {
@@ -23,7 +26,7 @@ function persist(list) {
 }
 
 /** Add one. Returns the full updated list. */
-export function addCustom({ text, checkpoint }) {
+export function addCustom({ text, checkpoint, tip }) {
   const clean = (text || '').trim()
   if (!clean) return loadCustom()
 
@@ -31,6 +34,7 @@ export function addCustom({ text, checkpoint }) {
   list.push({
     id: `c-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     text: clean.slice(0, 120),
+    tip: tip || tipForIdea(clean) || undefined,   // a suggested idea brings its "Not yet" tip along
     checkpoint,
     domain: 'custom',
     custom: true,
