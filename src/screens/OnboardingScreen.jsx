@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ONBOARDING_LINE } from '../lib/disclaimer'
 import { getProfile } from '../lib/db'
 
 const sexOptions = [
@@ -357,6 +358,11 @@ export default function OnboardingScreen({ onComplete }) {
       >
         {saving ? 'Saving…' : (isEditing ? 'Save Changes' : 'Get Started')}
       </button>
+      {!isEditing && (
+        <p style={{ margin: '12px 0 0', fontSize: '12px', color: '#9ca3af', textAlign: 'center', lineHeight: 1.5 }}>
+          {ONBOARDING_LINE}
+        </p>
+      )}
     </div>
   )
 }
