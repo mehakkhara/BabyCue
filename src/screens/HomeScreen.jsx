@@ -100,7 +100,8 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
     return () => { cancelled = true }
   }, [savedNote])
 
-  // Tip of the day rotates through every tip for the month. The "For {baby}"
+  // Tip of the day rotates through every advice tip for the month (activities
+  // have their own row below). The "For {baby}"
   // pick below is where this baby's patterns (mood log + what helped) show up.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `today` re-picks at midnight
   const tip = useMemo(() => pickDailyTip(month), [month, today])
