@@ -1,6 +1,6 @@
 // Picks the day's one tip and one activity. Pure functions over the curated
 // pool so Today (for the row subtitle) and the detail page agree.
-import { tips, funActivities, getTipsForProfile } from '../data/tips'
+import { tips, getTipsForProfile } from '../data/tips'
 
 // Days counted from local midnight, so the tip changes when the parent's day
 // does (a UTC count flipped it at 8pm in New York, hours before the "seen
@@ -14,29 +14,32 @@ export function clampMonth(m) {
   return Math.max(1, Math.min(24, m))
 }
 
+// Advice tips only: activities have their own row (pickDailyActivity), so the
+// two never show the same thing. Shared by Today and the "For {baby}" ranking.
+export function adviceTips(month, topic = null) {
+  return getTipsForProfile(clampMonth(month), topic).filter(t => t.topic !== 'activity')
+}
+
 // One tip per day, advancing daily. `topic` leans the pool (mood check-in);
 // if that pool is empty for the month, fall back to every tip for the month.
 // `offset` is the "show me a different one" nudge for today only.
 export function pickDailyTip(month, { topic = null, offset = 0 } = {}) {
-  const m = clampMonth(month)
-  let pool = topic ? getTipsForProfile(m, topic) : []
-  if (pool.length === 0) pool = getTipsForProfile(m)
+  let pool = topic ? adviceTips(month, topic) : []
+  if (pool.length === 0) pool = adviceTips(month)
   if (pool.length === 0) return null
   return pool[(dayIndex() + offset) % pool.length]
 }
 
-const ACTIVITY_TOPICS = ['activity', 'play', 'motor']
-
-// The day's "one thing to do": an activity-flavoured tip for this month,
-// widening to neighbouring months if the month has none.
+// The day's "one thing to do": a sourced activity for this age. Activities
+// suit a span of ages (the page says "Great for 13–15 months"), so the pool
+// takes the month on either side too; that keeps the repeat cycle long
+// without drifting far from the baby's age. Widens further only if empty.
 export function pickDailyActivity(month, { offset = 0 } = {}) {
   const m = clampMonth(month)
-  const all = [...tips, ...funActivities]
-  for (const span of [0, 1, 2]) {
-    for (const topic of ACTIVITY_TOPICS) {
-      const pool = all.filter(t => Math.abs(t.month - m) <= span && t.topic === topic)
-      if (pool.length > 0) return pool[(dayIndex() + offset) % pool.length]
-    }
+  const activities = tips.filter(t => t.topic === 'activity' && t.source)
+  for (const span of [1, 2, 3]) {
+    const pool = activities.filter(t => Math.abs(t.month - m) <= span)
+    if (pool.length > 0) return pool[(dayIndex() + offset) % pool.length]
   }
   return null
 }

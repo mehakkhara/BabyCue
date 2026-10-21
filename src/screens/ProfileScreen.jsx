@@ -16,6 +16,7 @@ import {
 import StreakRow from '../components/StreakRow'
 import { Screen, Card, ListRow, Avatar, PrimaryButton } from '../components/ui'
 import { color, gradient, shadow, type } from '../theme'
+import { ABOUT_PARAGRAPHS } from '../lib/disclaimer'
 
 export default function ProfileScreen({ profile, onBack, onEditProfile, onSavedTips, onChecklists, onSignOut, onPhotoChange }) {
   const babyName = (profile.babyName || '').trim() || 'your baby'
@@ -156,11 +157,19 @@ export default function ProfileScreen({ profile, onBack, onEditProfile, onSavedT
       </Card>
 
       {onSignOut && (
-        <Card padding="4px 14px">
+        <Card style={{ marginBottom: '14px' }} padding="4px 14px">
           <ListRow emoji="🔑" hue="mint" title="Change password" onClick={() => { setNewPwd(''); setConfirmPwd(''); setPwdError(''); setPwdOk(false); setShowPwd(true) }} />
           <ListRow emoji="👋" hue="rose" title="Sign out" onClick={onSignOut} right={null} last />
         </Card>
       )}
+
+      {/* Where the tips come from, and what the app is not. One place, same wording everywhere. */}
+      <Card padding="16px 18px">
+        <p style={type.bodyStrong}>About the tips</p>
+        {ABOUT_PARAGRAPHS.map((text, i) => (
+          <p key={i} style={{ ...type.small, marginTop: i === 0 ? '6px' : '8px' }}>{text}</p>
+        ))}
+      </Card>
 
       {showPwd && (
         <div onClick={() => !pwdBusy && setShowPwd(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '24px' }}>

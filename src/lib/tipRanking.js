@@ -2,8 +2,7 @@
 // (one month of tips); patterns only reorder within it, and every boost
 // carries a plain-English "because" so the parent can see why.
 import { MOOD_TOPIC } from './moodLog'
-import { getTipsForProfile } from '../data/tips'
-import { clampMonth, dayIndex } from './dailyTip'
+import { adviceTips, dayIndex } from './dailyTip'
 import { loadBabySummary } from './babySummary'
 
 // What a "this helped" tap tells us about which tips to favour. `words` are
@@ -78,8 +77,7 @@ export function rankTips(pool, summary) {
 // rotating through the top bucket day by day so it still changes. Null when
 // there is not enough evidence or nothing is boosted, so the card hides.
 export function pickPersonalTip(month, { summary = loadBabySummary(), excludeId = null, offset = 0 } = {}) {
-  const m = clampMonth(month)
-  const ranked = rankTips(getTipsForProfile(m), summary).filter(r => r.score > 0 && r.tip.id !== excludeId)
+  const ranked = rankTips(adviceTips(month), summary).filter(r => r.score > 0 && r.tip.id !== excludeId)
   if (ranked.length === 0) return null
   // Rotate through the top few so the card changes daily but stays on-pattern.
   const bucket = ranked.slice(0, TOP_BUCKET)

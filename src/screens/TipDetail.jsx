@@ -12,6 +12,7 @@ import { relatedTips, ageRangeLabel, topicLabel, clampMonth, TOPIC_EMOJI, TOPIC_
 import { Screen, IconButton, Pill, PrimaryButton, SecondaryButton, InfoRow, SectionHeader, Card, IconTile, Chevron } from '../components/ui'
 import Burst from '../components/Burst'
 import { color, shadow, type } from '../theme'
+import { TIP_FOOTNOTE, sourceLabel } from '../lib/disclaimer'
 
 const KICKER = { tip: "Today's tip", activity: "Today's activity", saved: 'Saved tip', related: 'Related tip', browse: 'From the library', personal: 'For {baby}' }
 
@@ -34,7 +35,7 @@ export default function TipDetail({ tip, kind = 'tip', because = [], profile, on
   }
 
   function share() {
-    const text = `${title}\n\n${body}${tip.source ? `\n\nSource: ${tip.source}` : ''}`
+    const text = `${title}\n\n${body}${tip.source ? `\n\n${sourceLabel(tip.source)}` : ''}`
     if (navigator.share) navigator.share({ title, text }).catch(() => {})
     else if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {})
   }
@@ -98,7 +99,8 @@ export default function TipDetail({ tip, kind = 'tip', because = [], profile, on
         {tip.minutes && <InfoRow emoji="⏱️" hue="amber" text={`Takes about ${tip.minutes} minutes`} />}
         {tip.materials && <InfoRow emoji="🧺" hue="mint" text={tip.materials} />}
         <InfoRow emoji="👶" hue="rose" text={`Great for ${ageRangeLabel(tip)}`} />
-        {tip.source && <InfoRow emoji="📚" hue="lavender" text={`Source: ${tip.source}`} />}
+        {tip.source && <InfoRow emoji="📚" hue="lavender" text={sourceLabel(tip.source)} />}
+        <p style={{ ...type.small, marginTop: '8px', paddingLeft: '42px' }}>{personalize(TIP_FOOTNOTE, profile)}</p>
       </div>
 
       <div style={{ position: 'relative' }}>
