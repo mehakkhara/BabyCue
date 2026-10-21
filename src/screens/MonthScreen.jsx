@@ -2,6 +2,7 @@
 // growing and a heads-up, with the source. Free and one tap from Today.
 // (The full month-by-month library is BrowseScreen.)
 import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
+import { sourceLabel } from '../lib/disclaimer'
 import { overviewForMonth } from '../data/monthOverview'
 import { personalize } from '../lib/pronouns'
 import { clampMonth } from '../lib/dailyTip'
@@ -29,7 +30,7 @@ export default function MonthScreen({ profile, onBack }) {
           <InfoRow emoji="🍼" hue="sky" title="Feeding" text={personalize(overview.feeding, profile)} />
           <InfoRow emoji="🧠" hue="mint" title="Growing" text={personalize(overview.development, profile)} />
           <InfoRow emoji="💡" hue="amber" title="Heads-up" text={personalize(overview.headsUp, profile)} />
-          <p style={{ ...type.small, marginTop: '8px', color: color.lavender }}>Source: {overview.source}</p>
+          <p style={{ ...type.small, marginTop: '8px', color: color.lavender }}>{sourceLabel(overview.source)}</p>
         </Card>
       ) : (
         <p style={{ ...type.body, textAlign: 'center', padding: '30px 10px', color: color.faint }}>Nothing written for this month yet.</p>

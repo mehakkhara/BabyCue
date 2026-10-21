@@ -1,5 +1,6 @@
 // Her bookmarked tips, on their own page (reached from Profile).
 import { useState } from 'react'
+import { sourceLabel } from '../lib/disclaimer'
 import { loadSaved, removeSaved } from '../lib/savedTips'
 import { personalize } from '../lib/pronouns'
 import { Screen, Card } from '../components/ui'
@@ -32,7 +33,7 @@ export default function SavedTipsScreen({ profile, onBack, onOpenTip }) {
             <p style={{ ...type.body, fontSize: '13px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {personalize(t.body, profile)}
             </p>
-            {t.source && <p style={{ ...type.small, marginTop: '6px', color: color.lavender }}>Source: {t.source}</p>}
+            {t.source && <p style={{ ...type.small, marginTop: '6px', color: color.lavender }}>{sourceLabel(t.source)}</p>}
           </Card>
         ))
       )}
