@@ -4,46 +4,24 @@ import { useEffect, useMemo, useState } from 'react'
 import { getBabyAgeInMonths, formatBabyAge } from '../data/tips'
 import { pickTonight, STORIES } from '../data/stories'
 import { getReadIds, todayKey as storyDayKey } from '../lib/storyProgress'
-import { pickDailyTip, pickDailyActivity, clampMonth, dayIndex } from '../lib/dailyTip'
+import { pickDailyTip, pickDailyActivity, clampMonth } from '../lib/dailyTip'
 import { dueChecklists, itemCount } from '../data/checklists'
 import { loadProgress, doneCount, isComplete, isHidden } from '../lib/checklistProgress'
 import { overviewForMonth } from '../data/monthOverview'
 import { getTodayMoods } from '../lib/moodLog'
-import { pickPersonalTip } from '../lib/tipRanking'
-import { TOPIC_EMOJI, TOPIC_HUE } from '../lib/dailyTip'
 import { BABY_STATES } from '../data/babyStates'
 import { getBabyPhoto, latestJournalPhotoUrl } from '../lib/babyPhoto'
 import { greetingForHour, isBedtimeHour } from '../lib/timeOfDay'
 import { personalize } from '../lib/pronouns'
+import { sourceLabel } from '../lib/disclaimer'
 import { getEntries } from '../data/journalStore'
 import { pickFlashback } from '../components/Flashback'
 import Flashback from '../components/Flashback'
 import MemoryForm from '../components/MemoryForm'
 import { markCheckIn, dayKey } from '../lib/streak'
 import { hasSeenTipToday, markTipSeenToday } from '../lib/tipCard'
-import { Screen, Card, ListRow, Avatar, SectionHeader, Chevron, PrimaryButton, SecondaryButton, IconTile } from '../components/ui'
+import { Screen, Card, ListRow, Avatar, SectionHeader, PrimaryButton, SecondaryButton, IconTile } from '../components/ui'
 import { color, shadow, type } from '../theme'
-
-// Warm, non-clinical lines under the photo. Not advice — just a breath.
-const QUOTES = [
-  'Curious minds make a brighter world.',
-  'Small moments, big growing.',
-  'You are exactly the parent {baby} needs.',
-  'Every day, a little more of the world opens up.',
-  'Slow days count too.',
-  'Wonder first, milestones second.',
-  'The ordinary days are the ones you will miss most.',
-  'Rest when {baby} rests, when you can.',
-  'A calm parent is the best toy in the room.',
-  'Today is enough.',
-]
-
-function subtitleForHour(h, babyName) {
-  if (h >= 19 || h < 5) return `A quiet wind-down with ${babyName}`
-  if (h >= 17) return `A gentle evening with ${babyName}`
-  if (h >= 12) return `A calm afternoon with ${babyName}`
-  return `A calmer, brighter day with ${babyName}`
-}
 
 export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersion = 0 }) {
   const { babyName, dateOfBirth, momName } = profile
@@ -55,9 +33,9 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   const [savedNote, setSavedNote] = useState(null)
   const [heroUrl, setHeroUrl] = useState(() => getBabyPhoto())
   const [flashback, setFlashback] = useState(null)
-  // First open ever on this device: surface today's tip in full, once, so the
-  // very first visit teaches something instead of landing on a quiet list.
-  const [showTipCard, setShowTipCard] = useState(() => !hasSeenTipToday())
+  // Today's tip stays in full on the screen all day; "Got it" only marks it
+  // read (and counts the check-in), it no longer collapses the card.
+  const [gotIt, setGotIt] = useState(() => hasSeenTipToday())
   // The local calendar day; everything "of the day" re-picks when it changes.
   const [today, setToday] = useState(() => dayKey())
 
@@ -66,10 +44,10 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
     function refresh() {
       setHour(new Date().getHours())
       setMoods(getTodayMoods())
-      // Past midnight since last look: new day, new tip, shown in full again.
+      // Past midnight since last look: new day, new tip, not yet read.
       setToday(prev => {
         const next = dayKey()
-        if (next !== prev) setShowTipCard(!hasSeenTipToday())
+        if (next !== prev) setGotIt(hasSeenTipToday())
         return next
       })
     }
@@ -101,14 +79,9 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
   }, [savedNote])
 
   // Tip of the day rotates through every advice tip for the month (activities
-  // have their own row below). The "For {baby}"
-  // pick below is where this baby's patterns (mood log + what helped) show up.
+  // have their own row below).
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `today` re-picks at midnight
   const tip = useMemo(() => pickDailyTip(month), [month, today])
-  // Re-ranked whenever today's moods change (check-in or resume); the summary
-  // reads the synced stores directly.
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- moods is the deliberate recompute trigger
-  const personal = useMemo(() => pickPersonalTip(month, { excludeId: tip?.id }), [month, tip?.id, moods, today])
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `today` re-picks at midnight
   const activity = useMemo(() => pickDailyActivity(month), [month, today])
   const overview = overviewForMonth(month)
@@ -121,22 +94,16 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
     () => pickTonight(ageInMonths, { seed: `${storyDayKey()}:${babyName || ''}`, readIds: getReadIds() }),
     [ageInMonths, babyName],
   )
-  const quote = personalize(QUOTES[dayIndex() % QUOTES.length], profile)
-  const dateLabel = new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+  const dateLabel = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
   const pickedStates = BABY_STATES.filter(s => moods.includes(s.key))
-
-  function dismissTipCard() {
-    markTipSeenToday()
-    setShowTipCard(false)
-  }
 
   function tipCardGotIt() {
     markCheckIn('tip')
-    dismissTipCard()
+    markTipSeenToday()
+    setGotIt(true)
   }
 
   function tipCardReadMore() {
-    dismissTipCard()
     onOpen('tip', { tip, kind: 'tip' })
   }
 
@@ -148,18 +115,18 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
 
   return (
     <Screen>
-      {/* Greeting */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '16px' }}>
+      {/* Greeting: name and the date. Profile sits behind the avatar. */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
         <div style={{ minWidth: 0 }}>
           <h1 style={{ ...type.h1, fontSize: '24px' }}>{greetingForHour(hour, momName)}</h1>
-          <p style={{ ...type.body, marginTop: '4px' }}>{subtitleForHour(hour, babyName)}</p>
+          <p style={{ ...type.body, marginTop: '4px' }}>{dateLabel}</p>
         </div>
         <Avatar name={momName} onClick={() => onOpen('profile')} label="Your profile" />
       </div>
 
-      {/* Baby hero */}
+      {/* Baby hero: the photo, with name and age on it. Tap for the profile. */}
       <button onClick={() => onOpen('profile')} aria-label={`${babyName}'s photo`} style={{
-        display: 'block', width: '100%', padding: 0, border: 'none', cursor: 'pointer',
+        display: 'block', width: '100%', padding: 0, border: 'none', cursor: 'pointer', marginTop: '14px',
         borderRadius: '24px', overflow: 'hidden', position: 'relative', aspectRatio: '4 / 3',
         background: heroUrl ? `center / cover no-repeat url(${heroUrl})` : 'linear-gradient(135deg, #c4b5fd, #dce8f8 60%, #d4ede6)',
         boxShadow: shadow.cardLg, textAlign: 'left', fontFamily: 'inherit',
@@ -173,117 +140,86 @@ export default function HomeScreen({ profile, onOpen, onOpenJournal, photoVersio
         <div style={{ position: 'absolute', right: '18px', bottom: '16px', textAlign: 'right', color: '#fff' }}>
           <p style={{ margin: 0, fontSize: '24px', fontWeight: 700, lineHeight: 1.1, textShadow: '0 1px 8px rgba(0,0,0,0.3)' }}>{babyName}</p>
           <p style={{ margin: '3px 0 0', fontSize: '14px', fontWeight: 600, opacity: 0.95 }}>{formatBabyAge(dateOfBirth)}</p>
-          <p style={{ margin: '2px 0 0', fontSize: '11px', opacity: 0.85 }}>{dateLabel}</p>
         </div>
       </button>
-      {/* Mood check-in: first thing under the photo, so it gets logged before the tips. */}
-      <Card onClick={() => onOpen('mood')} style={{ marginTop: '14px' }} padding="14px 18px">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={type.bodyStrong}>How is {babyName} today?</p>
-            <p style={{ ...type.small, marginTop: '2px' }}>
-              {pickedStates.length === 0
-                ? `Tap to check in — it helps the app get to know ${babyName}`
-                : pickedStates.map(s => `${s.emoji} ${s.label}`).join(' · ')}
-            </p>
+
+      {/* Mood check-in: one slim line under the photo, so it gets logged before the tip. */}
+      <button onClick={() => onOpen('mood')} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 4px 0', border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <p style={{ ...type.body, color: color.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {pickedStates.length === 0
+            ? <>How is {babyName} today? <span style={{ color: color.primary, fontWeight: 600 }}>Check in ›</span></>
+            : <>{pickedStates.map(s => `${s.emoji} ${s.label}`).join(' · ')} <span style={{ color: color.primary, fontWeight: 600 }}>Update ›</span></>}
+        </p>
+      </button>
+
+      {/* Today's tip: first thing on the screen, in full, all day. "Got it" marks it read
+          and stays ticked; tomorrow brings the next tip. */}
+      {tip && (
+        <Card padding="18px 16px" style={{ marginTop: '10px', background: 'linear-gradient(160deg, #f5f3ff, #ffffff 70%)', border: '1px solid #e6e3f5' }}>
+          <p style={type.kicker}>💡 Today's tip</p>
+          <p style={{ ...type.bodyStrong, fontSize: '19px', lineHeight: 1.3, marginTop: '8px' }}>{personalize(tip.title, profile)}</p>
+          <p style={{ ...type.body, color: color.text, marginTop: '8px' }}>{personalize(tip.body, profile)}</p>
+          {tip.source && <p style={{ ...type.small, marginTop: '8px' }}>{sourceLabel(tip.source)}</p>}
+          <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+            <SecondaryButton onClick={tipCardReadMore} style={{ flex: 1 }}>Read more</SecondaryButton>
+            <PrimaryButton onClick={tipCardGotIt} done={gotIt} style={{ flex: 1, padding: '12px' }}>✓ Got it</PrimaryButton>
           </div>
-          <Chevron />
+        </Card>
+      )}
+
+      {/* Do today: the day's activity, with how long it takes. */}
+      <Card onClick={() => activity && onOpen('tip', { tip: activity, kind: 'activity' })} style={{ marginTop: '14px' }} padding="14px">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <IconTile emoji="🎯" hue="rose" size={40} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={type.bodyStrong}>Do today</p>
+            <p style={{ ...type.small, marginTop: '2px' }}>{activity ? personalize(activity.title, profile) : 'A 5-minute activity'}</p>
+          </div>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', background: '#fef3c7', padding: '4px 8px', borderRadius: '999px', whiteSpace: 'nowrap' }}>
+            {activity?.minutes ? `${activity.minutes} min` : '5 min'}
+          </span>
         </div>
       </Card>
 
-      {/* Today's tip: in full, straight under the baby, until she taps a button; then a one-line
-          row for the rest of the day so the tip stays one tap away. Back in full tomorrow. */}
-      {tip && (showTipCard ? (
-        <Card padding="18px" style={{ marginTop: '14px', background: color.paper, border: '1px solid #eee7db' }}>
-          <p style={type.kicker}>💡 Today's tip</p>
-          <p style={{ ...type.bodyStrong, fontSize: '17px', marginTop: '8px' }}>{personalize(tip.title, profile)}</p>
-          <p style={{ ...type.body, color: color.text, marginTop: '8px' }}>{personalize(tip.body, profile)}</p>
-          {tip.source && <p style={{ ...type.small, marginTop: '8px' }}>Source: {tip.source}</p>}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
-            <SecondaryButton onClick={tipCardReadMore} style={{ flex: 1 }}>Read more</SecondaryButton>
-            <PrimaryButton onClick={tipCardGotIt} style={{ flex: 1, padding: '12px' }}>✓ Got it</PrimaryButton>
-          </div>
+      {/* Journal and Read, side by side. */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }}>
+        <Card onClick={() => setAdding(true)} padding="12px">
+          <IconTile emoji="🧸" hue="peach" size={32} />
+          <p style={{ ...type.bodyStrong, fontSize: '13.5px', marginTop: '10px' }}>Journal</p>
+          <p style={{ ...type.small, marginTop: '2px' }}>
+            {flashback ? `${flashback.monthsAgo === 1 ? 'One month' : `${flashback.monthsAgo} months`} ago today · add a moment` : "Add today's moment"}
+          </p>
         </Card>
-      ) : (
-        <Card onClick={() => onOpen('tip', { tip, kind: 'tip' })} style={{ marginTop: '14px' }} padding="14px 18px">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <IconTile emoji="💡" hue="amber" />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={type.kicker}>💡 Today's tip</p>
-              <p style={{ ...type.bodyStrong, marginTop: '4px' }}>{personalize(tip.title, profile)}</p>
-            </div>
-            <Chevron />
-          </div>
+        <Card onClick={() => tonight && onOpen('story', { story: tonight })} padding="12px">
+          <IconTile emoji="🌙" hue="sky" size={32} />
+          <p style={{ ...type.bodyStrong, fontSize: '13.5px', marginTop: '10px' }}>{isBedtimeHour(hour) ? 'Read tonight' : 'Read at bedtime'}</p>
+          <p style={{ ...type.small, marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tonight ? tonight.title : 'A bedtime story'}</p>
         </Card>
-      ))}
+      </div>
 
-      {/* For {baby}: a tip this baby's recent patterns point to, with the reason shown. Hidden until there is enough logged. */}
-      {personal && (
-        <Card onClick={() => onOpen('tip', { tip: personal.tip, kind: 'personal', because: personal.because })} style={{ marginTop: '14px' }} padding="14px 18px">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <IconTile emoji={TOPIC_EMOJI[personal.tip.topic] || '💛'} hue={TOPIC_HUE[personal.tip.topic] || 'peach'} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={type.kicker}>💛 For {babyName}</p>
-              <p style={{ ...type.bodyStrong, marginTop: '4px' }}>{personalize(personal.tip.title, profile)}</p>
-              <p style={{ ...type.small, marginTop: '2px', color: color.inkSoft }}>Because {personal.because.join(' · ').toLowerCase()}</p>
-            </div>
-            <Chevron />
-          </div>
+      {/* This month: what to expect (free, always one tap away) and anything due now. */}
+      <SectionHeader title="This month" action="Browse by month" onAction={() => onOpen('browse')} style={{ marginTop: '18px' }} />
+      {(overview || todos.length > 0) && (
+        <Card padding="4px 14px">
+          {overview && (
+            <ListRow
+              emoji="📅" hue="mint" title={`Month ${month}: what to expect`}
+              subtitle={personalize(overview.headsUp, profile)}
+              onClick={() => onOpen('month')}
+              last={todos.length === 0}
+            />
+          )}
+          {todos.slice(0, 2).map(({ c, done, total }, i, arr) => (
+            <ListRow
+              key={c.id}
+              emoji={c.emoji} hue={c.hue}
+              title={personalize(c.title, profile)}
+              subtitle={done === 0 ? personalize(c.intro, profile) : `${done} of ${total} done`}
+              onClick={() => onOpen('checklist', { id: c.id })}
+              last={i === arr.length - 1}
+            />
+          ))}
         </Card>
-      )}
-
-      <p style={{ ...type.small, textAlign: 'center', margin: '14px 0 4px', fontStyle: 'italic', color: color.inkSoft }}>“{quote}”</p>
-
-      {/* Today for you */}
-      <SectionHeader title="Today for you" action="Browse by month" onAction={() => onOpen('browse')} style={{ marginTop: '18px' }} />
-      <Card padding="4px 14px">
-        <ListRow
-          emoji="🎯" hue="rose" title="Do"
-          subtitle={activity ? personalize(activity.title, profile) : 'A 5-minute activity'}
-          onClick={() => activity && onOpen('tip', { tip: activity, kind: 'activity' })}
-        />
-        <ListRow
-          emoji="❤️" hue="lavender" title="Remember"
-          subtitle={flashback ? `${flashback.monthsAgo === 1 ? 'One month' : `${flashback.monthsAgo} months`} ago today · capture a moment` : 'Capture a moment'}
-          onClick={() => setAdding(true)}
-        />
-        <ListRow
-          emoji="📖" hue="sky" title="Read"
-          subtitle={tonight ? `${isBedtimeHour(hour) ? 'Tonight' : 'Bedtime'}: ${tonight.title}` : 'A bedtime story'}
-          onClick={() => tonight && onOpen('story', { story: tonight })}
-          last
-        />
-      </Card>
-
-      {/* This month: what to expect (free, always one tap away) */}
-      {overview && (
-        <Card padding="4px 14px" style={{ marginTop: '14px' }}>
-          <ListRow
-            emoji="📅" hue="mint" title={`Month ${month}: what to expect`}
-            subtitle={personalize(overview.headsUp, profile)}
-            onClick={() => onOpen('month')}
-            last
-          />
-        </Card>
-      )}
-
-      {/* To do: checklists due right now */}
-      {todos.length > 0 && (
-        <>
-          <SectionHeader title="To do" action="All checklists" onAction={() => onOpen('checklists')} style={{ marginTop: '18px' }} />
-          <Card padding="4px 14px">
-            {todos.slice(0, 2).map(({ c, done, total }, i, arr) => (
-              <ListRow
-                key={c.id}
-                emoji={c.emoji} hue={c.hue}
-                title={personalize(c.title, profile)}
-                subtitle={done === 0 ? personalize(c.intro, profile) : `${done} of ${total} done`}
-                onClick={() => onOpen('checklist', { id: c.id })}
-                last={i === arr.length - 1}
-              />
-            ))}
-          </Card>
-        </>
       )}
 
       {/* A memory resurfaced from ~N months ago, when one exists */}
