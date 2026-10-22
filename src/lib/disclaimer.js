@@ -1,7 +1,7 @@
 // The one place the app's legal wording lives, so every screen says the same
 // thing. Two concerns, kept separate on purpose: the tips are general guidance
 // (not medical advice), and the sources we draw on have not endorsed the app.
-export const SOURCE_ORGS = 'the American Academy of Pediatrics, the CDC, the WHO, Zero to Three, ASHA, the Pediatric Sleep Council and Nemours KidsHealth'
+export const SOURCE_ORGS = 'the American Academy of Pediatrics, the CDC, the WHO, Zero to Three, ASHA, the Pediatric Sleep Council, Nemours KidsHealth and a few other public health and research bodies'
 
 // Under a tip: one calm line. {baby} is personalized by the caller.
 export const TIP_FOOTNOTE = 'General guidance written in our own words, not medical advice. For anything about {baby}’s health, ask your pediatrician.'
