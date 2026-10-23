@@ -141,7 +141,7 @@ function drawBadge(ctx, alpha = 1) {
   ctx.font = FONT_SMALL
   ctx.fillStyle = 'rgba(255,255,255,0.85)'
   ctx.textBaseline = 'top'
-  ctx.fillText('✦ BabyCue', 70, 70)
+  ctx.fillText('✦ Babylume', 70, 70)
   ctx.restore()
 }
 
@@ -218,7 +218,7 @@ function drawOutro(ctx, scene, local) {
   ctx.fillText(`${n} little moments`, W / 2, H / 2 + 70)
   ctx.font = FONT_SMALL
   ctx.fillStyle = 'rgba(255,255,255,0.75)'
-  ctx.fillText('✦ BabyCue', W / 2, H / 2 + 220)
+  ctx.fillText('✦ Babylume', W / 2, H / 2 + 220)
   ctx.restore()
 }
 
@@ -374,7 +374,7 @@ export function makeReel({ canvas, scene, voice = true, onProgress, signal }) {
 
 export async function shareReel(blob, ext, title) {
   const safe = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-  const file = new File([blob], `babycue-reel-${safe}.${ext}`, { type: blob.type })
+  const file = new File([blob], `babylume-reel-${safe}.${ext}`, { type: blob.type })
   if (navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title })

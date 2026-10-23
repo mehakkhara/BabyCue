@@ -1,7 +1,7 @@
 {
-  "name": "BabyCue — Your Mom Assistant",
-  "short_name": "BabyCue",
-  "description": "Personalized, evidence-based guidance for new moms — tailored to your baby's age and your parenting style.",
+  "name": "Babylume",
+  "short_name": "Babylume",
+  "description": "A calm companion for the first two years. One evidence-based tip a day, matched to your baby's exact age.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

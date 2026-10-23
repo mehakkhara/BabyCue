@@ -136,7 +136,7 @@ export default function AuthScreen() {
           color: '#1e1b4b',
           textAlign: 'center',
         }}>
-          Welcome to BabyCue
+          Welcome to Babylume
         </h1>
         <p style={{
           margin: '0 0 24px',

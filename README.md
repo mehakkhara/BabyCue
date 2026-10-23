@@ -1,10 +1,10 @@
-# BabyCue
+# Babylume
 
 A calm companion for the first two years. One evidence-based tip a day, one small activity, a bedtime story, and a private journal, all matched to the baby's exact age. No feed, no tracking, no chat.
 
-**Live app:** https://mehakkhara.github.io/BabyCue/ (installable to the phone's home screen as a PWA)
+**Live app:** https://mehakkhara.github.io/Babylume/ (installable to the phone's home screen as a PWA)
 
-The name is a working title and will change before launch.
+The repo and product are both called Babylume. The site moves from the github.io address to babylume.app before launch.
 
 ---
 
@@ -38,7 +38,7 @@ The name is a working title and will change before launch.
 ┌──────────────────────────────────────┐        ┌──────────────────────────────────────┐
 │  React + Vite PWA                    │ HTTPS  │  Supabase                            │
 │  GitHub Pages                        │ ─────► │  auth · profiles · journal metadata  │
-│  mehakkhara.github.io/BabyCue        │        │  photo/video/audio storage bucket    │
+│  mehakkhara.github.io/Babylume        │        │  photo/video/audio storage bucket    │
 │                                      │        │  small stores (moods, streak, …)     │
 │  Static bundle, no secrets           │        │                                      │
 └──────────────────────────────────────┘        └──────────────────────────────────────┘
@@ -111,7 +111,7 @@ baby_app/
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/BabyCue/
+npm run dev        # http://localhost:5173/Babylume/
 ```
 
 Create a `.env` with your Supabase project values (see `.env.example`):
@@ -123,7 +123,7 @@ VITE_SUPABASE_ANON_KEY=<anon key>
 
 Without them the app runs local-only: no sign-in, no sync.
 
-To test on a phone, open `http://<your Mac's LAN IP>:5173/BabyCue/` on the same Wi-Fi. Camera, microphone and notifications need HTTPS or localhost, so some journal features only work on the live site.
+To test on a phone, open `http://<your Mac's LAN IP>:5173/Babylume/` on the same Wi-Fi. Camera, microphone and notifications need HTTPS or localhost, so some journal features only work on the live site.
 
 ```bash
 npm run lint
@@ -164,8 +164,8 @@ Next, roughly in order: run the pending deploy; choose the final name and move t
 
 ## Useful links
 
-- **Live app:** https://mehakkhara.github.io/BabyCue/
-- **Repo:** https://github.com/mehakkhara/BabyCue
-- **Actions (deploy):** https://github.com/mehakkhara/BabyCue/actions
+- **Live app:** https://mehakkhara.github.io/Babylume/
+- **Repo:** https://github.com/mehakkhara/Babylume
+- **Actions (deploy):** https://github.com/mehakkhara/Babylume/actions
 - **Supabase dashboard:** https://supabase.com/dashboard
 - **Vite docs:** https://vitejs.dev · **React docs:** https://react.dev

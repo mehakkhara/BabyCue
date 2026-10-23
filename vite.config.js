@@ -24,7 +24,7 @@ export default defineConfig({
             urlPattern: ({ url }) => url.pathname.endsWith('/api/daily-tip'),
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'numae-daily-tip',
+              cacheName: 'babylume-daily-tip',
               networkTimeoutSeconds: 8,
               expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 },
               cacheableResponse: { statuses: [0, 200] },
@@ -48,5 +48,5 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/BabyCue/',
+  base: '/Babylume/',
 })
