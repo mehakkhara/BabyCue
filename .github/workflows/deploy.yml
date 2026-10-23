@@ -48,3 +48,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
+          # Keeps the custom domain set: without this every deploy would wipe the
+          # CNAME file from gh-pages and GitHub Pages would drop babylume.app.
+          cname: babylume.app
