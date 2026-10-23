@@ -12,7 +12,7 @@
 // PaintingCanvas will render the image instead — nothing else has to change.
 
 // Story art lives in public/story-art/. The prefix follows Vite's `base`, so
-// the paths keep working when the site moves from /Babylume/ to its own domain.
+// the paths keep working whatever the deploy base path is.
 const ART_BASE = `${import.meta.env.BASE_URL}story-art/`
 
 export const PAINTINGS = {
