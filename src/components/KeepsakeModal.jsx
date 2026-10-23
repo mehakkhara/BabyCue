@@ -203,7 +203,7 @@ export default function KeepsakeModal({ photoUrl, title: initialTitle = '', take
             background: 'rgba(255,255,255,0.88)', color: look.badge,
             fontSize: '9.5px', fontWeight: 700, borderRadius: '999px', padding: '4px 9px',
           }}>
-            ✦ BabyCue
+            ✦ Babylume
           </span>
           <div style={{ position: 'absolute', left: '16px', right: '16px', bottom: '16px', pointerEvents: 'none' }}>
             <div style={{

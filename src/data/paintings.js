@@ -12,7 +12,7 @@
 // PaintingCanvas will render the image instead — nothing else has to change.
 
 // Story art lives in public/story-art/. The prefix follows Vite's `base`, so
-// the paths keep working when the site moves from /BabyCue/ to its own domain.
+// the paths keep working when the site moves from /Babylume/ to its own domain.
 const ART_BASE = `${import.meta.env.BASE_URL}story-art/`
 
 export const PAINTINGS = {
@@ -20,19 +20,19 @@ export const PAINTINGS = {
   // museum works below so their provenance stays clear in the reader.
   robinMeadow: {
     title: 'Robin in the Meadow', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     file: `${ART_BASE}robin-in-the-meadow.jpg`,
     palette: ['#f6c457', '#9cc7ea', '#7e9c50', '#df7c34', '#fff9e8'],
   },
   otterStream: {
     title: 'Otter and the Pebble', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     file: `${ART_BASE}otter-and-the-pebble.jpg`,
     palette: ['#9ed6d4', '#708b4b', '#8a603e', '#f5eac9', '#d4b15b'],
   },
   rabbitBurrow: {
     title: 'Rabbit by the Burrow', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     file: `${ART_BASE}rabbit-by-the-burrow.jpg`,
     palette: ['#dfb45e', '#8fa367', '#9b673e', '#fff0c7', '#e9b7a6'],
   },
@@ -42,63 +42,63 @@ export const PAINTINGS = {
   // Brief: a farmyard at sunrise, one brown-and-white cow standing in green grass, a small yellow duck waddling past. Soft, warm, simple shapes.
   farmMorning: {
     title: 'Morning on the Farm', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     file: `${ART_BASE}morning-on-the-farm.jpg`,
     palette: ['#f3d27a', '#8fb36a', '#a7714a', '#fff6dc', '#7fb7e6'],
   },
   // Brief: a warm bath with white bubbles and one yellow rubber duck floating, seen from the side. A soft towel folded nearby. Pastel bathroom tones.
   bathDuck: {
     title: 'Bath Time Duck', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     file: `${ART_BASE}bath-time-duck.jpg`,
     palette: ['#bfe3f2', '#ffffff', '#f6cf4d', '#f3e2cf', '#8fc6e8'],
   },
   // Brief: a dark-blue night sky over a small cottage with one lit window, a round white moon half-hidden behind a soft grey cloud. Calm and quiet.
   moonCloud: {
     title: 'The Moon and the Cloud', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'swirl',
+    collection: 'Babylume original illustration', motif: 'swirl',
     file: `${ART_BASE}the-moon-and-the-cloud.jpg`,
     palette: ['#1d2a5a', '#f4f0dc', '#8f97b3', '#f6d36b', '#31407a'],
   },
   // Brief: a still blue pond with a mama duck and exactly three yellow ducklings in a line behind her, a green frog on a lily pad watching. Reeds at the edge.
   pondDucks: {
     title: 'Three Little Ducks', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     file: `${ART_BASE}three-little-ducks.jpg`,
     palette: ['#7fb9d8', '#f6d24d', '#8aa85a', '#e8d9a6', '#5a8f4e'],
   },
   // Brief: a big brown bear and a tiny grey mouse sitting side by side under a tall tree at dusk, sharing one patchwork blanket. Gentle, friendly faces.
   bearMouse: {
     title: 'Big Bear, Little Mouse', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     file: `${ART_BASE}big-bear-little-mouse.jpg`,
     palette: ['#8b5e3c', '#b8b3c4', '#6a8f5a', '#e9c29b', '#3b4a6b'],
   },
   // Brief: one apple tree with clearly red apples on a green hill, a big round yellow sun, and a plain blue sky. Four bold colours, nothing else.
   appleTree: {
     title: 'The Apple Tree', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'tree',
+    collection: 'Babylume original illustration', motif: 'tree',
     file: `${ART_BASE}the-apple-tree.jpg`,
     palette: ['#d9412f', '#f7d23e', '#79b356', '#7cc3ec', '#8a5a33'],
   },
   // Brief: a clay pot on a sunny windowsill with a tiny green sprout just up, a small watering can beside it, morning light through the window.
   windowsillSprout: {
     title: 'The Little Seed', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'flowers',
+    collection: 'Babylume original illustration', motif: 'flowers',
     file: `${ART_BASE}the-little-seed.jpg`,
     palette: ['#f6e6b8', '#7fb06a', '#c47a4a', '#a9d8ef', '#5a3d2b'],
   },
   // Brief: a cosy child's bedroom at night: a small bed with a quilt, a glowing lamp, a teddy bear, pyjamas folded on a chair, a toothbrush in a cup. Warm lamplight.
   cosyBedroom: {
     title: 'Night-Night Room', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'interior',
+    collection: 'Babylume original illustration', motif: 'interior',
     file: `${ART_BASE}night-night-room.jpg`,
     palette: ['#f2c98a', '#6b5a8e', '#e07a5f', '#f7efe1', '#3d3560'],
   },
   // Brief: a green frog on the first of five lily pads in a row across a pond, a dragonfly overhead, a soft green bank on the far side. Moonlit.
   frogLilypads: {
     title: 'Freddie Frog Counts to Five', year: 2026,
-    collection: 'BabyCue original illustration', motif: 'animal',
+    collection: 'Babylume original illustration', motif: 'animal',
     // No illustration yet: the generated file came out solid black, so the
     // reader draws the frog on lily pads from the palette until one lands.
     palette: ['#69b04a', '#3e7fb0', '#c9e39a', '#f4e7a8', '#2f5f8a'],

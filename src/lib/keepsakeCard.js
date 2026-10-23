@@ -88,7 +88,7 @@ export async function composeKeepsake({ photoUrl, title, subtitle, theme = 'lave
   ctx.fillRect(0, 0, W, H)
 
   // Small brand badge, top right.
-  const badgeText = '✦ BabyCue'
+  const badgeText = '✦ Babylume'
   ctx.font = '600 34px Inter, system-ui, sans-serif'
   const bw = ctx.measureText(badgeText).width + 48
   const bx = W - bw - 40
@@ -135,7 +135,7 @@ export async function composeKeepsake({ photoUrl, title, subtitle, theme = 'lave
 // Share via the native sheet where available, otherwise download the file —
 // same outcome either way: the card leaves the app.
 export async function shareKeepsake(blob, title) {
-  const file = new File([blob], 'babycue-keepsake.jpg', { type: 'image/jpeg' })
+  const file = new File([blob], 'babylume-keepsake.jpg', { type: 'image/jpeg' })
   if (navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title })
@@ -148,7 +148,7 @@ export async function shareKeepsake(blob, title) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'babycue-keepsake.jpg'
+  a.download = 'babylume-keepsake.jpg'
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 5000)
   return 'downloaded'
